@@ -7,16 +7,11 @@ import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.models.enums.Role;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
     UserResponse createUser(CreateUserRequest request);
-    
-    UserResponse getUserById(UUID id);
-    
-    Page<UserResponse> searchUsers(UserSearchRequest request);
-    
-    Page<UserResponse> getUsersByRole(Role role, int page, int size);
     
     UserResponse updateUser(UUID id, UpdateUserRequest request);
     
@@ -25,6 +20,14 @@ public interface UserService {
     void toggleUserStatus(UUID id);
     
     void deleteUser(UUID id);
+
+    UserResponse getUserById(UUID id);
+
+    Page<UserResponse> searchUsers(UserSearchRequest request);
+
+    Page<UserResponse> getUsersByRole(Role role, int page, int size);
     
     UserResponse getUserByEmail(String email);
+
+    Page<UserResponse> getAllUsers(int page, int size);
 }

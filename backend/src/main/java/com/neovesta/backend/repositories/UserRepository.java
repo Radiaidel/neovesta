@@ -28,8 +28,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             String email, String firstName, String lastName, Pageable pageable);
     
     @Query("SELECT u FROM User u WHERE " +
-           "(:role IS NULL OR u.role = :role) AND " +
-           "(:status IS NULL OR u.status = :status) AND " +
            "(:searchTerm IS NULL OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +

@@ -117,4 +117,11 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
+
+
+    @Override
+    public Page<UserResponse> getAllUsers(int page, int size) {
+        Page<User> users = userRepository.findAll(PageRequest.of(page, size));
+        return users.map(userMapper::toResponse);
+    }
 }
