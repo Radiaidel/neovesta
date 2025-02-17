@@ -19,7 +19,6 @@ import java.util.function.Function;
 @Slf4j
 @Service
 public class JwtService {
-
     @Value("${spring.security.jwt.secret-key}")
     private String secretKey;
 
@@ -109,5 +108,10 @@ public class JwtService {
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        return "ROLE_" + claims.get("role", String.class);
     }
 }

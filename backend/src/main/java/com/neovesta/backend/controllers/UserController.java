@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class UserController {
     @Operation(summary = "Search users with pagination")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER') or (hasRole('RESIDENT') and #request.role == null)")
     public ResponseEntity<Page<UserResponse>> searchUsers(@Valid UserSearchRequest request) {
+        log.info("Searching" + request);
         return ResponseEntity.ok(userService.searchUsers(request));
     }
 

@@ -24,6 +24,6 @@ public class UserResponse {
     private LocalDateTime updatedAt;
     private boolean status;
 
-//    private ResidenceResponse residence; // For RESIDENCE_MANAGER
-//    private UserResponse manager;        // For SUB_RESIDENCE_MANAGER
+    private ResidenceResponse residence; // For RESIDENCE_MANAGER
+    private UserResponse manager;        // For SUB_RESIDENCE_MANAGER
 }

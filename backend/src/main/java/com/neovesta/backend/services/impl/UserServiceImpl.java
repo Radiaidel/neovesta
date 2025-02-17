@@ -57,8 +57,6 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> searchUsers(UserSearchRequest request) {
         PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize());
         return userRepository.searchUsers(
-                request.getRole(),
-                request.getStatus(),
                 request.getSearchTerm(),
                 pageRequest
         ).map(userMapper::toResponse);

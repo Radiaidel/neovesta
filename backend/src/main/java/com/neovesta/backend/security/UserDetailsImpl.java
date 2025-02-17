@@ -39,10 +39,10 @@ public class UserDetailsImpl implements UserDetails {
         this.updatedAt = user.getUpdatedAt();
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return List.of(new SimpleGrantedAuthority(role.name()));
+//    }
 
     @Override
     public String getPassword() {
@@ -86,5 +86,10 @@ public class UserDetailsImpl implements UserDetails {
                 .updatedAt(updatedAt)
                 .status(status)
                 .build();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 }
