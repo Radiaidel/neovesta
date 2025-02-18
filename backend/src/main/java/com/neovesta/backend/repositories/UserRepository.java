@@ -23,10 +23,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findByRole(Role role, Pageable pageable);
     
     Page<User> findByStatus(boolean status, Pageable pageable);
-    
-    Page<User> findByEmailContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-            String email, String firstName, String lastName, Pageable pageable);
-    
+
+    @Query("SELECT u FROM User u WHERE u.role = 'RESIDENT' and u.id= :userId and u.status = true")
+    Optional<User> findResidentById(@Param("userId") UUID userId);
+
     @Query("SELECT u FROM User u WHERE " +
            "(:searchTerm IS NULL OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
