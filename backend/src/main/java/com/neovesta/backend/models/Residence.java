@@ -52,6 +52,9 @@ public class Residence {
     @CollectionTable(name = "residence_documents", joinColumns = @JoinColumn(name = "residence_id"))
     private List<Document> documents = new ArrayList<>();
 
+    @OneToMany(mappedBy = "residence", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Feature> features = new ArrayList<>();
+
     @OneToOne(mappedBy = "residence")
     private ResidenceManager manager;
 
