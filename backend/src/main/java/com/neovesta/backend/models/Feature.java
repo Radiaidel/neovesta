@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,4 +60,7 @@ public class Feature {
 
     @Column(name = "requires_manager_approval")
     private Boolean requiresManagerApproval;
+
+    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL)
+    private List<Subscription> subscriptions = new ArrayList<>();
 }

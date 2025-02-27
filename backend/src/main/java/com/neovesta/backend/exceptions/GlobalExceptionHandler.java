@@ -21,6 +21,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(SubscriptionNotFoundException.class)
+    public ResponseEntity<String> handleSubscriptionNotFound(SubscriptionNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
     @ExceptionHandler(ResidenceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResidenceNotFoundException(ResidenceNotFoundException ex) {
         Map<String, String> error = new HashMap<>();

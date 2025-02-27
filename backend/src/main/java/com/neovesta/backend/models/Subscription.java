@@ -1,59 +1,57 @@
 package com.neovesta.backend.models;
 
-import com.neovesta.backend.models.enums.ReservationStatus;
-import com.neovesta.backend.models.enums.SubscriptionPeriod;
-import com.neovesta.backend.models.enums.SubscriptionStatus;
+import com.neovesta.backend.models.enums.PaymentStatus;
+import com.neovesta.backend.models.enums.SubscriptionType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "subscriptions")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Subscription {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resident_id", nullable = false)
-    private Resident resident; // Résident qui fait la demande
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "feature_id", nullable = false)
-    private Feature feature; // Service souscrit
+    private Feature feature;
+
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "subscription_period", nullable = false)
-    private SubscriptionPeriod subscriptionPeriod; // MONTHLY, QUARTERLY, YEARLY
+    @Column(nullable = false)
+    private SubscriptionType type;
 
-    @Column(name = "start_date")
-    private LocalDate startDate; // Date de début confirmée
+    @Column(nullable = false)
+    private LocalDate startDate;
 
-    @Column(name = "end_date")
-    private LocalDate endDate; // Date de fin selon la période
+    @Column(nullable = false)
+    private LocalDate endDate;
+
+    @Column(nullable = false)
+    private Double price;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private SubscriptionStatus status; // PENDING, ACTIVE, CANCELED, REFUSED
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
 
-    @Column(name = "admin_note", columnDefinition = "TEXT")
-    private String adminNote; // Note explicative en cas de refus
+    @Column(nullable = false)
+    private Boolean isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by")
-    private User approvedBy; // Gestionnaire qui valide ou refuse l’abonnement
+    @Column(nullable = false)
+    private Boolean isConfirmedByAdmin;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private String adminNote;
 }
