@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neovesta_test
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  mail:
+    host: localhost
+    port: 3025
+    username: test
+    password: test
+
+logging:
+  level:
+    com.neovesta: DEBUG

@@ -1,0 +1,70 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neovesta_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET}
+      expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+      refresh-token:
+        expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
+      remember-me:
+        expiration: ${JWT_REMEMBER_ME_EXPIRATION:2592000000} # 30 days
+    default-passwords:
+      admin: ${DEFAULT_ADMIN_PASSWORD}
+      manager: ${DEFAULT_MANAGER_PASSWORD}
+      resident: ${DEFAULT_RESIDENT_PASSWORD}
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    from: ${SPRING_MAIL_FROM:no-reply@neovesta.com}
+    test-connection: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+  flyway:
+    clean-disabled: false
+    enabled: true
+    baseline-on-migrate: true
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.neovesta.backend: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
