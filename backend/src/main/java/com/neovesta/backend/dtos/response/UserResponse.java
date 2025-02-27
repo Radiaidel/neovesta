@@ -1,6 +1,5 @@
 package com.neovesta.backend.dtos.response;
 
-import com.neovesta.backend.dtos.embedded.UserEmbeddedDTO;
 import com.neovesta.backend.models.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +20,8 @@ public class UserResponse {
     private String lastName;
     private String phoneNumber;
     private Role role;
-//    private LocalDateTime createdAt;
-//    private LocalDateTime updatedAt;
+   private LocalDateTime createdAt;
+   private LocalDateTime updatedAt;
     private boolean status;
 //
 //    private ResidenceResponse residence; // For RESIDENCE_MANAGER

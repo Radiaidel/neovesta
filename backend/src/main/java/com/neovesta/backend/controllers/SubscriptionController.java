@@ -3,9 +3,7 @@ package com.neovesta.backend.controllers;
 import com.neovesta.backend.dtos.request.SubscriptionRequestDTO;
 import com.neovesta.backend.dtos.response.SubscriptionResponseDTO;
 import com.neovesta.backend.services.SubscriptionService;
-import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

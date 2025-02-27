@@ -13,7 +13,6 @@ import com.neovesta.backend.repositories.FeatureRepository;
 import com.neovesta.backend.repositories.ReservationRepository;
 import com.neovesta.backend.repositories.UserRepository;
 import com.neovesta.backend.services.ReservationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;

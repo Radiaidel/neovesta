@@ -6,7 +6,6 @@ import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.mappers.ContractMapper;
 import com.neovesta.backend.models.Contract;
 import com.neovesta.backend.models.Residence;
-import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.ContractStatus;
 import com.neovesta.backend.repositories.ContractRepository;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 
 @Service

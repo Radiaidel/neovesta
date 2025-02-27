@@ -10,8 +10,6 @@ import com.neovesta.backend.models.Residence;
 import com.neovesta.backend.repositories.FeatureRepository;
 import com.neovesta.backend.repositories.ResidenceRepository;
 import com.neovesta.backend.services.FeatureService;
-import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

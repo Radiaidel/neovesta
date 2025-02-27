@@ -1,0 +1,23 @@
+
+p
+java:S1104"NMake id a static final constant or non-public and provide accessors if needed.(ê“àşùÿÿÿÿ8æøîŒÔ2
+r
+java:S1104"PMake user a static final constant or non-public and provide accessors if needed.(‡˜¤äşÿÿÿÿ8æøîŒÔ2
+u
+java:S1104"SMake feature a static final constant or non-public and provide accessors if needed.(ªìîÿÿÿÿÿ8ÍúïŒÔ2
+r
+java:S1104"PMake type a static final constant or non-public and provide accessors if needed.(ÿ””Œÿÿÿÿÿ8æøîŒÔ2
+r
+java:S1104"UMake startDate a static final constant or non-public and provide accessors if needed.(ĞêæÑ8æøîŒÔ2
+u
+java:S1104"SMake endDate a static final constant or non-public and provide accessors if needed.(²áñ†şÿÿÿÿ8æøîŒÔ2
+n
+java:S1104"QMake price a static final constant or non-public and provide accessors if needed.(†Óª8æøîŒÔ2
+{
+java:S1104"YMake paymentStatus a static final constant or non-public and provide accessors if needed.(‡€ûéüÿÿÿÿ8æøîŒÔ2
+q
+java:S1104"TMake isActive a static final constant or non-public and provide accessors if needed.(Ğ¤Ş”8æøîŒÔ2
+€
+java:S1104"^Make isConfirmedByAdmin a static final constant or non-public and provide accessors if needed.(æ–Íıÿÿÿÿ8æøîŒÔ2
+r
+java:S1104"UMake adminNote a static final constant or non-public and provide accessors if needed.(´‰ÆÏ8æøîŒÔ2

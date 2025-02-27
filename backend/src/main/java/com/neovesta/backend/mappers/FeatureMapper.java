@@ -1,11 +1,8 @@
 package com.neovesta.backend.mappers;
 
-import com.neovesta.backend.dtos.embedded.ResidenceEmbeddedDTO;
 import com.neovesta.backend.dtos.request.FeatureRequest;
 import com.neovesta.backend.dtos.response.FeatureResponse;
-import com.neovesta.backend.dtos.response.ResidenceResponse;
 import com.neovesta.backend.models.Feature;
-import com.neovesta.backend.models.Residence;
 import org.mapstruct.*;
 
 

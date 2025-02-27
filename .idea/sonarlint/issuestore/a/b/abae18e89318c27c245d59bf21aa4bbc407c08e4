@@ -1,0 +1,25 @@
+
+j
+java:S11922"HDefine a constant instead of duplicating this literal "user_id" 3 times.(õØ–”ùÿÿÿÿ8åÊıöĞ2
+i
+java:S11921"LDefine a constant instead of duplicating this literal "remember_me" 3 times.(ı’œ’8åÊıöĞ2
+S
+java:S1874J"1Remove this use of "setClaims"; it is deprecated.(Ûªæ§ûÿÿÿÿ8öÊıöĞ2
+O
+java:S1874K"2Remove this use of "setSubject"; it is deprecated.(òÃêù8öÊıöĞ2
+P
+java:S1874L"3Remove this use of "setIssuedAt"; it is deprecated.(øÔ÷ò8öÊıöĞ2
+W
+java:S1874M"5Remove this use of "setExpiration"; it is deprecated.(¾¨ŸÒùÿÿÿÿ8÷ÊıöĞ2
+M
+java:S1874N"0Remove this use of "signWith"; it is deprecated.(´º‹ø8÷ÊıöĞ2
+W
+java:S1874N":Remove this use of "SignatureAlgorithm"; it is deprecated.(´º‹ø8÷ÊıöĞ2
+W
+java:S1874N":Remove this use of "SignatureAlgorithm"; it is deprecated.(´º‹ø8÷ÊıöĞ2
+W
+java:S1874f"5Remove this use of "setSigningKey"; it is deprecated.(‘‰±•ÿÿÿÿÿ8ùÊıöĞ2
+X
+java:S1874h"6Remove this use of "parseClaimsJws"; it is deprecated.(ëÙ–ºıÿÿÿÿ8úÊıöĞ2
+L
+java:S1874i"/Remove this use of "getBody"; it is deprecated.(ÊÄ¿Ì8úÊıöĞ2
