@@ -5,3 +5,4 @@ s
 java:S11925"VDefine a constant instead of duplicating this literal "/api/v1/residences/**" 3 times.(¤Îâ8«õĞ2
 h
 java:S11923"FDefine a constant instead of duplicating this literal "ADMIN" 5 times.(“§ñúÿÿÿÿ8«õĞ2
+X	java:S125I"<This block of commented-out lines of code should be removed.(ü¥¼Á8Ø‚ôîÔ2
