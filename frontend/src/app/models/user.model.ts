@@ -44,9 +44,23 @@ export interface ForgotPasswordRequest {
   email: string
 }
 
+export interface VerifyResetTokenRequest {
+  token: string
+}
+
 export interface ResetPasswordRequest {
   token: string
-  password: string
+  newPassword: string
   confirmPassword: string
 }
 
+export interface UpdatePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export interface ApiError {
+  message: string
+  status: number
+}

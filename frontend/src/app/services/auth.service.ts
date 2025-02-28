@@ -8,6 +8,7 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   RegisterUserRequest,
+  UpdatePasswordRequest,
 } from "../models/user.model"
 import { Router } from "@angular/router"
 import { environment } from "../../environments/environment"
@@ -60,6 +61,10 @@ export class AuthService {
 
   resetPassword(request: ResetPasswordRequest): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/reset-password`, request)
+  }
+
+  updatePassword(userId: string, request: UpdatePasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/update-password`, request)
   }
 
   refreshToken(): Observable<AuthResponse> {

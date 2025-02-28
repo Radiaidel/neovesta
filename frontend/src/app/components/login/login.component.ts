@@ -1,14 +1,15 @@
 import { Component, type OnInit, inject } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormBuilder, type FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
-import { Router, ActivatedRoute } from "@angular/router"
+import { Router, ActivatedRoute, RouterLink } from "@angular/router"
 import { AuthService } from "../../services/auth.service"
+import { NotificationService } from "../../services/notification.service"
 import { finalize } from "rxjs"
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.css"],
 })
@@ -17,10 +18,10 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService)
   private router = inject(Router)
   private route = inject(ActivatedRoute)
+  private notificationService = inject(NotificationService)
 
   loginForm!: FormGroup
   isLoading = false
-  error = ""
   showPassword = false
 
   ngOnInit(): void {
@@ -50,18 +51,20 @@ export class LoginComponent implements OnInit {
     }
 
     this.isLoading = true
-    this.error = ""
 
     this.authService
       .login(this.loginForm.value)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParams["returnUrl"] || "/"
+          const returnUrl = this.route.snapshot.queryParams["dashboard"] || "dashboard"
           this.router.navigate([returnUrl])
+          this.notificationService.success("Login successful")
         },
         error: (err) => {
-          this.error = err.error?.message || "Login failed. Please check your credentials and try again."
+          this.notificationService.error(
+            err.error?.message || "Login failed. Please check your credentials and try again.",
+          )
         },
       })
   }
