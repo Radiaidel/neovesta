@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
-import { type Observable, BehaviorSubject, tap } from "rxjs"
-import type {
+import {  Observable, BehaviorSubject, tap } from "rxjs"
+import  {
   AuthResponse,
   LoginRequest,
   User,
@@ -12,6 +12,7 @@ import type {
 } from "../models/user.model"
 import { Router } from "@angular/router"
 import { environment } from "../../environments/environment"
+import { Role } from "../models/user.model"
 
 @Injectable({
   providedIn: "root",
@@ -93,6 +94,33 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem("token")
+  }
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value
+  }
+  
+  hasRole(roles: Role[]): boolean {
+    const user = this.getCurrentUser()
+    return user ? roles.includes(user.role) : false
+  }
+
+  canCreateRole(role: Role): boolean {
+    const currentUserRole = this.getCurrentUser()?.role
+
+    if (!currentUserRole) return false
+
+    switch (role) {
+      case Role.ADMIN:
+        return currentUserRole === Role.SUPER_ADMIN
+      case Role.RESIDENCE_MANAGER:
+        return currentUserRole === Role.SUPER_ADMIN || currentUserRole === Role.ADMIN
+      case Role.SUB_RESIDENCE_MANAGER:
+        return currentUserRole === Role.RESIDENCE_MANAGER
+      case Role.RESIDENT:
+        return currentUserRole === Role.RESIDENCE_MANAGER || currentUserRole === Role.SUB_RESIDENCE_MANAGER
+      default:
+        return false
+    }
   }
 }
 
