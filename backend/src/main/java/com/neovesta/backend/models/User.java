@@ -6,6 +6,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -41,6 +43,11 @@ public class User {
 
     private String resetToken;
     private LocalDateTime resetTokenExpiryDate;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Subscription> subscriptions = new ArrayList<>();
+
 
     @PrePersist
     protected void onCreate() {

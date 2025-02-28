@@ -20,10 +20,10 @@ public class UserResponse {
     private String lastName;
     private String phoneNumber;
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+   private LocalDateTime createdAt;
+   private LocalDateTime updatedAt;
     private boolean status;
-
+//
 //    private ResidenceResponse residence; // For RESIDENCE_MANAGER
-//    private UserResponse manager;        // For SUB_RESIDENCE_MANAGER
+//    private UserEmbeddedDTO manager;        // For SUB_RESIDENCE_MANAGER
 }

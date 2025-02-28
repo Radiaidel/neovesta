@@ -4,9 +4,9 @@ import com.neovesta.backend.dtos.request.*;
 import com.neovesta.backend.dtos.response.AuthResponse;
 import com.neovesta.backend.services.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -49,4 +49,10 @@ public class AuthController {
         authService.registerUser(request);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/test-role")
+    public ResponseEntity<String> testRole(Authentication authentication) {
+        return ResponseEntity.ok(authentication.getAuthorities().toString());
+    }
+
 }

@@ -14,7 +14,6 @@ import com.neovesta.backend.services.AuthService;
 import com.neovesta.backend.services.EmailService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,14 +48,6 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-    @Value("${spring.security.default-passwords.admin}")
-    private String defaultAdminPassword;
-
-    @Value("${spring.security.default-passwords.manager}")
-    private String defaultManagerPassword;
-
-    @Value("${spring.security.default-passwords.resident}")
-    private String defaultResidentPassword;
 
     @Override
     public AuthResponse login(@Valid LoginRequest request) {
@@ -143,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
             validateRoleCreation(currentUser.getRole(), request.getRole());
 
             User user = createUserByRole(request);
-            String password = generateDefaultPassword(request.getRole());
+            String password = request.getPassword();
             user.setPassword(passwordEncoder.encode(password));
             
             User savedUser = userRepository.save(user);
@@ -213,14 +204,7 @@ public class AuthServiceImpl implements AuthService {
         };
     }
 
-    private String generateDefaultPassword(Role role) {
-        return switch (role) {
-            case ADMIN -> defaultAdminPassword;
-            case RESIDENCE_MANAGER, SUB_RESIDENCE_MANAGER -> defaultManagerPassword;
-            case RESIDENT -> defaultResidentPassword;
-            default -> throw new IllegalArgumentException("No default password configured for role: " + role);
-        };
-    }
+
 
     @Override
     public AuthResponse loginWithRememberMe(LoginRequest request) {
@@ -232,7 +216,6 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             
-            // Generate tokens with remember-me flag
             String token = jwtService.generateToken(userDetails, true);
             String refreshToken = jwtService.generateRefreshToken(userDetails);
             String rememberMeToken = jwtService.generateRememberMeToken(userDetails);

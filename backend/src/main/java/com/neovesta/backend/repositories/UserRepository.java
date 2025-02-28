@@ -23,20 +23,17 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findByRole(Role role, Pageable pageable);
     
     Page<User> findByStatus(boolean status, Pageable pageable);
-    
-    Page<User> findByEmailContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-            String email, String firstName, String lastName, Pageable pageable);
-    
+
+    @Query("SELECT u FROM User u WHERE u.role = 'RESIDENT' and u.id= :userId and u.status = true")
+    Optional<User> findResidentById(@Param("userId") UUID userId);
+
     @Query("SELECT u FROM User u WHERE " +
-           "(:role IS NULL OR u.role = :role) AND " +
-           "(:status IS NULL OR u.status = :status) AND " +
            "(:searchTerm IS NULL OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<User> searchUsers(
-            @Param("role") Role role,
-            @Param("status") Boolean status,
+
             @Param("searchTerm") String searchTerm,
             Pageable pageable);
 }

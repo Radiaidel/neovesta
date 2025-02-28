@@ -1,0 +1,13 @@
+
+ƒ
+java:S1192-"aDefine a constant instead of duplicating this literal "Subscription not found with ID: " 6 times.(ÌµÓĞıÿÿÿÿ8şÛ¦Ô2
+o
+java:S6204w"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¤¡–Ô2
+o
+java:S6204"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¥¡–Ô2
+p
+java:S6204‡"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¦¡–Ô2
+p
+java:S6204"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¦¡–Ô2
+p
+java:S6204›"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¨¡–Ô2

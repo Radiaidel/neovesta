@@ -57,8 +57,6 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> searchUsers(UserSearchRequest request) {
         PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize());
         return userRepository.searchUsers(
-                request.getRole(),
-                request.getStatus(),
                 request.getSearchTerm(),
                 pageRequest
         ).map(userMapper::toResponse);
@@ -118,5 +116,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    }
+
+
+    @Override
+    public Page<UserResponse> getAllUsers(int page, int size) {
+        Page<User> users = userRepository.findAll(PageRequest.of(page, size));
+        return users.map(userMapper::toResponse);
     }
 }

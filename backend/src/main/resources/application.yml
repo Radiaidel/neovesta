@@ -28,10 +28,6 @@ spring:
         expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
       remember-me:
         expiration: ${JWT_REMEMBER_ME_EXPIRATION:2592000000} # 30 days
-    default-passwords:
-      admin: ${DEFAULT_ADMIN_PASSWORD}
-      manager: ${DEFAULT_MANAGER_PASSWORD}
-      resident: ${DEFAULT_RESIDENT_PASSWORD}
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
