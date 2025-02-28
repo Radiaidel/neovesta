@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { FooterComponent } from '../shared/footer/footer.component';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'landing-app-landing',
   standalone: true,
-  imports: [RouterLink],
+  imports: [ FooterComponent , HeaderComponent],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent {
