@@ -1,0 +1,14 @@
+
+g	java:S112Q"FDefine and throw a dedicated exception instead of using a generic one.(¼°£ùÿÿÿÿ8İÁ§öĞ2
+a	java:S112d"FDefine and throw a dedicated exception instead of using a generic one.(ˆ­±.8ŞÁ§öĞ2
+h	java:S112ğ"FDefine and throw a dedicated exception instead of using a generic one.(¿¢Óâÿÿÿÿÿ8ŞÁ§öĞ2
+l
+java:S1192C"ODefine a constant instead of duplicating this literal "User not found" 4 times.(š”™‰8ßÁ§öĞ2
+K
+java:S6205³"(Remove this redundant block and "yield".(ä¶“³şÿÿÿÿ8şÁ§öĞ2
+P
+java:S1135²"2Complete the task associated to this TODO comment.(®´Ê8şÁ§öĞ2
+F
+java:S6205½"(Remove this redundant block and "yield".(³ø”˜8ÿÁ§öĞ2
+U
+java:S1135¼"2Complete the task associated to this TODO comment.(—ãÜåøÿÿÿÿ8ÿÁ§öĞ2

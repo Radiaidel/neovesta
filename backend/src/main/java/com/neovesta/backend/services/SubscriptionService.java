@@ -2,8 +2,6 @@ package com.neovesta.backend.services;
 
 import com.neovesta.backend.dtos.request.SubscriptionRequestDTO;
 import com.neovesta.backend.dtos.response.SubscriptionResponseDTO;
-import com.neovesta.backend.models.Subscription;
-import com.neovesta.backend.models.enums.PaymentStatus;
 import org.apache.coyote.BadRequestException;
 
 import java.time.LocalDate;

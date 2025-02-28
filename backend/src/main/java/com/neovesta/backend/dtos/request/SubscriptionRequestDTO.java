@@ -2,7 +2,6 @@ package com.neovesta.backend.dtos.request;
 
 import com.neovesta.backend.models.enums.PaymentStatus;
 import com.neovesta.backend.models.enums.SubscriptionType;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 

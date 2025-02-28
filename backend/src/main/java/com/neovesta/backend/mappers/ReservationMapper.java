@@ -5,7 +5,6 @@ import com.neovesta.backend.dtos.response.ReservationResponseDTO;
 import com.neovesta.backend.models.Reservation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
