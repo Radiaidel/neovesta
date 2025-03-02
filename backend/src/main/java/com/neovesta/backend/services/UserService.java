@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(CreateUserRequest request);
+    UserResponse createUser(CreateUserRequest request  );
     
     UserResponse updateUser(UUID id, UpdateUserRequest request);
     

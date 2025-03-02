@@ -30,6 +30,5 @@ public class CreateUserRequest {
     @NotNull(message = "Role is required")
     private Role role;
 
-    private UUID residenceId; 
     private UUID managerId;   
 }

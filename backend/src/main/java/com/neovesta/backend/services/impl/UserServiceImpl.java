@@ -7,6 +7,8 @@ import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.exceptions.UnauthorizedException;
 import com.neovesta.backend.mappers.UserMapper;
+import com.neovesta.backend.models.ResidenceManager;
+import com.neovesta.backend.models.SubResidenceManager;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.Role;
 import com.neovesta.backend.repositories.UserRepository;
@@ -28,23 +30,38 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
     public UserResponse createUser(CreateUserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
+    User newUser;
 
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .phoneNumber(request.getPhoneNumber())
-                .role(request.getRole())
-                .build();
+    if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
 
-        return userMapper.toResponse(userRepository.save(user));
+        ResidenceManager manager = userRepository.findById(request.getManagerId())
+            .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
+            .map(user -> (ResidenceManager) user)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+
+        newUser = SubResidenceManager.builder()
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .phoneNumber(request.getPhoneNumber())
+            .role(Role.SUB_RESIDENCE_MANAGER)
+            .manager(manager) // Assignation automatique du manager
+            .build();
+    } else {
+        newUser = User.builder()
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .phoneNumber(request.getPhoneNumber())
+            .role(request.getRole())
+            .build();
     }
+
+    return  userMapper.toResponse(userRepository.save(newUser));
+}
 
     @Override
     public UserResponse getUserById(UUID id) {
