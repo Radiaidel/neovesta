@@ -1,17 +1,19 @@
 package com.neovesta.backend.models;
 
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 
+@Data
+@Builder
 @Embeddable
-@Getter
-@Setter
+@NoArgsConstructor  // Ajout crucial pour JPA
+@AllArgsConstructor // Nécessaire pour le Builder
 public class Document {
     private String name;
     private String url;
     private String type;
-    private LocalDateTime uploadedAt = LocalDateTime.now();
 }

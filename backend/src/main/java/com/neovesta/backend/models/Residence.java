@@ -72,6 +72,4 @@ public class Residence {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 }

@@ -1,10 +1,11 @@
 package com.neovesta.backend.dtos.request;
 
-import com.neovesta.backend.models.enums.ResidenceStatus;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class DocumentRequest {
     @NotBlank(message = "Document name is required")
     private String name;
@@ -14,6 +15,4 @@ public class DocumentRequest {
 
     @NotBlank(message = "Document type is required")
     private String type;
-
-    private ResidenceStatus status;
 }

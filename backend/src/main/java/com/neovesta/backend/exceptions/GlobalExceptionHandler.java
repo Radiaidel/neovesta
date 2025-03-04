@@ -11,6 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
+
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,6 +23,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<String> handleMultipartException(MultipartException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+            .body("File size exceeds limit");
+    }
 
     @ExceptionHandler(SubscriptionNotFoundException.class)
     public ResponseEntity<String> handleSubscriptionNotFound(SubscriptionNotFoundException ex) {

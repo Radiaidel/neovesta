@@ -1,6 +1,8 @@
 package com.neovesta.backend.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovesta.backend.dtos.request.CreateResidenceRequest;
+import com.neovesta.backend.dtos.request.DocumentUploadRequest;
 import com.neovesta.backend.dtos.request.UpdateResidenceRequest;
 import com.neovesta.backend.dtos.response.PageResponse;
 import com.neovesta.backend.dtos.response.ResidenceResponse;
@@ -10,11 +12,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/residences")
@@ -22,13 +30,63 @@ import java.util.UUID;
 public class ResidenceController {
 
     private final ResidenceService residenceService;
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResidenceResponse> createResidence(
-            @Valid @RequestBody CreateResidenceRequest request) {
-        return ResponseEntity.ok(residenceService.createResidence(request));
+        @Valid @RequestPart("data") String requestJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles
+    ) throws IOException {
+        // Convertir le JSON en objet CreateResidenceRequest
+        ObjectMapper objectMapper = new ObjectMapper();
+        CreateResidenceRequest request = objectMapper.readValue(requestJson, CreateResidenceRequest.class);
+        
+        // Définir les images et documents
+        request.setImages(images);
+        
+        // Convertir les fichiers en DocumentUploadRequest
+        List<DocumentUploadRequest> documents = documentFiles != null 
+            ? documentFiles.stream()
+                .map(file ->DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file).type(file.getContentType()).build())
+                .collect(Collectors.toList())
+            : null;
+        
+        request.setDocuments(documents);
+       
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(residenceService.createResidence(request));
     }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResidenceResponse> updateResidence(
+        @PathVariable UUID id,
+        @Valid @RequestPart("data") String requestJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles
+    ) throws IOException {
+        // Convertir le JSON en objet UpdateResidenceRequest
+        ObjectMapper objectMapper = new ObjectMapper();
+        UpdateResidenceRequest request = objectMapper.readValue(requestJson, UpdateResidenceRequest.class);
+        
+        // Définir les images et documents
+        request.setImages(images);
+        
+        // Convertir les fichiers en DocumentUploadRequest
+        List<DocumentUploadRequest> documents = documentFiles != null
+            ? documentFiles.stream()
+                .map(file ->  DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file).type(file.getContentType()).build())
+                .collect(Collectors.toList())
+            : null;
+        
+        request.setDocuments(documents);
+       
+        return ResponseEntity.ok(residenceService.updateResidence(id, request));
+    }
+    // @PostMapping
+    // @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    // public ResponseEntity<ResidenceResponse> createResidence(
+    //         @Valid @RequestBody CreateResidenceRequest request) {
+    //     return ResponseEntity.ok(residenceService.createResidence(request));
+    // }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
@@ -63,16 +121,16 @@ public class ResidenceController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ResidenceResponse> updateResidence(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateResidenceRequest request) {
+            @Valid @RequestBody UpdateResidenceRequest request) throws IOException {
         return ResponseEntity.ok(residenceService.updateResidence(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<Void> deleteResidence(@PathVariable UUID id) {
+    @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Void> deleteResidence(@PathVariable UUID id) throws IOException {
         residenceService.deleteResidence(id);
         return ResponseEntity.ok().build();
     }
@@ -84,7 +142,7 @@ public class ResidenceController {
         return ResponseEntity.ok(citiesPage);
     }
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<PageResponse<ResidenceResponse>> searchResidences(
             @RequestParam String query,
             Pageable pageable) {
@@ -92,7 +150,7 @@ public class ResidenceController {
         return ResponseEntity.ok(residencesPage);
     }
     @GetMapping("/city/{city}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<PageResponse<ResidenceResponse>> getResidencesByCity(
             @PathVariable String city,
             Pageable pageable) {
