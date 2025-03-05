@@ -8,6 +8,8 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { userReducer } from './store/user.reducer';
 import { UserEffects } from './store/user.effects';
+import { residenceReducer } from './store/residence/residence.reducer';
+import { ResidenceEffects } from './store/residence/residence.effects';
 
 export const appConfig: ApplicationConfig = {
 //   providers: [
@@ -24,8 +26,9 @@ providers: [
   provideHttpClient(withInterceptors([authInterceptor])),
   provideStore({
     users: userReducer,
+    residences: residenceReducer,
   }),
-  provideEffects([UserEffects]),
+  provideEffects([UserEffects , ResidenceEffects]),
   provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
 ],
 };
