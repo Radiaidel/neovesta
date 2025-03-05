@@ -1,0 +1,259 @@
+<app-header></app-header>
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading State -->
+    <div class="flex justify-center my-12" *ngIf="loading$ | async">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <ng-container *ngIf="!(loading$ | async)">
+      <ng-container *ngIf="residence$ | async as residence; else noResidence">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+              <a routerLink="/residences" class="hover:underline">Residences</a>
+              <span>/</span>
+              <span>{{ residence.name }}</span>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">{{ residence.name }}</h1>
+          </div>
+          <div class="flex gap-3">
+            <a 
+              [routerLink]="['/residences', residence.id, 'edit']" 
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit
+            </a>
+            <button 
+              (click)="confirmDelete()"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="mb-8">
+          <span 
+            class="px-4 py-1.5 rounded-full text-sm font-medium"
+            [ngClass]="{
+              'bg-green-100 text-green-800': residence.status === 'ACTIVE',
+              'bg-red-100 text-red-800': residence.status === 'INACTIVE',
+              'bg-yellow-100 text-yellow-800': residence.status === 'UNDER_MAINTENANCE',
+              'bg-blue-100 text-blue-800': residence.status === 'COMING_SOON'
+            }"
+          >
+            {{ formatStatus(residence.status) }}
+          </span>
+        </div>
+
+        <!-- Image Gallery -->
+        <div class="mb-8">
+          <ng-container *ngIf="residence.imageUrls && residence.imageUrls.length > 0; else noImages">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="rounded-xl overflow-hidden h-64 bg-gray-100 dark:bg-gray-700" *ngFor="let imageUrl of residence.imageUrls">
+                <img [src]="imageUrl" [alt]="residence.name" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noImages>
+            <div class="rounded-xl bg-gray-100 dark:bg-gray-700 h-64 flex items-center justify-center">
+              <div class="text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="mt-2 text-gray-500 dark:text-gray-400">No images available</p>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left Column -->
+          <div class="lg:col-span-2">
+            <!-- Description -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+              <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Description</h2>
+              <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                {{ residence.description || 'No description available.' }}
+              </p>
+            </div>
+
+            <!-- Map Location -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+              <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Location</h2>
+              <ng-container *ngIf="residence.address.latitude && residence.address.longitude; else noLocation">
+                <app-map [address]="residence.address" [editable]="false"></app-map>
+              </ng-container>
+              <ng-template #noLocation>
+                <p class="text-gray-500 dark:text-gray-400">No map coordinates available for this residence.</p>
+              </ng-template>
+            </div>
+
+            <!-- Amenities -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+              <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Amenities</h2>
+              <ng-container *ngIf="residence.amenities && residence.amenities.length > 0; else noAmenities">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div class="flex items-center gap-2" *ngFor="let amenity of residence.amenities">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-gray-700 dark:text-gray-300">{{ amenity }}</span>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #noAmenities>
+                <p class="text-gray-500 dark:text-gray-400">No amenities listed.</p>
+              </ng-template>
+            </div>
+
+            <!-- Documents -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+              <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Documents</h2>
+              <ng-container *ngIf="residence.documents && residence.documents.length > 0; else noDocuments">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" *ngFor="let document of residence.documents">
+                    <div class="flex items-center gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <div>
+                        <div class="font-medium text-gray-800 dark:text-white">{{ document.name }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ document.type }} • Uploaded {{ document.uploadedAt | date }}</div>
+                      </div>
+                    </div>
+                    <a 
+                      [href]="document.url" 
+                      target="_blank"
+                      class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #noDocuments>
+                <p class="text-gray-500 dark:text-gray-400">No documents available.</p>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div>
+            <!-- Info Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 sticky top-4">
+              <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Property Details</h2>
+              
+              <!-- Price -->
+              <div class="mb-6">
+                <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">\
+                  ${{ residence.startingPrice | number:'1.0-0' }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Starting price</div>
+              </div>
+              
+              <!-- Details -->
+              <div class="space-y-4 mb-6">
+                <!-- Address -->
+                <div class="flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <div>
+                    <div class="font-medium text-gray-800 dark:text-white">Address</div>
+                    <div class="text-gray-600 dark:text-gray-300">
+                      {{ residence.address.street }}<br>
+                      {{ residence.address.city }}, {{ residence.address.state }} {{ residence.address.postalCode }}<br>
+                      {{ residence.address.country }}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Apartments -->
+                <div class="flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <div>
+                    <div class="font-medium text-gray-800 dark:text-white">Apartments</div>
+                    <div class="text-gray-600 dark:text-gray-300">
+                      Total: {{ residence.totalApartments }}<br>
+                      Available: {{ residence.availableApartments }}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Contact -->
+                <div class="flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <div>
+                    <div class="font-medium text-gray-800 dark:text-white">Contact Information</div>
+                    <div class="text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                      {{ residence.contactInformation || 'No contact information available.' }}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Created/Updated -->
+                <div class="flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <div class="font-medium text-gray-800 dark:text-white">Dates</div>
+                    <div class="text-gray-600 dark:text-gray-300">
+                      Created: {{ residence.createdAt | date:'medium' }}<br>
+                      <ng-container *ngIf="residence.updatedAt">
+                        Updated: {{ residence.updatedAt | date:'medium' }}
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noResidence>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">Residence not found</h3>
+          <p class="mt-1 text-gray-500 dark:text-gray-400">The residence you're looking for doesn't exist or you don't have permission to view it.</p>
+          <a 
+            routerLink="/residences"
+            class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Back to Residences
+          </a>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [isOpen]="showDeleteConfirm"
+      [title]="'Delete Residence'"
+      [message]="'Are you sure you want to delete this residence? This action cannot be undone.'"
+      [confirmText]="'Delete'"
+      [cancelText]="'Cancel'"
+      (confirm)="deleteResidence()"
+      (cancel)="cancelDelete()"
+    ></app-confirm-dialog>
+  </div>
