@@ -10,16 +10,12 @@ import { userReducer } from './store/user.reducer';
 import { UserEffects } from './store/user.effects';
 import { residenceReducer } from './store/residence/residence.reducer';
 import { ResidenceEffects } from './store/residence/residence.effects';
+import { contractReducer } from './store/contract/contract.reducer';
+import { ContractEffects } from './store/contract/contract.effects';
+import { provideAnimations } from "@angular/platform-browser/animations"
 
 export const appConfig: ApplicationConfig = {
-//   providers: [
-//     provideRouter(routes, withComponentInputBinding()),
-//     provideHttpClient(withInterceptors([authInterceptor])),
-  
-//     provideStore({ user: userReducer }),
-//     provideEffects(UserEffects),
-//     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
-// ]
+
   
 providers: [
   provideRouter(routes),
@@ -27,8 +23,10 @@ providers: [
   provideStore({
     users: userReducer,
     residences: residenceReducer,
+    contract: contractReducer
   }),
-  provideEffects([UserEffects , ResidenceEffects]),
+  provideEffects([UserEffects , ResidenceEffects , ContractEffects]),
+  provideAnimations(),
   provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
 ],
 };
