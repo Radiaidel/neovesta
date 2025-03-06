@@ -13,8 +13,6 @@ import com.neovesta.backend.repositories.ResidenceManagerRepository;
 import com.neovesta.backend.repositories.ResidenceRepository;
 import com.neovesta.backend.services.ResidenceService;
 import jakarta.persistence.criteria.Predicate;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,10 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @Transactional
 public class ResidenceServiceImpl implements ResidenceService {
@@ -85,104 +81,15 @@ public class ResidenceServiceImpl implements ResidenceService {
         return residenceMapper.toResponse(residence);
     }
 
-    // ResidenceServiceImpl.java
     @Override
     @Transactional
-    public ResidenceResponse updateResidence(UUID id, UpdateResidenceRequest request) throws IOException {
+    public ResidenceResponse updateResidence(UUID id, UpdateResidenceRequest request) {
         Residence residence = residenceRepository.findById(id)
                 .orElseThrow(() -> new ResidenceNotFoundException("Residence not found"));
 
-        // Gestion des images
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            List<String> oldImageUrls = residence.getImageUrls();
-            List<String> newImageUrls = cloudinaryService.uploadImages(request.getImages());
-            residence.setImageUrls(newImageUrls);
-
-            // Suppression asynchrone des anciennes images
-            if (!oldImageUrls.isEmpty()) {
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        cloudinaryService.deleteImages(oldImageUrls);
-                    } catch (Exception e) {
-                        log.error("Error deleting old images", e);
-                    }
-                });
-            }
-        }
-
-        // Gestion des documents
-        if (request.getDocuments() != null && !request.getDocuments().isEmpty()) {
-            List<Document> oldDocuments = new ArrayList<>(residence.getDocuments());
-            List<Document> newDocuments = request.getDocuments().stream()
-                    .map(doc -> {
-                        try {
-                            String url = supabaseStorageService.uploadDocument(doc.getFile());
-                            return Document.builder()
-                                    .name(doc.getName())
-                                    .url(url)
-                                    .type(doc.getType())
-                                    .build();
-                        } catch (IOException e) {
-                            throw new RuntimeException("Failed to upload document", e);
-                        }
-                    })
-                    .collect(Collectors.toList());
-            residence.setDocuments(newDocuments);
-
-            // Suppression asynchrone des anciens documents
-            if (!oldDocuments.isEmpty()) {
-                CompletableFuture.runAsync(() -> {
-                    oldDocuments.forEach(doc -> {
-                        try {
-                            supabaseStorageService.deleteDocumentByUrl(doc.getUrl());
-                        } catch (IOException e) {
-                            log.error("Failed to delete document: {}", doc.getUrl(), e);
-                        }
-                    });
-                });
-            }
-        }
-
-        // Mise à jour des autres champs
         residenceMapper.updateEntityFromRequest(residence, request);
         residence = residenceRepository.save(residence);
-
         return residenceMapper.toResponse(residence);
-    }
-
-    @Override
-    @Transactional
-    public void deleteResidence(UUID id) throws IOException {
-        Residence residence = residenceRepository.findById(id)
-                .orElseThrow(() -> new ResidenceNotFoundException("Residence not found"));
-
-        // Suppression des images
-        List<String> imageUrls = residence.getImageUrls();
-        if (!imageUrls.isEmpty()) {
-            cloudinaryService.deleteImages(imageUrls);
-        }
-
-        // Suppression des documents
-        List<Document> documents = residence.getDocuments();
-        if (!documents.isEmpty()) {
-            documents.forEach(doc -> {
-                try {
-                    supabaseStorageService.deleteDocumentByUrl(doc.getUrl());
-                } catch (IOException e) {
-                    log.error("Failed to delete document: {}", doc.getUrl(), e);
-                }
-            });
-        }
-
-        // Détachement du manager
-        if (residence.getManager() != null) {
-            ResidenceManager manager = residence.getManager();
-            manager.setResidence(null);
-            residenceManagerRepository.save(manager);
-        }
-
-        // Suppression de la résidence
-        residenceRepository.delete(residence);
     }
 
     @Override
@@ -240,26 +147,25 @@ public class ResidenceServiceImpl implements ResidenceService {
         return new PageResponse<>(page);
     }
 
-    // @Override
-    // @Transactional
-    // public void deleteResidence(UUID id) {
-    // Residence residence = residenceRepository.findById(id)
-    // .orElseThrow(() -> new ResidenceNotFoundException("Residence not found with
-    // id: " + id));
+    @Override
+    @Transactional
+    public void deleteResidence(UUID id) {
+        Residence residence = residenceRepository.findById(id)
+                .orElseThrow(() -> new ResidenceNotFoundException("Residence not found with id: " + id));
 
-    // if (residence.getManager() != null) {
-    // ResidenceManager manager = residence.getManager();
-    // manager.setResidence(null);
-    // residenceManagerRepository.save(manager);
-    // residence.setManager(null);
-    // }
+        if (residence.getManager() != null) {
+            ResidenceManager manager = residence.getManager();
+            manager.setResidence(null);
+            residenceManagerRepository.save(manager);
+            residence.setManager(null);
+        }
 
-    // residence.getImageUrls().clear();
-    // residence.getAmenities().clear();
-    // residence.getDocuments().clear();
+        residence.getImageUrls().clear();
+        residence.getAmenities().clear();
+        residence.getDocuments().clear();
 
-    // residenceRepository.delete(residence);
-    // }
+        residenceRepository.delete(residence);
+    }
 
     @Override
     public PageResponse<String> getAllCities(Pageable pageable) {

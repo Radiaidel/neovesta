@@ -62,6 +62,40 @@ public class CloudinaryService {
         });
     }
 
+    // @Override
+    public String uploadImage(MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("Image file cannot be null or empty");
+        }
+        
+        Map<?, ?> uploadResult = cloudinary.uploader().upload(
+            image.getBytes(), 
+            ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", "neovesta/features"
+            )
+        );
+        
+        return uploadResult.get("url").toString();
+    }
+
+    // @Override
+    public void deleteImage(String imageUrl) throws IOException {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return;
+        }
+        
+        // Extract public_id from URL
+        String publicId = extractPublicIdFromUrl(imageUrl);
+        
+        if (publicId != null) {
+            cloudinary.uploader().destroy(
+                publicId,
+                ObjectUtils.emptyMap()
+            );
+            log.info("Deleted image with public ID: {}", publicId);
+        }
+    }
     private String extractPublicIdFromUrl(String url) {
         try {
             URI uri = new URI(url);

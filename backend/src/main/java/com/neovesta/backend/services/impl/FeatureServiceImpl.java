@@ -7,111 +7,213 @@ import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.mappers.FeatureMapper;
 import com.neovesta.backend.models.Feature;
 import com.neovesta.backend.models.Residence;
+import com.neovesta.backend.models.enums.FeatureCategory;
+import com.neovesta.backend.models.enums.FeatureType;
 import com.neovesta.backend.repositories.FeatureRepository;
 import com.neovesta.backend.repositories.ResidenceRepository;
+import com.neovesta.backend.services.CloudinaryService;
 import com.neovesta.backend.services.FeatureService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class FeatureServiceImpl implements FeatureService {
+
     private final FeatureRepository featureRepository;
-    private final FeatureMapper featureMapper;
     private final ResidenceRepository residenceRepository;
-
-
-    public FeatureServiceImpl(FeatureRepository featureRepository, FeatureMapper featureMapper, ResidenceRepository residenceRepository) {
-        this.featureRepository = featureRepository;
-        this.featureMapper = featureMapper;
-        this.residenceRepository = residenceRepository;
-    }
+    private final FeatureMapper featureMapper;
+    private final CloudinaryService cloudinaryService;
 
     @Override
-    public FeatureResponse createFeature(FeatureRequest featureRequest) {
-        validateFeatureRequest(featureRequest);
+    public FeatureResponse createFeature(FeatureRequest request, MultipartFile image) throws IOException {
+        Residence residence = residenceRepository.findById(request.getResidenceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Residence not found with id: " + request.getResidenceId()));
 
-        Residence residence = residenceRepository.findById(featureRequest.getResidenceId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Residence not found with ID: %s", featureRequest.getResidenceId())
-                ));
+        Feature feature = Feature.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .featureType(request.getFeatureType())
+                .featureCategory(request.getFeatureCategory())
+                .location(request.getLocation())
+                .active(request.getActive())
+                .termsAndConditions(request.getTermsAndConditions())
+                .cancellationPolicy(request.getCancellationPolicy())
+                .requiresManagerApproval(request.getRequiresManagerApproval())
+                .residence(residence)
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        Feature feature = featureMapper.toEntity(featureRequest);
-        feature.setResidence(residence);
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = cloudinaryService.uploadImage(image);
+            feature.setImageUrl(imageUrl);
+        }
 
         Feature savedFeature = featureRepository.save(feature);
+        
         return featureMapper.toResponse(savedFeature);
     }
 
     @Override
-    public FeatureResponse updateFeature(UUID id, FeatureRequest featureRequest) {
-        validateFeatureRequest(featureRequest);
+    public FeatureResponse updateFeature(UUID id, FeatureRequest request, MultipartFile image) throws IOException {
+        Feature existingFeature = featureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Feature not found with id: " + id));
 
-        Feature feature = featureRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Feature not found with ID: %s", id)
-                ));
-
-        if (!feature.getResidence().getId().equals(featureRequest.getResidenceId())) {
-            throw new FeatureException("Cannot change the residence of an existing feature");
+        if (!existingFeature.getResidence().getId().equals(request.getResidenceId())) {
+            Residence residence = residenceRepository.findById(request.getResidenceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Residence not found with id: " + request.getResidenceId()));
+            existingFeature.setResidence(residence);
         }
 
-        featureMapper.updateEntity(featureRequest, feature);
-        return featureMapper.toResponse(featureRepository.save(feature));
+        existingFeature.setName(request.getName());
+        existingFeature.setDescription(request.getDescription());
+        existingFeature.setFeatureType(request.getFeatureType());
+        existingFeature.setFeatureCategory(request.getFeatureCategory());
+        existingFeature.setLocation(request.getLocation());
+        existingFeature.setActive(request.getActive());
+        existingFeature.setTermsAndConditions(request.getTermsAndConditions());
+        existingFeature.setCancellationPolicy(request.getCancellationPolicy());
+        existingFeature.setRequiresManagerApproval(request.getRequiresManagerApproval());
+        existingFeature.setUpdatedAt(LocalDateTime.now());
+
+        if (image != null && !image.isEmpty()) {
+            if (existingFeature.getImageUrl() != null && !existingFeature.getImageUrl().isEmpty()) {
+                cloudinaryService.deleteImage(existingFeature.getImageUrl());
+            }
+            
+            String imageUrl = cloudinaryService.uploadImage(image);
+            existingFeature.setImageUrl(imageUrl);
+        }
+
+        Feature updatedFeature = featureRepository.save(existingFeature);
+        
+        return featureMapper.toResponse(updatedFeature);
     }
 
     @Override
-    public void deleteFeature(UUID id) {
-        if (!featureRepository.existsById(id)) {
-            throw new ResourceNotFoundException(
-                    String.format("Feature not found with ID: %s", id)
-            );
+    public void deleteFeature(UUID id) throws IOException {
+        Feature feature = featureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Feature not found with id: " + id));
+
+        if (feature.getImageUrl() != null && !feature.getImageUrl().isEmpty()) {
+            cloudinaryService.deleteImage(feature.getImageUrl());
         }
-        featureRepository.deleteById(id);
+
+        featureRepository.delete(feature);
     }
 
     @Override
     public FeatureResponse getFeatureById(UUID id) {
-        return featureRepository.findById(id)
-                .map(featureMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Feature not found with ID: %s", id)
-                ));
+        Feature feature = featureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Feature not found with id: " + id));
+        return featureMapper.toResponse(feature);
     }
 
     @Override
-    public Page<FeatureResponse> getFeaturesByResidence(String residenceName, Pageable pageable) {
-        if (residenceName == null || residenceName.trim().isEmpty()) {
-            throw new FeatureException("Residence name cannot be empty");
+    public Page<FeatureResponse> getAllFeatures(
+            String residenceName, String featureType, String featureCategory,
+            Boolean active, String search, Pageable pageable) {
+        
+        Pageable adjustedPageable = adjustPageableForSnakeCase(pageable);
+        
+        FeatureType typeEnum = null;
+        if (featureType != null && !featureType.trim().isEmpty()) {
+            try {
+                typeEnum = FeatureType.valueOf(featureType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new FeatureException("Invalid feature type: " + featureType);
+            }
         }
 
-        return featureRepository.findByResidence_NameContainingIgnoreCase(residenceName, pageable)
-                .map(featureMapper::toResponse);
+        FeatureCategory categoryEnum = null;
+        if (featureCategory != null && !featureCategory.trim().isEmpty()) {
+            try {
+                categoryEnum = FeatureCategory.valueOf(featureCategory.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new FeatureException("Invalid feature category: " + featureCategory);
+            }
+        }
+
+        String cleanResidenceName = (residenceName != null && !residenceName.trim().isEmpty()) ? residenceName.trim() : null;
+        String cleanSearch = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+
+        String featureTypeStr = featureType != null ? featureType : null;
+        String featureCategoryStr = featureCategory != null ? featureCategory : null;
+        
+        Page<Feature> features = featureRepository.findFeaturesByFilters(
+                cleanResidenceName,
+                featureTypeStr,
+                featureCategoryStr,
+                active,
+                cleanSearch,
+                adjustedPageable);
+
+        return features.map(featureMapper::toResponse);
     }
 
-    private void validateFeatureRequest(FeatureRequest request) {
-        if (request == null) {
-            throw new FeatureException("Feature request cannot be null");
+    @Override
+    public Page<FeatureResponse> getFeaturesByResidence(String residenceName, Pageable pageable) throws BadRequestException {
+        if (residenceName == null || residenceName.trim().isEmpty()) {
+            throw new BadRequestException("Residence name is required");
         }
+        
+        Pageable adjustedPageable = adjustPageableForSnakeCase(pageable);
+        Page<Feature> features = featureRepository.findByResidenceName(residenceName, adjustedPageable);
+        return features.map(featureMapper::toResponse);
+    }
 
-        if (request.getResidenceId() == null) {
-            throw new FeatureException("Residence ID is required");
+    private Pageable adjustPageableForSnakeCase(Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            return pageable;
         }
-
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new FeatureException("Feature name is required");
+        
+        List<Sort.Order> adjustedOrders = new ArrayList<>();
+        
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+            
+            if ("createdAt".equals(property)) {
+                property = "created_at";
+            } else if ("updatedAt".equals(property)) {
+                property = "updated_at";
+            } else if ("featureType".equals(property)) {
+                property = "feature_type";
+            } else if ("featureCategory".equals(property)) {
+                property = "feature_category";
+            } else if ("imageUrl".equals(property)) {
+                property = "image_url";
+            } else if ("termsAndConditions".equals(property)) {
+                property = "terms_and_conditions";
+            } else if ("cancellationPolicy".equals(property)) {
+                property = "cancellation_policy";
+            } else if ("requiresManagerApproval".equals(property)) {
+                property = "requires_manager_approval";
+            }
+            
+            adjustedOrders.add(new Sort.Order(order.getDirection(), property));
         }
-
-        if (request.getFeatureType() == null) {
-            throw new FeatureException("Feature type is required");
-        }
-
-        if (request.getFeatureCategory() == null) {
-            throw new FeatureException("Feature category is required");
-        }
+        
+        return PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(adjustedOrders)
+        );
     }
 }
+
