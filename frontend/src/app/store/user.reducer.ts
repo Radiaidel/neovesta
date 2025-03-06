@@ -5,6 +5,7 @@ import * as UserActions from "./user.actions"
 export interface UserState {
   users: PageResponse<UserResponse> | null
   selectedUser: UserResponse | null
+  createdUser: UserResponse | null; 
   loading: boolean
   error: any
 }
@@ -12,6 +13,7 @@ export interface UserState {
 export const initialState: UserState = {
   users: null,
   selectedUser: null,
+  createdUser: null, 
   loading: false,
   error: null,
 }
@@ -71,6 +73,7 @@ export const userReducer = createReducer(
 
     return {
       ...state,
+      createdUser: user,
       users: {
         ...state.users,
         content: updatedContent,
@@ -186,5 +189,17 @@ export const userReducer = createReducer(
     error,
     loading: false,
   })),
+
+  on(UserActions.createUserSuccess, (state, { user }) => ({
+    ...state,
+    createdUser: user,
+    loading: false,
+  })),
+
+  on(UserActions.resetCreatedUser, (state) => ({
+    ...state,
+    createdUser: null,
+  })),
+
 )
 

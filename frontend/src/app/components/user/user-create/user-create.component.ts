@@ -1,11 +1,13 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import {  FormBuilder,  FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
-import  { Router } from "@angular/router"
-import  { Store } from "@ngrx/store"
-import { Role } from "../../../models/user.model"
-import  { AuthService } from "../../../services/auth.service"
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
+import { Router } from "@angular/router"
+import { Store } from "@ngrx/store"
+import { Role, UserResponse } from "../../../models/user.model"
+import { AuthService } from "../../../services/auth.service"
 import * as UserActions from "../../../store/user.actions"
+import { Subject, takeUntil } from "rxjs"
+import { selectUserCreationSuccess } from "../../../store/user.selectors"
 
 @Component({
   selector: "app-user-create",
@@ -17,7 +19,7 @@ export class UserCreateComponent implements OnInit {
   userForm: FormGroup
   isSubmitting = false
   availableRoles: Role[] = []
-
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -33,10 +35,10 @@ export class UserCreateComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
       password: ["", [Validators.required, Validators.minLength(6)]],
-      role: ['', Validators.required], 
-      managerId: [{ value: '', disabled: true }] // Champ caché
+      role: ['', Validators.required],
+      managerId: [{ value: '', disabled: true }] 
     });
-    
+
   }
 
   ngOnInit(): void {
@@ -45,8 +47,61 @@ export class UserCreateComponent implements OnInit {
     this.role?.valueChanges.subscribe((role) => {
       this.updateConditionalFields(role)
     })
+
+    this.setupUserCreationListener();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupUserCreationListener(): void {
+    this.store.select(selectUserCreationSuccess)
+      .pipe(takeUntil(this.destroy$)) 
+      .subscribe(createdUser => {
+        if (createdUser) {
+          this.handleUserCreationSuccess(createdUser);
+        }
+      });
+  }
+
+  private handleUserCreationSuccess(createdUser: UserResponse): void {
+    this.isSubmitting = false;
+
+    if (createdUser.role === Role.RESIDENT) {
+      this.router.navigate(['/contracts/new'], {
+        queryParams: { residentId: createdUser.id }
+      });
+    } else {
+      this.router.navigate(['/users']);
+    }
+
+    this.store.dispatch(UserActions.resetCreatedUser());
+  }
+
+  private prepareUserData(): any {
+    const formData = { ...this.userForm.value };
+    const currentUser = this.authService.getCurrentUser();
+
+    switch (formData.role) {
+      case Role.SUB_RESIDENCE_MANAGER:
+        formData.managerId = currentUser?.id;
+        break;
+      default:
+        delete formData.managerId;
+    }
+
+    return formData;
+  }
+
+  onSubmit(): void {
+    if (this.userForm.invalid) return;
+
+    this.isSubmitting = true;
+    const userData = this.prepareUserData();
+    this.store.dispatch(UserActions.createUser({ user: userData }));
+  }
   get firstName() {
     return this.userForm.get("firstName")
   }
@@ -105,9 +160,9 @@ export class UserCreateComponent implements OnInit {
 
   updateConditionalFields(role: Role): void {
 
-    
+
     this.managerId?.clearValidators();
-    
+
     this.residenceId?.updateValueAndValidity();
     this.managerId?.updateValueAndValidity();
   }
@@ -116,36 +171,5 @@ export class UserCreateComponent implements OnInit {
     this.router.navigate(['/users']);
   }
 
-  onSubmit(): void {
-    if (this.userForm.invalid) {
-      return;
-    }
-    
-    this.isSubmitting = true;
-    const userData = {...this.userForm.value};
-    
-    if (userData.role === Role.RESIDENCE_MANAGER) {
-      delete userData.managerId;
-    } 
-
-    else if (userData.role === Role.SUB_RESIDENCE_MANAGER) {
-      const currentUser = this.authService.getCurrentUser();
-      if (currentUser) {
-        userData.managerId = currentUser.id;
-      }
-    }
-
-
-    else if (userData.role === Role.RESIDENT) {
-      delete userData.managerId;
-    }
-    
-    this.store.dispatch(UserActions.createUser({ user: userData }));
-    
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.router.navigate(['/users']);
-    }, 1000);
-  }
 }
 

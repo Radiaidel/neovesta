@@ -50,3 +50,5 @@ export const deleteUserSuccess = createAction("[User] Delete User Success", prop
 
 export const deleteUserFailure = createAction("[User] Delete User Failure", props<{ error: any }>())
 
+export const resetCreatedUser = createAction('[User] Reset Created User');
+
