@@ -2,11 +2,14 @@ package com.neovesta.backend.controllers;
 
 import com.neovesta.backend.dtos.request.ContractRequest;
 import com.neovesta.backend.dtos.response.ContractResponse;
+import com.neovesta.backend.models.enums.ContractStatus;
+import com.neovesta.backend.models.enums.ContractType;
 import com.neovesta.backend.services.ContractService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -56,23 +60,22 @@ public class ContractController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER')")
-    public ResponseEntity<Page<ContractResponse>> getAllContracts(Pageable pageable) {
-        return ResponseEntity.ok(contractService.getAllContracts(pageable));
+    public ResponseEntity<Page<ContractResponse>> getAllContracts(
+            @RequestParam(required = false) UUID residentId,
+            @RequestParam(required = false) UUID residenceId,
+            @RequestParam(required = false) ContractType contractType,
+            @RequestParam(required = false) ContractStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateTo,
+            Pageable pageable) {
+        
+        return ResponseEntity.ok(contractService.getAllContractsWithFilters(
+                residentId, residenceId, contractType, status,
+                startDateFrom, startDateTo, endDateFrom, endDateTo,
+                pageable));
     }
-
-    //TODO : delete these functons cuz i'll just use update method
-//    @PatchMapping("/{id}/renew")
-//    @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER')")
-//    public ResponseEntity<ContractResponse> renewContract(@PathVariable UUID id, @RequestParam String newEndDate) {
-//        return ResponseEntity.ok(contractService.renewContract(id, newEndDate));
-//    }
-//
-//    @PatchMapping("/{id}/cancel")
-//    @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER')")
-//    public ResponseEntity<Void> cancelContract(@PathVariable UUID id, @RequestParam String reason) {
-//        contractService.cancelContract(id, reason);
-//        return ResponseEntity.noContent().build();
-//    }
 
     @GetMapping("/{id}/pdf")
     @PreAuthorize("hasAnyRole('RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER') or @contractAuthorizationService.isContractOwner(#id, authentication.principal.id)")
@@ -119,3 +122,4 @@ public class ContractController {
         return new ResponseEntity<>(exportBytes, headers, HttpStatus.OK);
     }
 }
+

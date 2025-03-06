@@ -8,6 +8,7 @@ import com.neovesta.backend.models.Contract;
 import com.neovesta.backend.models.Residence;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.ContractStatus;
+import com.neovesta.backend.models.enums.ContractType;
 import com.neovesta.backend.repositories.ContractRepository;
 import com.neovesta.backend.repositories.ResidenceRepository;
 import com.neovesta.backend.repositories.UserRepository;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.util.List;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -51,7 +54,8 @@ public class ContractServiceImpl implements ContractService {
     @Transactional
     public ContractResponse createContract(ContractRequest request) {
         User resident = userRepository.findResidentById(request.residentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resident not found or does not have the RESIDENT role: " + request.residentId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Resident not found or does not have the RESIDENT role: " + request.residentId()));
 
         Residence residence = residenceRepository.findById(request.residenceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Residence not found: " + request.residenceId()));
@@ -82,7 +86,8 @@ public class ContractServiceImpl implements ContractService {
         Contract contract = getContract(id);
 
         User resident = userRepository.findResidentById(request.residentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resident not found or does not have the RESIDENT role: " + request.residentId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Resident not found or does not have the RESIDENT role: " + request.residentId()));
 
         Residence residence = residenceRepository.findById(request.residenceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Residence not found: " + request.residenceId()));
@@ -129,8 +134,6 @@ public class ContractServiceImpl implements ContractService {
                 .map(contractMapper::toResponse);
     }
 
-
-
     private Contract getContract(UUID id) {
         return contractRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contract not found: " + id));
@@ -142,8 +145,8 @@ public class ContractServiceImpl implements ContractService {
                 .orElseThrow(() -> new ResourceNotFoundException("Contract not found with id: " + id));
 
         User resident = userRepository.findResidentById(contract.getResident().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resident not found or does not have the RESIDENT role: " + contract.getResident().getId()));
-
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Resident not found or does not have the RESIDENT role: " + contract.getResident().getId()));
 
         Residence residence = residenceRepository.findById(contract.getResidence().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Residence not found"));
@@ -179,8 +182,10 @@ public class ContractServiceImpl implements ContractService {
                     .setBold());
             document.add(new Paragraph("Type: " + contract.getContractType()));
             document.add(new Paragraph("Statut: " + contract.getStatus()));
-            document.add(new Paragraph("Date de début: " + contract.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-            document.add(new Paragraph("Date de fin: " + contract.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+            document.add(new Paragraph(
+                    "Date de début: " + contract.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+            document.add(new Paragraph(
+                    "Date de fin: " + contract.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
             document.add(new Paragraph("Durée: " + contract.getDurationInMonths() + " mois"));
 
             document.add(new Paragraph("\nInformations financières:")
@@ -194,7 +199,6 @@ public class ContractServiceImpl implements ContractService {
             if (contract.getCancellationReason() != null && !contract.getCancellationReason().isEmpty()) {
                 document.add(new Paragraph("\nRaison d'annulation: " + contract.getCancellationReason()));
             }
-
 
             document.add(new Paragraph("\nRègles du contrat:")
                     .setBold());
@@ -256,7 +260,7 @@ public class ContractServiceImpl implements ContractService {
             document.add(new Paragraph("Nombre total de contrats: " + contracts.size())
                     .setTextAlignment(TextAlignment.RIGHT));
 
-            float[] columnWidths = {1, 2, 2, 1.5f, 1.5f, 1, 1.5f};
+            float[] columnWidths = { 1, 2, 2, 1.5f, 1.5f, 1, 1.5f };
             Table table = new Table(columnWidths);
 
             table.addHeaderCell("ID");
@@ -299,7 +303,7 @@ public class ContractServiceImpl implements ContractService {
 
     private byte[] generateContractsExcel(List<Contract> contracts) {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("Contracts");
 
@@ -326,7 +330,8 @@ public class ContractServiceImpl implements ContractService {
 
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(contract.getId().toString());
-                row.createCell(1).setCellValue(resident != null ? resident.getLastName() + ", " + resident.getFirstName() : "N/A");
+                row.createCell(1).setCellValue(
+                        resident != null ? resident.getLastName() + ", " + resident.getFirstName() : "N/A");
                 row.createCell(2).setCellValue(residence != null ? residence.getName() : "N/A");
                 row.createCell(3).setCellValue(contract.getStartDate().format(formatter));
                 row.createCell(4).setCellValue(contract.getEndDate().format(formatter));
@@ -358,7 +363,8 @@ public class ContractServiceImpl implements ContractService {
         try {
             StringBuilder csv = new StringBuilder();
 
-            csv.append("ID,Résident,Résidence,Date début,Date fin,Durée (mois),Type,Statut,Montant total,Montant payé,Montant restant,Fréquence paiement,Méthode paiement\n");
+            csv.append(
+                    "ID,Résident,Résidence,Date début,Date fin,Durée (mois),Type,Statut,Montant total,Montant payé,Montant restant,Fréquence paiement,Méthode paiement\n");
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (Contract contract : contracts) {
@@ -366,7 +372,9 @@ public class ContractServiceImpl implements ContractService {
                 Residence residence = residenceRepository.findById(contract.getResident().getId()).orElse(null);
 
                 csv.append(contract.getId().toString()).append(",");
-                csv.append(escapeCsv(resident != null ? resident.getLastName() + ", " + resident.getFirstName() : "N/A")).append(",");
+                csv.append(
+                        escapeCsv(resident != null ? resident.getLastName() + ", " + resident.getFirstName() : "N/A"))
+                        .append(",");
                 csv.append(escapeCsv(residence != null ? residence.getName() : "N/A")).append(",");
                 csv.append(contract.getStartDate().format(formatter)).append(",");
                 csv.append(contract.getEndDate().format(formatter)).append(",");
@@ -390,11 +398,61 @@ public class ContractServiceImpl implements ContractService {
     }
 
     private String escapeCsv(String value) {
-        if (value == null) return "";
+        if (value == null)
+            return "";
         if (value.contains("\"") || value.contains(",")) {
             return "\"" + value.replace("\"", "\"\"") + "\"";
         }
         return value;
+    }
+
+    // Implémenter cette méthode dans votre classe ContractServiceImpl
+    @Override
+    public Page<ContractResponse> getAllContractsWithFilters(
+            UUID residentId, UUID residenceId, ContractType contractType, ContractStatus status,
+            LocalDate startDateFrom, LocalDate startDateTo, LocalDate endDateFrom, LocalDate endDateTo,
+            Pageable pageable) {
+
+        // Créer une spécification pour filtrer les contrats
+        Specification<Contract> spec = Specification.where(null);
+
+        if (residentId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("residentId"), residentId));
+        }
+
+        if (residenceId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("residenceId"), residenceId));
+        }
+
+        if (contractType != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("contractType"), contractType));
+        }
+
+        if (status != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+        }
+
+        if (startDateFrom != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("startDate"), startDateFrom));
+        }
+
+        if (startDateTo != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("startDate"), startDateTo));
+        }
+
+        if (endDateFrom != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("endDate"), endDateFrom));
+        }
+
+        if (endDateTo != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("endDate"), endDateTo));
+        }
+
+        // Exécuter la requête avec la spécification et la pagination
+        Page<Contract> contracts = contractRepository.findAll(spec, pageable);
+
+        // Convertir les entités en DTOs
+        return contracts.map(contractMapper::toResponse);
     }
 
 }
