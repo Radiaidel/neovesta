@@ -6,11 +6,13 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 @Data
 public class UpdateResidenceRequest {
     private String name;
     private String description;
-    private List<String> imageUrls;
+    private List<MultipartFile> images;
 
     @Valid
     private AddressRequest address;
@@ -19,6 +21,6 @@ public class UpdateResidenceRequest {
     private Integer availableApartments;
     private BigDecimal startingPrice;
     private List<String> amenities;
-    private List<DocumentRequest> documents;
+    private List<DocumentUploadRequest> documents;
     private String contactInformation;
 }

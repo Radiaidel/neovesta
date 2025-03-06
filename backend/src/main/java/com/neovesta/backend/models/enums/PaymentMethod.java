@@ -2,7 +2,8 @@ package com.neovesta.backend.models.enums;
 
 public enum PaymentMethod {
     BANK_TRANSFER,
-    CARD,
+    CREDIT_CARD,
     CASH,
-    CHECK
+    CHECK,
+    DIRECT_DEBIT
 }

@@ -1,3 +1,5 @@
+
+
 spring:
   config:
     import: optional:file:.env[.properties]
@@ -46,7 +48,7 @@ spring:
       write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
-    default-property-inclusion: non_null
+    default-property-inclusion: NON_NULL
   flyway:
     clean-disabled: false
     enabled: true
@@ -64,3 +66,19 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+      enabled: true
+app:
+  cloud:
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME}
+      api-key: ${CLOUDINARY_API_KEY}
+      api-secret: ${CLOUDINARY_API_SECRET}
+    supabase:
+      url: ${SUPABASE_URL}
+      key: ${SUPABASE_KEY}
+      bucket: ${SUPABASE_BUCKET}

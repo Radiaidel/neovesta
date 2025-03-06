@@ -7,11 +7,10 @@ import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.models.enums.Role;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(CreateUserRequest request);
+    UserResponse createUser(CreateUserRequest request  );
     
     UserResponse updateUser(UUID id, UpdateUserRequest request);
     

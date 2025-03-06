@@ -4,9 +4,7 @@ package com.neovesta.backend.models;
 import com.neovesta.backend.models.enums.ResidenceStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -74,6 +72,4 @@ public class Residence {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 }

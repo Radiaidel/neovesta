@@ -4,5 +4,5 @@ public enum ResidenceStatus {
     ACTIVE,
     INACTIVE,
     UNDER_MAINTENANCE,
-    FULL
+    COMING_SOON
 }

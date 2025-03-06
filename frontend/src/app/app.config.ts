@@ -1,8 +1,32 @@
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
+import { ApplicationConfig, isDevMode } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from "@angular/router"
+import { provideHttpClient, withInterceptors } from "@angular/common/http"
+import { authInterceptor } from "./interceptors/auth.interceptor"
 import { routes } from './app.routes';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { userReducer } from './store/user.reducer';
+import { UserEffects } from './store/user.effects';
+import { residenceReducer } from './store/residence/residence.reducer';
+import { ResidenceEffects } from './store/residence/residence.effects';
+import { contractReducer } from './store/contract/contract.reducer';
+import { ContractEffects } from './store/contract/contract.effects';
+import { provideAnimations } from "@angular/platform-browser/animations"
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes)]
+
+  
+providers: [
+  provideRouter(routes),
+  provideHttpClient(withInterceptors([authInterceptor])),
+  provideStore({
+    users: userReducer,
+    residences: residenceReducer,
+    contract: contractReducer
+  }),
+  provideEffects([UserEffects , ResidenceEffects , ContractEffects]),
+  provideAnimations(),
+  provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+],
 };

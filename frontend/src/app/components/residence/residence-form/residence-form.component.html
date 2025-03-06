@@ -1,0 +1,467 @@
+<app-header></app-header>
+<div class="container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+        <a routerLink="/residences" class="hover:underline">Residences</a>
+        <span>/</span>
+        <span>{{ isEditMode ? 'Edit' : 'New' }} Residence</span>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+        {{ isEditMode ? 'Edit' : 'Create' }} Residence
+      </h1>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="residenceForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Basic Information Section -->
+      <div class="md:col-span-2">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Basic Information</h2>
+      </div>
+
+      <!-- Name -->
+      <div class="md:col-span-2">
+        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter residence name"
+        />
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['name']">{{ formErrors['name'] }}</p>
+      </div>
+
+      <!-- Description -->
+      <div class="md:col-span-2">
+        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          rows="4"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter residence description"
+        ></textarea>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+        <select 
+          id="status" 
+          formControlName="status"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+        >
+          <option [ngValue]="null" disabled>Select status</option>
+          <option [value]="ResidenceStatus.ACTIVE">Active</option>
+          <option [value]="ResidenceStatus.INACTIVE">Inactive</option>
+          <option [value]="ResidenceStatus.UNDER_MAINTENANCE">Under Maintenance</option>
+          <option [value]="ResidenceStatus.COMING_SOON">Coming Soon</option>
+        </select>
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['status']">{{ formErrors['status'] }}</p>
+      </div>
+
+      <!-- Manager ID -->
+      <div>
+        <label for="managerId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manager ID</label>
+        <input 
+          type="text" 
+          id="managerId" 
+          formControlName="managerId"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter manager ID"
+        />
+      </div>
+
+      <!-- Starting Price -->
+      <div>
+        <label for="startingPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Price *</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">$</span>
+          </div>
+          <input 
+            type="number" 
+            id="startingPrice" 
+            formControlName="startingPrice"
+            class="pl-8 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['startingPrice']">{{ formErrors['startingPrice'] }}</p>
+      </div>
+
+      <!-- Total Apartments -->
+      <div>
+        <label for="totalApartments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Apartments *</label>
+        <input 
+          type="number" 
+          id="totalApartments" 
+          formControlName="totalApartments"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter total apartments"
+          min="1"
+        />
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['totalApartments']">{{ formErrors['totalApartments'] }}</p>
+      </div>
+
+      <!-- Available Apartments -->
+      <div>
+        <label for="availableApartments" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Available Apartments *</label>
+        <input 
+          type="number" 
+          id="availableApartments" 
+          formControlName="availableApartments"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter available apartments"
+          min="0"
+        />
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['availableApartments']">{{ formErrors['availableApartments'] }}</p>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="md:col-span-2">
+        <label for="contactInformation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Information</label>
+        <textarea 
+          id="contactInformation" 
+          formControlName="contactInformation"
+          rows="3"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          placeholder="Enter contact information"
+        ></textarea>
+      </div>
+
+      <!-- Address Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Address</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Click on the map to select a location or use the "My Location" button to use your current location.
+        </p>
+      </div>
+
+      <!-- Map for Address Selection -->
+      <div class="md:col-span-2 mb-6 max-h-[400px]">
+        <app-map
+          [address]="currentAddress"
+          [editable]="true"
+          (addressChange)="onAddressChange($event)"
+        ></app-map>
+      </div>
+
+      <div formGroupName="address">
+        <!-- Street -->
+        <div>
+          <label for="street" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street *</label>
+          <input 
+            type="text" 
+            id="street" 
+            formControlName="street"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter street address"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['address.street']">{{ formErrors['address.street'] }}</p>
+        </div>
+
+        <!-- City -->
+        <div>
+          <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
+          <input 
+            type="text" 
+            id="city" 
+            formControlName="city"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter city"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['address.city']">{{ formErrors['address.city'] }}</p>
+        </div>
+
+        <!-- State -->
+        <div>
+          <label for="state" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State *</label>
+          <input 
+            type="text" 
+            id="state" 
+            formControlName="state"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter state"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['address.state']">{{ formErrors['address.state'] }}</p>
+        </div>
+
+        <!-- Postal Code -->
+        <div>
+          <label for="postalCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Postal Code *</label>
+          <input 
+            type="text" 
+            id="postalCode" 
+            formControlName="postalCode"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter postal code"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['address.postalCode']">{{ formErrors['address.postalCode'] }}</p>
+        </div>
+
+        <!-- Country -->
+        <div>
+          <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country *</label>
+          <input 
+            type="text" 
+            id="country" 
+            formControlName="country"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter country"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['address.country']">{{ formErrors['address.country'] }}</p>
+        </div>
+
+        <!-- Hidden Latitude and Longitude -->
+        <input type="hidden" formControlName="latitude" />
+        <input type="hidden" formControlName="longitude" />
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Images</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Images</label>
+          <div 
+            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors"
+            (click)="imageInput.click()"
+          >
+            <div class="space-y-1 text-center">
+          
+              <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                <label for="image-upload" class="relative cursor-pointer rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 focus-within:outline-none">
+                  <span>Upload images</span>
+                  <input 
+                    #imageInput
+                    id="image-upload" 
+                    name="image-upload" 
+                    type="file" 
+                    class="sr-only" 
+                    multiple
+                    accept="image/*"
+                    (change)="onImagesSelected($event)"
+                  />
+                </label>
+                <p class="pl-1">or drag and drop</p>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                PNG, JPG, GIF up to 10MB
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4" *ngIf="selectedImages.length > 0">
+          <div class="relative group" *ngFor="let image of selectedImages; let i = index; trackBy: trackByIndex">
+            <img 
+            [src]="previewUrls[i]"
+              alt="Preview" 
+              class="h-32 w-full object-cover rounded-lg"
+            />
+            <button 
+              type="button"
+              (click)="removeImage(i)"
+              class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Existing Images (for edit mode) -->
+        <div class="mt-6" *ngIf="isEditMode && existingImageUrls.length > 0">
+          <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Existing Images</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="relative group" *ngFor="let imageUrl of existingImageUrls; let i = index; trackBy: trackByIndex">
+              <img 
+                [src]="imageUrl" 
+                alt="Existing image" 
+                class="h-32 w-full object-cover rounded-lg"
+              />
+              <button 
+                type="button"
+                (click)="removeExistingImage(i)"
+                class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amenities Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Amenities</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div formArrayName="amenities" class="space-y-3">
+          <div class="flex gap-2" *ngFor="let control of amenitiesFormArray.controls; let i = index; trackBy: trackByIndex">
+            <input 
+              type="text" 
+              [formControlName]="i"
+              class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              placeholder="Enter amenity"
+            />
+            <button 
+              type="button" 
+              (click)="removeAmenity(i)"
+              class="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button 
+          type="button" 
+          (click)="addAmenity()"
+          class="mt-3 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Add Amenity
+        </button>
+      </div>
+
+      <!-- Documents Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Documents</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Documents</label>
+          <div 
+            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors"
+            (click)="documentInput.click()"
+          >
+            <div class="space-y-1 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                <label for="document-upload" class="relative cursor-pointer rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 focus-within:outline-none">
+                  <span>Upload documents</span>
+                  <input 
+                    #documentInput
+                    id="document-upload" 
+                    name="document-upload" 
+                    type="file" 
+                    class="sr-only" 
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+                    (change)="onDocumentsSelected($event)"
+                  />
+                </label>
+                <p class="pl-1">or drag and drop</p>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                PDF, DOC, DOCX, XLS, XLSX, TXT up to 10MB
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document List -->
+        <div class="mt-4 space-y-3" *ngIf="selectedDocuments.length > 0">
+          <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" *ngFor="let doc of selectedDocuments; let i = index; trackBy: trackByIndex">
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <div>
+                <div class="font-medium text-gray-800 dark:text-white">{{ doc.file.name }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{ formatFileSize(doc.file.size) }} • {{ doc.file.type || 'Unknown type' }}</div>
+              </div>
+            </div>
+            <button 
+              type="button"
+              (click)="removeDocument(i)"
+              class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Existing Documents (for edit mode) -->
+        <div class="mt-6" *ngIf="isEditMode && existingDocuments.length > 0">
+          <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Existing Documents</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" *ngFor="let doc of existingDocuments; let i = index; trackBy: trackByIndex">
+              <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <div>
+                  <div class="font-medium text-gray-800 dark:text-white">{{ doc.name }}</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">{{ doc.type }} • Uploaded {{ doc.uploadedAt | date }}</div>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <a 
+                  [href]="doc.url" 
+                  target="_blank"
+                  class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </a>
+                <button 
+                  type="button"
+                  (click)="removeExistingDocument(i)"
+                  class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <a 
+        routerLink="/residences"
+        class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      >
+        Cancel
+      </a>
+      <button 
+        type="submit" 
+        [disabled]="residenceForm.invalid || (loading$ | async) || isSubmitting"
+        class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Residence' }}
+      </button>
+    </div>
+  </form>
+</div>

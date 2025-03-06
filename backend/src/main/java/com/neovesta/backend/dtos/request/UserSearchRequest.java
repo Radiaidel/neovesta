@@ -1,6 +1,5 @@
 package com.neovesta.backend.dtos.request;
 
-import com.neovesta.backend.models.enums.Role;
 import lombok.Data;
 
 @Data
