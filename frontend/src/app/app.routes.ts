@@ -93,23 +93,26 @@ export const routes: Routes = [
       import("./components/contract/contract-form/contract-form.component").then((m) => m.ContractFormComponent),
     canActivate: [authGuard]
   },
-  // {
-  //   path: "residences",
-  //   loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/create", loadComponent: () => import("./components/residence/residence-form/residence-form.component").then((m) => m.ResidenceFormComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/:id", loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/:id/edit", loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
+  {
+    path: "features",
+    loadComponent: () =>
+      import("./components/feature/feature-list/feature-list.component").then((m) => m.FeatureListComponent),
+  },
+  {
+    path: "features/new",
+    loadComponent: () =>
+      import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+  },
+  {
+    path: "features/:id",
+    loadComponent: () =>
+      import("./components/feature/feature-detail/feature-detail.component").then((m) => m.FeatureDetailComponent),
+  },
+  {
+    path: "features/:id/edit",
+    loadComponent: () =>
+      import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+  },
   {
     path: "**",
     loadComponent: () => import("./components/shared/not-found/not-found.component").then((m) => m.NotFoundComponent),
