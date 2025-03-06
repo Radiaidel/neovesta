@@ -1,0 +1,211 @@
+<app-header></app-header>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+          <a routerLink="/contracts" class="hover:underline">Contracts</a>
+          <span>/</span>
+          <span>{{ isEditMode ? 'Edit' : 'New' }} Contract</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+          {{ isEditMode ? 'Edit' : 'Create' }} Contract
+        </h1>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="contractForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Basic Information Section -->
+        <div class="md:col-span-2">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Contract Information</h2>
+        </div>
+
+        <!-- Resident -->
+        <div>
+          <label for="residentId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Resident *</label>
+          <select 
+            id="residentId" 
+            formControlName="residentId"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [attr.disabled]="residentIdFromRoute ? true : null"
+          >
+            <option [ngValue]="null" disabled>Select resident</option>
+            <option *ngFor="let resident of residents" [value]="resident.id">{{ resident.firstName }} {{ resident.lastName }}</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['residentId']">{{ formErrors['residentId'] }}</p>
+        </div>
+
+        <!-- Residence -->
+        <div>
+          <label for="residenceId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Residence *</label>
+          <select 
+            id="residenceId" 
+            formControlName="residenceId"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          >
+            <option [ngValue]="null" disabled>Select residence</option>
+            <option *ngFor="let residence of residences" [value]="residence.id">{{ residence.name }}</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['residenceId']">{{ formErrors['residenceId'] }}</p>
+        </div>
+
+        <!-- Contract Type -->
+        <div>
+          <label for="contractType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Type *</label>
+          <select 
+            id="contractType" 
+            formControlName="contractType"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          >
+            <option [ngValue]="null" disabled>Select contract type</option>
+            <option [ngValue]="ContractType.LEASE">Lease</option>
+            <option [ngValue]="ContractType.RENT">Rent</option>
+            <option [ngValue]="ContractType.PURCHASE">Purchase</option>
+            <option [ngValue]="ContractType.TEMPORARY">Temporary</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['contractType']">{{ formErrors['contractType'] }}</p>
+        </div>
+
+        <!-- Start Date -->
+        <div>
+          <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
+          <input 
+            type="date" 
+            id="startDate" 
+            formControlName="startDate"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['startDate']">{{ formErrors['startDate'] }}</p>
+        </div>
+
+        <!-- End Date -->
+        <div>
+          <label for="endDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
+          <input 
+            type="date" 
+            id="endDate" 
+            formControlName="endDate"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['endDate']">{{ formErrors['endDate'] }}</p>
+        </div>
+
+        <!-- Total Amount -->
+        <div>
+          <label for="totalAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Amount *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 dark:text-gray-400">$</span>
+            </div>
+            <input 
+              type="number" 
+              id="totalAmount" 
+              formControlName="totalAmount"
+              class="pl-8 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['totalAmount']">{{ formErrors['totalAmount'] }}</p>
+        </div>
+
+        <!-- Paid Amount -->
+        <div>
+          <label for="paidAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paid Amount *</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 dark:text-gray-400">$</span>
+            </div>
+            <input 
+              type="number" 
+              id="paidAmount" 
+              formControlName="paidAmount"
+              class="pl-8 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paidAmount']">{{ formErrors['paidAmount'] }}</p>
+        </div>
+
+        <!-- Payment Frequency -->
+        <div>
+          <label for="paymentFrequency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Frequency *</label>
+          <select 
+            id="paymentFrequency" 
+            formControlName="paymentFrequency"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          >
+            <option [ngValue]="null" disabled>Select payment frequency</option>
+            <option [ngValue]="PaymentFrequency.MONTHLY">Monthly</option>
+            <option [ngValue]="PaymentFrequency.QUARTERLY">Quarterly</option>
+            <option [ngValue]="PaymentFrequency.SEMI_ANNUALLY">Semi-Annually</option>
+            <option [ngValue]="PaymentFrequency.ANNUALLY">Annually</option>
+            <option [ngValue]="PaymentFrequency.ONE_TIME">One Time</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paymentFrequency']">{{ formErrors['paymentFrequency'] }}</p>
+        </div>
+
+        <!-- Payment Method -->
+        <div>
+          <label for="paymentMethod" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method *</label>
+          <select 
+            id="paymentMethod" 
+            formControlName="paymentMethod"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          >
+            <option [ngValue]="null" disabled>Select payment method</option>
+            <option [ngValue]="PaymentMethod.BANK_TRANSFER">Bank Transfer</option>
+            <option [ngValue]="PaymentMethod.CREDIT_CARD">Credit Card</option>
+            <option [ngValue]="PaymentMethod.CASH">Cash</option>
+            <option [ngValue]="PaymentMethod.CHECK">Check</option>
+            <option [ngValue]="PaymentMethod.DIRECT_DEBIT">Direct Debit</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paymentMethod']">{{ formErrors['paymentMethod'] }}</p>
+        </div>
+
+        <!-- Contract Rules -->
+        <div class="md:col-span-2">
+          <label for="contractRules" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Rules</label>
+          <textarea 
+            id="contractRules" 
+            formControlName="contractRules"
+            rows="6"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            placeholder="Enter contract rules and additional terms..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <button 
+        [disabled]="isFormDirty && !isSubmitting"
+          routerLink="/contracts"
+          class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+      </button>
+        <button 
+          type="submit" 
+          [disabled]="contractForm.invalid || (loading$ | async) || isSubmitting"
+          class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Contract' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="unsaved-changes" *ngIf="isFormDirty">
+        ⚠ Vous avez des modifications non sauvegardées !
+      </div>
+  </div>
