@@ -4,6 +4,7 @@ import { authGuard } from "./guards/auth.guard"
 import { LandingComponent } from './components/landing-page/landing.component';
 import { Role } from './models/user.model';
 import { roleGuard } from './guards/role.guard';
+import { ContractRequiredGuard } from './guards/contract-required.guard';
 
 export const routes: Routes = [
   { path: "login", component: LoginComponent },
@@ -51,6 +52,7 @@ export const routes: Routes = [
     path: "residences/new",
     loadComponent: () =>
       import("./components/residence/residence-form/residence-form.component").then((m) => m.ResidenceFormComponent),
+    canActivate: [authGuard]
   },
   {
     path: "residences/:id",
@@ -58,11 +60,38 @@ export const routes: Routes = [
       import("./components/residence/residence-detail/residence-detail.component").then(
         (m) => m.ResidenceDetailComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "residences/:id/edit",
     loadComponent: () =>
       import("./components/residence/residence-form/residence-form.component").then((m) => m.ResidenceFormComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: "contracts",
+    loadComponent: () =>
+      import("./components/contract/contract-list/contract-list.component").then((m) => m.ContractListComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: "contracts/new",
+    loadComponent: () =>
+      import("./components/contract/contract-form/contract-form.component").then((m) => m.ContractFormComponent ),
+    canDeactivate: [ContractRequiredGuard],
+    canActivate: [authGuard]
+  },
+  {
+    path: "contracts/:id",
+    loadComponent: () =>
+      import("./components/contract/contract-detail/contract-detail.component").then((m) => m.ContractDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: "contracts/:id/edit",
+    loadComponent: () =>
+      import("./components/contract/contract-form/contract-form.component").then((m) => m.ContractFormComponent),
+    canActivate: [authGuard]
   },
   // {
   //   path: "residences",
