@@ -46,6 +46,7 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
 
 

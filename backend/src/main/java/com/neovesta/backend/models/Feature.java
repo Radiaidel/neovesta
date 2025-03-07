@@ -65,6 +65,7 @@ public class Feature {
     private Boolean requiresManagerApproval;
 
     @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
 
     @CreationTimestamp

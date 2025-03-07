@@ -15,6 +15,8 @@ import { ContractEffects } from './store/contract/contract.effects';
 import { provideAnimations } from "@angular/platform-browser/animations"
 import { featureReducer } from './store/feature/feature.reducer';
 import { FeatureEffects } from './store/feature/feature.effects';
+import { reservationReducer } from './store/reservation/reservation.reducer';
+import { ReservationEffects } from './store/reservation/reservation.effects';
 
 export const appConfig: ApplicationConfig = {
 
@@ -27,9 +29,10 @@ providers: [
     residences: residenceReducer,
     contract: contractReducer,
     feature: featureReducer,
+    reservations : reservationReducer
 
   }),
-  provideEffects([UserEffects , ResidenceEffects , ContractEffects , FeatureEffects]),
+  provideEffects([UserEffects , ResidenceEffects , ContractEffects , FeatureEffects , ReservationEffects]),
   provideAnimations(),
   provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
 ],
