@@ -149,6 +149,34 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "subscriptions",
+    loadComponent: () =>
+      import("./components/subscription/subscription-list/subscription-list.component").then(
+        (m) => m.SubscriptionListComponent,
+      ),
+  },
+  {
+    path: "subscriptions/new",
+    loadComponent: () =>
+      import("./components/subscription/subscription-form/subscription-form.component").then(
+        (m) => m.SubscriptionFormComponent,
+      ),
+  },
+  {
+    path: "subscriptions/:id",
+    loadComponent: () =>
+      import("./components/subscription/subscription-detail/subscription-detail.component").then(
+        (m) => m.SubscriptionDetailComponent,
+      ),
+  },
+  {
+    path: "subscriptions/:id/edit",
+    loadComponent: () =>
+      import("./components/subscription/subscription-form/subscription-form.component").then(
+        (m) => m.SubscriptionFormComponent,
+      ),
+  },
+  {
     path: "**",
     loadComponent: () => import("./components/shared/not-found/not-found.component").then((m) => m.NotFoundComponent),
   },

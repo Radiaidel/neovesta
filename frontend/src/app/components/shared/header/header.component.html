@@ -30,6 +30,13 @@
                         class="text-white hover:text-yellow-300 border-b-2 border-transparent hover:border-yellow-300 px-1 py-2 text-sm font-medium transition-colors duration-200">
                         Reservations
                     </a>
+
+                    <a *ngIf="isResidentOrManagerOrSubManager"
+                    routerLink="/subscriptions"
+                    class="text-white hover:text-yellow-300 border-b-2 border-transparent hover:border-yellow-300 px-1 py-2 text-sm font-medium transition-colors duration-200">
+                subscriptions
+                </a>
+
                     <a *ngIf="isResidentOrManagerOrSubManager"
                         routerLink="/my-reservations"
                         class="text-white hover:text-yellow-300 border-b-2 border-transparent hover:border-yellow-300 px-1 py-2 text-sm font-medium transition-colors duration-200">
