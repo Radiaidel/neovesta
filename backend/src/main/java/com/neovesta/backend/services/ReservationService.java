@@ -1,6 +1,7 @@
 package com.neovesta.backend.services;
 
 import com.neovesta.backend.dtos.request.ReservationRequestDTO;
+import com.neovesta.backend.dtos.response.PageResponse;
 import com.neovesta.backend.dtos.response.ReservationResponseDTO;
 import com.neovesta.backend.models.enums.ReservationStatus;
 
@@ -16,4 +17,17 @@ public interface ReservationService {
     ReservationResponseDTO rejectReservation(UUID reservationId, String adminNote);
     List<ReservationResponseDTO> getReservationsByStatus(ReservationStatus status);
     List<ReservationResponseDTO> getReservationsByDate(String filter);
+    ReservationResponseDTO getReservationById(UUID id);
+    PageResponse<ReservationResponseDTO> getAllReservations(
+        int page, 
+        int size, 
+        String sortBy, 
+        String sortDir,
+        UUID residentId,
+        UUID featureId,
+        ReservationStatus status,
+        String dateFilter,
+        String search
+    );
+    
 }

@@ -2,6 +2,8 @@ package com.neovesta.backend.exceptions;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+
+import org.hibernate.LazyInitializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
 
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +24,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(LazyInitializationException.class)
+    public ResponseEntity<String> handleLazyInitialization(LazyInitializationException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erreur de chargement des données: " + ex.getMessage());
+    }
+
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<String> handleMultipartException(MultipartException ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-            .body("File size exceeds limit");
+                .body("File size exceeds limit");
     }
 
     @ExceptionHandler(SubscriptionNotFoundException.class)
@@ -38,12 +45,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
     @ExceptionHandler(ResidenceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResidenceNotFoundException(ResidenceNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
     @ExceptionHandler(FeatureException.class)
     public ResponseEntity<ErrorResponse> handleFeatureException(FeatureException ex) {
         return new ResponseEntity<>(new ErrorResponse(
@@ -53,7 +62,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 null), HttpStatus.BAD_REQUEST);
     }
-
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -92,8 +100,7 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toMap(
                         FieldError::getField,
                         error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Invalid value",
-                        (existing, replacement) -> existing + "; " + replacement
-                ));
+                        (existing, replacement) -> existing + "; " + replacement));
 
         log.error("Validation error: {}", errors);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", errors);
@@ -107,8 +114,7 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toMap(
                         violation -> violation.getPropertyPath().toString(),
                         violation -> violation.getMessage(),
-                        (existing, replacement) -> existing + "; " + replacement
-                ));
+                        (existing, replacement) -> existing + "; " + replacement));
 
         log.error("Constraint violation: {}", errors);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", errors);
@@ -125,7 +131,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(status, message, null);
     }
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, Map<String, String> errors) {
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
+            Map<String, String> errors) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(status.value())

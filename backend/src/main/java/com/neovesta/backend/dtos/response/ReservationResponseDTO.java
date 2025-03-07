@@ -1,5 +1,8 @@
 package com.neovesta.backend.dtos.response;
 
+import com.neovesta.backend.dtos.embedded.FeatureEmbeddedDTO;
+import com.neovesta.backend.dtos.embedded.ResidentEmbeddedDTO;
+import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.enums.ReservationStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +14,8 @@ import java.util.UUID;
 @Builder
 public class ReservationResponseDTO {
     private UUID id;
-    private UUID residentId;
-    private UUID featureId;
+     private ResidentEmbeddedDTO resident;
+    private FeatureEmbeddedDTO feature;
     private LocalDateTime requestedDate;
     private LocalDateTime scheduledDate;
     private ReservationStatus status;

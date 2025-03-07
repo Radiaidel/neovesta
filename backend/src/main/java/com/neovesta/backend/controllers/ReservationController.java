@@ -1,6 +1,7 @@
 package com.neovesta.backend.controllers;
 
 import com.neovesta.backend.dtos.request.ReservationRequestDTO;
+import com.neovesta.backend.dtos.response.PageResponse;
 import com.neovesta.backend.dtos.response.ReservationResponseDTO;
 import com.neovesta.backend.models.enums.ReservationStatus;
 import com.neovesta.backend.services.ReservationService;
@@ -20,6 +21,26 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    @GetMapping
+    public ResponseEntity<PageResponse<ReservationResponseDTO>> getAllReservations(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "requestedDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) UUID residentId,
+            @RequestParam(required = false) UUID featureId,
+            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) String dateFilter,
+            @RequestParam(required = false) String search) {
+        
+        return ResponseEntity.ok(reservationService.getAllReservations(
+            page, size, sortBy, sortDir, residentId, featureId, status, dateFilter, search
+        ));
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ReservationResponseDTO> getReservationById(@PathVariable UUID id) {
+        return ResponseEntity.ok(reservationService.getReservationById(id));
+    }
     @PostMapping
     public ResponseEntity<ReservationResponseDTO> createReservation(@Valid @RequestBody ReservationRequestDTO dto) {
         return ResponseEntity.ok(reservationService.createReservation(dto));

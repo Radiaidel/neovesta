@@ -131,20 +131,20 @@ public class FeatureServiceImpl implements FeatureService {
             Boolean active, String search, Pageable pageable) {
         
         Pageable adjustedPageable = adjustPageableForSnakeCase(pageable);
+    
+
         
-        FeatureType typeEnum = null;
         if (featureType != null && !featureType.trim().isEmpty()) {
             try {
-                typeEnum = FeatureType.valueOf(featureType.toUpperCase());
+                FeatureType.valueOf(featureType.toUpperCase());
             } catch (IllegalArgumentException e) {
                 throw new FeatureException("Invalid feature type: " + featureType);
             }
         }
 
-        FeatureCategory categoryEnum = null;
         if (featureCategory != null && !featureCategory.trim().isEmpty()) {
             try {
-                categoryEnum = FeatureCategory.valueOf(featureCategory.toUpperCase());
+                FeatureCategory.valueOf(featureCategory.toUpperCase());
             } catch (IllegalArgumentException e) {
                 throw new FeatureException("Invalid feature category: " + featureCategory);
             }

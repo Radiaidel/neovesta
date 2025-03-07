@@ -122,7 +122,7 @@ public class ResidenceServiceImpl implements ResidenceService {
             }
 
             if (amenities != null && amenities.length > 0) {
-                predicates.add(root.join("amenities").in(amenities));
+                predicates.add(root.join("amenities").in((Object[]) amenities));
             }
 
             if (minPrice != null) {
