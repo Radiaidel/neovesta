@@ -37,6 +37,7 @@ export interface Feature extends FeatureRequest {
   id: string
   imageUrl?: string
   residenceName?: string
+  pricePerMonth?: number
   createdAt: string
   updatedAt?: string
 }
