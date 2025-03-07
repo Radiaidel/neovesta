@@ -4,6 +4,9 @@ import com.neovesta.backend.dtos.request.SubscriptionRequestDTO;
 import com.neovesta.backend.dtos.response.SubscriptionResponseDTO;
 import com.neovesta.backend.services.SubscriptionService;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +30,8 @@ public class SubscriptionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SubscriptionResponseDTO> update(@PathVariable UUID id, @RequestBody SubscriptionRequestDTO dto) {
+    public ResponseEntity<SubscriptionResponseDTO> update(@PathVariable UUID id,
+            @RequestBody SubscriptionRequestDTO dto) {
         return ResponseEntity.ok(subscriptionService.updateSubscription(id, dto));
     }
 
@@ -48,7 +52,8 @@ public class SubscriptionController {
     }
 
     @PatchMapping("/{id}/payment-status")
-    public ResponseEntity<SubscriptionResponseDTO> updatePaymentStatus(@PathVariable UUID id, @RequestParam String status) throws BadRequestException {
+    public ResponseEntity<SubscriptionResponseDTO> updatePaymentStatus(@PathVariable UUID id,
+            @RequestParam String status) throws BadRequestException {
         return ResponseEntity.ok(subscriptionService.updatePaymentStatus(id, status));
     }
 
@@ -78,7 +83,20 @@ public class SubscriptionController {
     }
 
     @GetMapping("/period")
-    public ResponseEntity<List<SubscriptionResponseDTO>> getByPeriod(@RequestParam LocalDate start, @RequestParam LocalDate end) throws BadRequestException {
+    public ResponseEntity<List<SubscriptionResponseDTO>> getByPeriod(@RequestParam LocalDate start,
+            @RequestParam LocalDate end) throws BadRequestException {
         return ResponseEntity.ok(subscriptionService.getSubscriptionsByPeriod(start, end));
     }
+
+    @GetMapping
+public ResponseEntity<Page<SubscriptionResponseDTO>> getSubscriptions(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "startDate") String sortBy,
+    @RequestParam(defaultValue = "desc") String sortDir,
+    @RequestParam UUID residenceId) {
+
+    Page<SubscriptionResponseDTO> subscriptions = subscriptionService.getSubscriptionsByResidence( residenceId,  PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy)));
+    return ResponseEntity.ok(subscriptions);
+}
 }

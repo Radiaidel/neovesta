@@ -13,16 +13,17 @@ import java.util.UUID;
 @Data
 @Builder
 public class SubscriptionResponseDTO {
-
-    public UUID id;
-    public UserEmbeddedDTO user;
-    public FeatureEmbeddedDTO feature;
-    public SubscriptionType type;
-    public LocalDate startDate;
-    public LocalDate endDate;
-    public Double price;
-    public PaymentStatus paymentStatus;
-    public Boolean isActive;
-    public Boolean isConfirmedByAdmin;
-    public String adminNote;
+    private UUID id;
+    private UserEmbeddedDTO user;
+    private FeatureEmbeddedDTO feature;
+    private SubscriptionType type;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Double price;
+    private PaymentStatus paymentStatus;
+    private Boolean isActive;
+    private Boolean isConfirmedByAdmin;
+    private String adminNote;
+    private String userNote;
 }
+

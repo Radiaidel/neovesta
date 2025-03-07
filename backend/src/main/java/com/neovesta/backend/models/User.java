@@ -60,4 +60,23 @@ public class User {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN || this.role == Role.SUPER_ADMIN;
+    }
+    
+    public boolean isManager() {
+        return this.role == Role.RESIDENCE_MANAGER;
+    }
+    
+    public boolean isSubManager() {
+        return this.role == Role.SUB_RESIDENCE_MANAGER;
+    }
+    
+    public boolean isResident() {
+        return this.role == Role.RESIDENT;
+    }
+    
+    public boolean isSuperAdmin() {
+        return this.role == Role.SUPER_ADMIN;
+    }
 }

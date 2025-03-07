@@ -52,8 +52,7 @@ public class Residence {
 
     @OneToMany(mappedBy = "residence", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feature> features = new ArrayList<>();
-
-    @OneToOne(mappedBy = "residence")
+    @OneToOne(mappedBy = "residence", fetch = FetchType.LAZY)
     private ResidenceManager manager;
 
     @Column(columnDefinition = "TEXT")
@@ -61,7 +60,7 @@ public class Residence {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private ResidenceStatus status ;
+    private ResidenceStatus status;
 
     @PrePersist
     protected void onCreate() {

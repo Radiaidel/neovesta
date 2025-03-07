@@ -9,6 +9,8 @@ import com.neovesta.backend.models.enums.PaymentStatus;
 import com.neovesta.backend.repositories.SubscriptionRepository;
 import com.neovesta.backend.services.SubscriptionService;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,4 +153,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .map(mapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+public Page<SubscriptionResponseDTO> getSubscriptionsByResidence(UUID residenceId, Pageable pageable) {
+    Page<Subscription> subscriptions = repository.findByFeatureResidenceId(residenceId, pageable);
+    return subscriptions.map(mapper::toResponseDTO);
+}
 }
