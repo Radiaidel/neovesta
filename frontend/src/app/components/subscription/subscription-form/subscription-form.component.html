@@ -1,0 +1,225 @@
+<app-header></app-header>
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading State -->
+    <div class="flex justify-center my-12" *ngIf="loading$ | async">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  
+    <ng-container *ngIf="!(loading$ | async)">
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+          <a routerLink="/subscriptions" class="hover:underline">Subscriptions</a>
+          <span>/</span>
+          <span>{{ isEditMode ? 'Edit Subscription' : 'New Subscription' }}</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+          {{ isEditMode ? 'Edit Subscription' : 'Create New Subscription' }}
+        </h1>
+      </div>
+  
+      <!-- Form -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <form [formGroup]="subscriptionForm" (ngSubmit)="onSubmit()">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- User Selection (Managers only) -->
+            <div *ngIf="isManager" class="md:col-span-2">
+              <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User</label>
+              <select 
+                id="userId"
+                formControlName="userId"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              >
+                <option [ngValue]="''">Select a user</option>
+                <ng-container *ngIf="users$ | async as users">
+                  <option *ngFor="let user of users" [value]="user.id">
+                    {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+                  </option>
+                </ng-container>
+              </select>
+              <div 
+                *ngIf="subscriptionForm.get('userId')?.invalid && subscriptionForm.get('userId')?.touched"
+                class="text-red-500 text-sm mt-1"
+              >
+                User is required
+              </div>
+            </div>
+  
+            <!-- Service Selection -->
+            <div class="md:col-span-2">
+              <label for="featureId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service</label>
+              <select 
+                id="featureId"
+                formControlName="featureId"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              >
+                <option [ngValue]="''">Select a service</option>
+                <ng-container *ngIf="features$ | async as features">
+                  <option *ngFor="let feature of features" [value]="feature.id">
+                    {{ feature.name }} - ${{ feature.pricePerMonth }}
+                  </option>
+                </ng-container>
+              </select>
+              <div 
+                *ngIf="subscriptionForm.get('featureId')?.invalid && subscriptionForm.get('featureId')?.touched"
+                class="text-red-500 text-sm mt-1"
+              >
+                Service is required
+              </div>
+            </div>
+  
+            <!-- Subscription Type -->
+            <div>
+              <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subscription Type</label>
+              <select 
+                id="type"
+                formControlName="type"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              >
+                <option [value]="SubscriptionType.MONTHLY">{{ formatSubscriptionType(SubscriptionType.MONTHLY) }}</option>
+                <option [value]="SubscriptionType.YEARLY">{{ formatSubscriptionType(SubscriptionType.YEARLY) }}</option>
+              </select>
+            </div>
+  
+            <!-- Price -->
+            <div>
+              <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">$</span>
+                <input 
+                  type="number"
+                  id="price"
+                  formControlName="price"
+                  class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 pl-8 pr-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              <div 
+                *ngIf="subscriptionForm.get('price')?.invalid && subscriptionForm.get('price')?.touched"
+                class="text-red-500 text-sm mt-1"
+              >
+                <span *ngIf="subscriptionForm.get('price')?.errors?.['required']">Price is required</span>
+                <span *ngIf="subscriptionForm.get('price')?.errors?.['min']">Price must be greater than or equal to 0</span>
+              </div>
+            </div>
+  
+            <!-- Start Date -->
+            <div>
+              <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+              <input 
+                type="date"
+                id="startDate"
+                formControlName="startDate"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              />
+              <div 
+                *ngIf="subscriptionForm.get('startDate')?.invalid && subscriptionForm.get('startDate')?.touched"
+                class="text-red-500 text-sm mt-1"
+              >
+                Start date is required
+              </div>
+            </div>
+  
+            <!-- End Date -->
+            <div>
+              <label for="endDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+              <input 
+                type="date"
+                id="endDate"
+                formControlName="endDate"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              />
+              <div 
+                *ngIf="subscriptionForm.get('endDate')?.invalid && subscriptionForm.get('endDate')?.touched"
+                class="text-red-500 text-sm mt-1"
+              >
+                End date is required
+              </div>
+            </div>
+  
+            <!-- Manager-only fields -->
+            <ng-container *ngIf="isManager">
+              <!-- Active Status -->
+              <div>
+                <div class="flex items-center">
+                  <input 
+                    type="checkbox"
+                    id="isActive"
+                    formControlName="isActive"
+                    class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                  />
+                  <label for="isActive" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Active
+                  </label>
+                </div>
+              </div>
+  
+              <!-- Admin Confirmation -->
+              <div>
+                <div class="flex items-center">
+                  <input 
+                    type="checkbox"
+                    id="isConfirmedByAdmin"
+                    formControlName="isConfirmedByAdmin"
+                    class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                  />
+                  <label for="isConfirmedByAdmin" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Confirmed by Admin
+                  </label>
+                </div>
+              </div>
+  
+              <!-- Payment Status -->
+              <div class="md:col-span-2">
+                <label for="paymentStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Status</label>
+                <select 
+                  id="paymentStatus"
+                  formControlName="paymentStatus"
+                  class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                >
+                  <option [value]="PaymentStatus.PENDING">{{ formatPaymentStatus(PaymentStatus.PENDING) }}</option>
+                  <option [value]="PaymentStatus.PAID">{{ formatPaymentStatus(PaymentStatus.PAID) }}</option>
+                  <option [value]="PaymentStatus.FAILED">{{ formatPaymentStatus(PaymentStatus.FAILED) }}</option>
+                  <option [value]="PaymentStatus.REFUNDED">{{ formatPaymentStatus(PaymentStatus.REFUNDED) }}</option>
+                  <option [value]="PaymentStatus.CANCELLED">{{ formatPaymentStatus(PaymentStatus.CANCELLED) }}</option>
+                </select>
+              </div>
+  
+              <!-- Admin Note -->
+              <div class="md:col-span-2">
+                <label for="adminNote" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admin Note</label>
+                <textarea 
+                  id="adminNote"
+                  formControlName="adminNote"
+                  rows="3"
+                  class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                  placeholder="Add a note (optional)..."
+                ></textarea>
+              </div>
+            </ng-container>
+          </div>
+  
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-3 mt-8">
+            <button 
+              type="button"
+              (click)="cancel()"
+              class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+            >
+              {{ isEditMode ? 'Update Subscription' : 'Create Subscription' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>
+  
+  

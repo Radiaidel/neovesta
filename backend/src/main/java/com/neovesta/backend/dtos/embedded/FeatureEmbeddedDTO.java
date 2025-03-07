@@ -11,8 +11,6 @@ import java.util.UUID;
 @Builder
 public class FeatureEmbeddedDTO {
     private UUID id;
-    private ResidenceEmbeddedDTO residence;
-    private String residenceName;
     private String name;
     private String description;
     private FeatureType featureType;

@@ -40,21 +40,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
                 authenticationManager(authenticationConfiguration),
-                jwtService
-        );
+                jwtService);
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/residences").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/residences").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/residences/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/residences/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "RESIDENCE_MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/residences/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "RESIDENCE_MANAGER", "SUB_RESIDENCE_MANAGER")
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/residences/**")
+                        .hasAnyRole("SUPER_ADMIN", "ADMIN", "RESIDENCE_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/residences/**")
+                        .hasAnyRole("SUPER_ADMIN", "ADMIN", "RESIDENCE_MANAGER", "SUB_RESIDENCE_MANAGER")
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilter(jwtAuthenticationFilter)
@@ -66,23 +67,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200"));
-
-        // Ou pour le développement uniquement, vous pouvez autoriser toutes les origines
-        // configuration.addAllowedOriginPattern("*");
-
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Autoriser toutes les origines en développement
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
-
-        // Important pour les requêtes avec authentification
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // 1 heure de cache
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

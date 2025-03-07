@@ -11,15 +11,15 @@ import java.util.UUID;
 @Data
 @Builder
 public class SubscriptionRequestDTO {
-
-    public UUID userId;
-    public UUID featureId;
-    public SubscriptionType type;
-    public LocalDate startDate;
-    public LocalDate endDate;
-    public Double price;
-    public PaymentStatus paymentStatus;
-    Boolean isActive;
-    Boolean isConfirmedByAdmin;
-
+    private UUID userId;
+    private UUID featureId;
+    private SubscriptionType type;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Double price;
+    private PaymentStatus paymentStatus;
+    private Boolean isActive;
+    private Boolean isConfirmedByAdmin;
+    private String userNote;
 }
+

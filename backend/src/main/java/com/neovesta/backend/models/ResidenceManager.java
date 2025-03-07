@@ -1,10 +1,17 @@
 package com.neovesta.backend.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.neovesta.backend.models.enums.Role;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,9 +28,12 @@ public class ResidenceManager extends User {
     @OneToOne
     @JoinColumn(name = "residence_id")
     private Residence residence;
+
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
+    private List<SubResidenceManager> subManagers = new ArrayList<>();
+
     @Override
     public void setRole(Role role) {
         super.setRole(Role.RESIDENCE_MANAGER);
     }
-
 }

@@ -4,13 +4,17 @@ import com.neovesta.backend.models.enums.FeatureCategory;
 import com.neovesta.backend.models.enums.FeatureType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FeatureRequest {
     @NotNull(message = "Residence ID is required")
     private UUID residenceId;
@@ -31,8 +35,8 @@ public class FeatureRequest {
     @NotNull(message = "Active status is required")
     private Boolean active;
 
-    private String imageUrl;
     private String termsAndConditions;
     private String cancellationPolicy;
     private Boolean requiresManagerApproval;
 }
+

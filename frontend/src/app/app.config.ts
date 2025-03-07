@@ -13,6 +13,12 @@ import { ResidenceEffects } from './store/residence/residence.effects';
 import { contractReducer } from './store/contract/contract.reducer';
 import { ContractEffects } from './store/contract/contract.effects';
 import { provideAnimations } from "@angular/platform-browser/animations"
+import { featureReducer } from './store/feature/feature.reducer';
+import { FeatureEffects } from './store/feature/feature.effects';
+import { reservationReducer } from './store/reservation/reservation.reducer';
+import { ReservationEffects } from './store/reservation/reservation.effects';
+import { subscriptionReducer } from './store/subscription/subscription.reducer';
+import { SubscriptionEffects } from './store/subscription/subscription.effects';
 
 export const appConfig: ApplicationConfig = {
 
@@ -23,9 +29,13 @@ providers: [
   provideStore({
     users: userReducer,
     residences: residenceReducer,
-    contract: contractReducer
+    contract: contractReducer,
+    feature: featureReducer,
+    reservations : reservationReducer,
+    subscriptions : subscriptionReducer
+
   }),
-  provideEffects([UserEffects , ResidenceEffects , ContractEffects]),
+  provideEffects([UserEffects , ResidenceEffects , ContractEffects , FeatureEffects , ReservationEffects, SubscriptionEffects]),
   provideAnimations(),
   provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
 ],

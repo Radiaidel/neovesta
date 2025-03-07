@@ -93,23 +93,89 @@ export const routes: Routes = [
       import("./components/contract/contract-form/contract-form.component").then((m) => m.ContractFormComponent),
     canActivate: [authGuard]
   },
-  // {
-  //   path: "residences",
-  //   loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/create", loadComponent: () => import("./components/residence/residence-form/residence-form.component").then((m) => m.ResidenceFormComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/:id", loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
-  // {
-  //   path: "residences/:id/edit", loadComponent: () => import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
-  //   canActivate: [authGuard],
-  // },
+  {
+    path: "features",
+    loadComponent: () =>
+      import("./components/feature/feature-list/feature-list.component").then((m) => m.FeatureListComponent),
+  },
+  {
+    path: "features/new",
+    loadComponent: () =>
+      import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+  },
+  {
+    path: "features/:id",
+    loadComponent: () =>
+      import("./components/feature/feature-detail/feature-detail.component").then((m) => m.FeatureDetailComponent),
+  },
+  {
+    path: "features/:id/edit",
+    loadComponent: () =>
+      import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+  },
+  {
+    path: "reservations",
+    loadComponent: () =>
+      import("./components/reservation/reservation-list/reservation-list.component").then(
+        (m) => m.ReservationListComponent,
+      ),
+  },
+  {
+    path: "reservations/new",
+    loadComponent: () =>
+      import("./components/reservation/reservation-form/reservation-form.component").then(
+        (m) => m.ReservationFormComponent,
+      ),
+  },
+  {
+    path: "reservations/:id",
+    loadComponent: () =>
+      import("./components/reservation/reservation-detail/reservation-detail.component").then(
+        (m) => m.ReservationDetailComponent,
+      ),
+  },
+  {
+    path: "reservations/:id/edit",
+    loadComponent: () =>
+      import("./components/reservation/reservation-form/reservation-form.component").then(
+        (m) => m.ReservationFormComponent,
+      ),
+  },
+  {
+    path: "my-reservations",
+    loadComponent: () =>
+      import("./components/reservation/my-reservations/my-reservations.component").then(
+        (m) => m.MyReservationsComponent,
+      ),
+  },
+  {
+    path: "subscriptions",
+    loadComponent: () =>
+      import("./components/subscription/subscription-list/subscription-list.component").then(
+        (m) => m.SubscriptionListComponent,
+      ),
+  },
+  {
+    path: "subscriptions/new",
+    loadComponent: () =>
+      import("./components/subscription/subscription-form/subscription-form.component").then(
+        (m) => m.SubscriptionFormComponent,
+      ),
+  },
+  {
+    path: "subscriptions/:id",
+    loadComponent: () =>
+      import("./components/subscription/subscription-detail/subscription-detail.component").then(
+        (m) => m.SubscriptionDetailComponent,
+      ),
+  },
+  {
+    path: "subscriptions/:id/edit",
+    loadComponent: () =>
+      import("./components/subscription/subscription-form/subscription-form.component").then(
+        (m) => m.SubscriptionFormComponent,
+      ),
+  },
   {
     path: "**",
     loadComponent: () => import("./components/shared/not-found/not-found.component").then((m) => m.NotFoundComponent),

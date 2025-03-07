@@ -1,0 +1,134 @@
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+          <a routerLink="/reservations" class="hover:underline">Reservations</a>
+          <span>/</span>
+          <span>{{ isEditMode ? 'Edit' : 'New' }} Reservation</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+          {{ isEditMode ? 'Edit' : 'Create' }} Reservation
+        </h1>
+      </div>
+    </div>
+  
+    <!-- Loading State -->
+    <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  
+    <!-- Form -->
+    <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Basic Information Section -->
+        <div class="md:col-span-2">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Reservation Details</h2>
+        </div>
+  
+        <!-- Service Selection -->
+        <div class="md:col-span-2">
+          <label for="featureId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service *</label>
+          <select 
+            id="featureId" 
+            formControlName="featureId"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            [disabled]="isEditMode"
+          >
+            <option [ngValue]="null" disabled>Select a service</option>
+            <option *ngFor="let feature of availableFeatures" [value]="feature.id">{{ feature.name }}</option>
+          </select>
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['featureId']">{{ formErrors['featureId'] }}</p>
+        </div>
+  
+        <!-- Selected Service Details -->
+        <div class="md:col-span-2 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" *ngIf="selectedFeature">
+          <div class="flex items-start gap-4">
+            <div class="w-24 h-24 rounded-lg overflow-hidden">
+              <img 
+                *ngIf="selectedFeature.imageUrl" 
+                [src]="selectedFeature.imageUrl" 
+                [alt]="selectedFeature.name"
+                class="w-full h-full object-cover"
+              />
+              <div 
+                *ngIf="!selectedFeature.imageUrl" 
+                class="w-full h-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ selectedFeature.name }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ selectedFeature.description }}</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <span class="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 rounded-full text-xs">
+                  {{ selectedFeature.featureType === 'RESERVATION_BASED' ? 'Reservation Based' : 'Subscription Based' }}
+                </span>
+                <span *ngIf="selectedFeature.requiresManagerApproval" class="px-2 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded-full text-xs">
+                  Requires Approval
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-gray-500 dark:text-gray-400" *ngIf="selectedFeature.requiresManagerApproval">
+            <div class="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>This service requires manager approval. Your reservation will be pending until approved.</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Requested Date -->
+        <div class="md:col-span-2">
+          <label for="requestedDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested Date & Time *</label>
+          <input 
+            type="datetime-local" 
+            id="requestedDate" 
+            formControlName="requestedDate"
+            [min]="minDate"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+          />
+          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['requestedDate']">{{ formErrors['requestedDate'] }}</p>
+        </div>
+  
+        <!-- Terms and Conditions -->
+        <div class="md:col-span-2 mt-4" *ngIf="selectedFeature?.termsAndConditions">
+          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h3 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Terms and Conditions</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ selectedFeature?.termsAndConditions }}</p>
+          </div>
+        </div>
+  
+        <!-- Cancellation Policy -->
+        <div class="md:col-span-2 mt-2" *ngIf="selectedFeature?.cancellationPolicy">
+          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h3 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Cancellation Policy</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ selectedFeature?.cancellationPolicy }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <a 
+          routerLink="/reservations"
+          class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+        </a>
+        <button 
+          type="submit" 
+          [disabled]="reservationForm.invalid || (loading$ | async) || isSubmitting || !userId"
+          class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Reservation' }}
+        </button>
+      </div>
+    </form>
+  </div>
+  

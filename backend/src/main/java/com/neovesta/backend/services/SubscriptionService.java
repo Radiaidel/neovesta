@@ -3,6 +3,8 @@ package com.neovesta.backend.services;
 import com.neovesta.backend.dtos.request.SubscriptionRequestDTO;
 import com.neovesta.backend.dtos.response.SubscriptionResponseDTO;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,4 +24,5 @@ public interface SubscriptionService {
     List<SubscriptionResponseDTO> getActiveSubscriptions();
     List<SubscriptionResponseDTO> getConfirmedSubscriptions();
     List<SubscriptionResponseDTO> getSubscriptionsByPeriod(LocalDate start, LocalDate end) throws BadRequestException;
+    Page<SubscriptionResponseDTO> getSubscriptionsByResidence(UUID residenceId, Pageable pageable);
 }

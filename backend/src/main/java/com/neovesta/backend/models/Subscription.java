@@ -29,7 +29,6 @@ public class Subscription {
     @JoinColumn(name = "feature_id", nullable = false)
     private Feature feature;
 
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SubscriptionType type;
@@ -54,4 +53,7 @@ public class Subscription {
     private Boolean isConfirmedByAdmin;
 
     private String adminNote;
+    
+    private String userNote;
 }
+

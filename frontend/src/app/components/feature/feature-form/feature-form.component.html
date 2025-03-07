@@ -1,0 +1,245 @@
+<app-header></app-header>
+<div class="container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+        <a routerLink="/features" class="hover:underline">Services</a>
+        <span>/</span>
+        <span>{{ isEditMode ? 'Edit' : 'New' }} Service</span>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+        {{ isEditMode ? 'Edit' : 'Create' }} Service
+      </h1>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="featureForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Basic Information Section -->
+      <div class="md:col-span-2">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Basic Information</h2>
+      </div>
+
+      <!-- Name -->
+      <div class="md:col-span-2">
+        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          placeholder="Enter service name"
+        />
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['name']">{{ formErrors['name'] }}</p>
+      </div>
+
+      <!-- Description -->
+      <div class="md:col-span-2">
+        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          rows="4"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          placeholder="Enter service description"
+        ></textarea>
+      </div>
+
+      <!-- Feature Type -->
+      <div>
+        <label for="featureType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Type *</label>
+        <select 
+          id="featureType" 
+          formControlName="featureType"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+        >
+          <option [value]="FeatureType.SUBSCRIPTION_BASED">Subscription Based</option>
+          <option [value]="FeatureType.RESERVATION_BASED">Reservation Based</option>
+        </select>
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['featureType']">{{ formErrors['featureType'] }}</p>
+      </div>
+
+      <!-- Feature Category -->
+      <div>
+        <label for="featureCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
+        <select 
+          id="featureCategory" 
+          formControlName="featureCategory"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+        >
+          <option *ngFor="let category of FeatureCategory | keyvalue" [value]="category.value">
+            {{ formatCategoryName(category.value) }}
+          </option>
+        </select>
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['featureCategory']">{{ formErrors['featureCategory'] }}</p>
+      </div>
+
+      <!-- Location -->
+      <div>
+        <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+        <input 
+          type="text" 
+          id="location" 
+          formControlName="location"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          placeholder="Enter location within the residence"
+        />
+      </div>
+
+      <!-- Active Status -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+        <div class="flex items-center gap-4">
+          <label class="inline-flex items-center">
+            <input 
+              type="radio" 
+              formControlName="active"
+              [value]="true"
+              class="form-radio h-4 w-4 text-emerald-600"
+            />
+            <span class="ml-2 text-gray-700 dark:text-gray-300">Active</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input 
+              type="radio" 
+              formControlName="active"
+              [value]="false"
+              class="form-radio h-4 w-4 text-emerald-600"
+            />
+            <span class="ml-2 text-gray-700 dark:text-gray-300">Inactive</span>
+          </label>
+        </div>
+        <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['active']">{{ formErrors['active'] }}</p>
+      </div>
+
+      <!-- Requires Manager Approval -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manager Approval</label>
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            id="requiresManagerApproval" 
+            formControlName="requiresManagerApproval"
+            class="form-checkbox h-5 w-5 text-emerald-600 rounded"
+          />
+          <label for="requiresManagerApproval" class="ml-2 text-gray-700 dark:text-gray-300">
+            Requires manager approval for usage
+          </label>
+        </div>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Image</h2>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Image</label>
+          <div 
+            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-400 transition-colors"
+            (click)="imageInput.click()"
+          >
+            <div class="space-y-1 text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                <label for="image-upload" class="relative cursor-pointer rounded-md font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 focus-within:outline-none">
+                  <span>Upload an image</span>
+                  <input 
+                    #imageInput
+                    id="image-upload" 
+                    name="image-upload" 
+                    type="file" 
+                    class="sr-only" 
+                    accept="image/*"
+                    (change)="onImageSelected($event)"
+                  />
+                </label>
+                <p class="pl-1">or drag and drop</p>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                PNG, JPG, GIF up to 5MB
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="mt-4" *ngIf="imagePreviewUrl">
+          <div class="relative group">
+            <img 
+              [src]="imagePreviewUrl" 
+              alt="Preview" 
+              class="h-64 w-full object-cover rounded-lg"
+            />
+            <button 
+              type="button"
+              (click)="removeImage()"
+              class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information Section -->
+      <div class="md:col-span-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Additional Information</h2>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="md:col-span-2">
+        <label for="termsAndConditions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Terms and Conditions</label>
+        <textarea 
+          id="termsAndConditions" 
+          formControlName="termsAndConditions"
+          rows="4"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          placeholder="Enter terms and conditions for using this service"
+        ></textarea>
+      </div>
+
+      <!-- Cancellation Policy -->
+      <div class="md:col-span-2">
+        <label for="cancellationPolicy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cancellation Policy</label>
+        <textarea 
+          id="cancellationPolicy" 
+          formControlName="cancellationPolicy"
+          rows="4"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          placeholder="Enter cancellation policy for this service"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <a 
+        routerLink="/features"
+        class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      >
+        Cancel
+      </a>
+      <button 
+        type="submit" 
+        [disabled]="featureForm.invalid || (loading$ | async) || isSubmitting || !residenceId"
+        class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Service' }}
+      </button>
+    </div>
+  </form>
+</div>
+

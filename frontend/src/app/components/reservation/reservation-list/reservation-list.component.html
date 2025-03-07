@@ -1,0 +1,177 @@
+<app-header></app-header>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Reservations</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">View and manage service reservations</p>
+      </div>
+      <a 
+        routerLink="/reservations/new" 
+        class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        New Reservation
+      </a>
+    </div>
+  
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Filters</h2>
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div class="col-span-1 md:col-span-2">
+          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="search" 
+              formControlName="search"
+              placeholder="Search by service or resident name..." 
+              class="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            />
+          </div>
+        </div>
+  
+        <!-- Status -->
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+          <select 
+            id="status" 
+            formControlName="status"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+          >
+            <option [ngValue]="null">All Statuses</option>
+            <option [value]="ReservationStatus.PENDING">Pending</option>
+            <option [value]="ReservationStatus.CONFIRMED">Confirmed</option>
+            <option [value]="ReservationStatus.REJECTED">Rejected</option>
+            <option [value]="ReservationStatus.CANCELLED">Cancelled</option>
+            <option [value]="ReservationStatus.COMPLETED">Completed</option>
+          </select>
+        </div>
+  
+        <!-- Date Filter -->
+        <div>
+          <label for="dateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+          <select 
+            id="dateFilter" 
+            formControlName="dateFilter"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+          >
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+  
+        <!-- Sort -->
+        <div>
+          <label for="sortBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+          <div class="flex gap-2">
+            <select 
+              id="sortBy" 
+              formControlName="sortBy"
+              class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            >
+              <option value="requestedDate">Requested Date</option>
+              <option value="scheduledDate">Scheduled Date</option>
+              <option value="status">Status</option>
+            </select>
+            <select 
+              id="sortDir" 
+              formControlName="sortDir"
+              class="w-24 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            >
+              <option value="desc">DESC</option>
+              <option value="asc">ASC</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end gap-3">
+          <button 
+            type="button" 
+            (click)="resetFilters()"
+            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            Reset
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Loading State -->
+    <div class="flex justify-center my-12" *ngIf="loading$ | async">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  
+    <!-- Results -->
+    <ng-container *ngIf="!(loading$ | async)">
+      <div *ngIf="(reservations$ | async)?.content?.length; else noReservations" class="space-y-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <app-reservation-card
+            *ngFor="let reservation of (reservations$ | async)?.content"
+            [reservation]="reservation"
+            [isManager]="isManager"
+            (delete)="confirmDelete(reservation)"
+            (confirm)="confirmReservation($event.id, $event.scheduledDate)"
+            (reject)="rejectReservation($event.id, $event.adminNote)"
+            (cancel)="cancelReservation($event)"
+          ></app-reservation-card>
+        </div>
+        
+        <!-- Pagination -->
+        <app-pagination
+          [currentPage]="(currentPage$ | async) || 0"
+          [totalPages]="(totalPages$ | async) || 0"
+          [isFirstPage]="(isFirstPage$ | async) || true"
+          [isLastPage]="(isLastPage$ | async) || true"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+      
+      <ng-template #noReservations>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No reservations found</h3>
+          <p class="mt-1 text-gray-500 dark:text-gray-400">Try adjusting your search or filter criteria</p>
+          <button 
+            (click)="resetFilters()"
+            class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Reset Filters
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+  
+    <!-- Confirmation Dialog -->
+    <app-confirm-dialog
+      [isOpen]="showDeleteConfirm"
+      [title]="'Delete Reservation'"
+      [message]="'Are you sure you want to delete this reservation? This action cannot be undone.'"
+      [confirmText]="'Delete'"
+      [cancelText]="'Cancel'"
+      (confirm)="deleteReservation()"
+      (cancel)="cancelDelete()"
+    ></app-confirm-dialog>
+  </div>
+  
+  

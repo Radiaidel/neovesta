@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "residence_features")
@@ -29,7 +32,7 @@ public class Feature {
     @JoinColumn(name = "residence_id", nullable = false)
     private Residence residence;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", columnDefinition = "TEXT", nullable = false)
     private String name;
 
     @Column(name = "description", columnDefinition = "TEXT")
@@ -62,5 +65,21 @@ public class Feature {
     private Boolean requiresManagerApproval;
 
     @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
