@@ -53,7 +53,6 @@ export class ReservationCardComponent {
         this.showConfirmForm = !this.showConfirmForm
         this.showRejectForm = false
         if (this.showConfirmForm) {
-            // Set default scheduled date to requested date
             const requestedDate = new Date(this.reservation.requestedDate)
             this.scheduledDate = this.formatDateForInput(requestedDate)
         }

@@ -24,12 +24,11 @@ import { ConfirmDialogComponent } from "../../ui/confirm-dialog/confirm-dialog.c
 import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinner.component"
 import { PaginationComponent } from "../../ui/pagination/pagination.component"
 import { AuthService } from "../../../services/auth.service"
-import { Role } from "../../../models/user.model"
 import { ReservationCardComponent } from "../reservation-card/reservation-card.component"
 import { HeaderComponent } from "../../shared/header/header.component";
 
 @Component({
-  selector: "app-reservation-list",
+  selector: "app-my-reservations",
   standalone: true,
   imports: [
     CommonModule,
@@ -41,9 +40,9 @@ import { HeaderComponent } from "../../shared/header/header.component";
     ReservationCardComponent,
     HeaderComponent
 ],
-  templateUrl: "./reservation-list.component.html",
+  templateUrl: "./my-reservations.component.html",
 })
-export class ReservationListComponent implements OnInit, OnDestroy {
+export class MyReservationsComponent implements OnInit, OnDestroy {
   private store = inject(Store)
   private fb = inject(FormBuilder)
   private authService = inject(AuthService)
@@ -59,15 +58,13 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   filterForm: FormGroup
   showDeleteConfirm = false
   reservationToDelete: Reservation | null = null
-  isManager = false
-  isResident = false
   userId: string | null = null
 
+  // Expose enums to template
   ReservationStatus = ReservationStatus
 
   constructor() {
     this.filterForm = this.fb.group({
-      search: [""],
       status: [null],
       dateFilter: ["upcoming"],
       sortBy: ["requestedDate"],
@@ -76,24 +73,36 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Get current user ID
     const currentUser = this.authService.getCurrentUser()
-    this.isManager = currentUser?.role === Role.RESIDENCE_MANAGER || currentUser?.role === Role.SUB_RESIDENCE_MANAGER
-    this.isResident = currentUser?.role === Role.RESIDENT
     this.userId = currentUser?.id || null
 
+    if (!this.userId) {
+      // Redirect to login if not logged in
+      // For now, we'll just show an empty list
+      return
+    }
+
+    // Subscribe to filter changes
     this.store
       .select(selectReservationFilters)
       .pipe(takeUntil(this.destroy$))
       .subscribe((filters) => {
         this.filterForm.patchValue({
-          search: filters.search || "",
           status: filters.status || null,
           dateFilter: filters.dateFilter || "upcoming",
           sortBy: filters.sortBy,
           sortDir: filters.sortDir,
         })
 
-        this.store.dispatch(ReservationActions.loadReservations({ filters }))
+        // Set resident ID filter to current user
+        const updatedFilters: ReservationFilters = {
+          ...filters,
+          residentId: this.userId || undefined,
+        }
+
+        // Load reservations with current filters
+        this.store.dispatch(ReservationActions.loadReservations({ filters: updatedFilters }))
       })
   }
 
@@ -106,16 +115,12 @@ export class ReservationListComponent implements OnInit, OnDestroy {
     const formValues = this.filterForm.value
 
     const filters: Partial<ReservationFilters> = {
-      search: formValues.search || undefined,
+      residentId: this.userId || undefined, // Always filter by current user
       status: formValues.status || undefined,
       dateFilter: formValues.dateFilter || undefined,
       sortBy: formValues.sortBy,
       sortDir: formValues.sortDir,
-      page: 0, 
-    }
-
-    if (this.isResident && this.userId) {
-      filters.residentId = this.userId
+      page: 0, // Reset to first page when applying new filters
     }
 
     this.store.dispatch(ReservationActions.setReservationFilters({ filters }))
@@ -124,7 +129,8 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   resetFilters(): void {
     this.store.dispatch(ReservationActions.resetReservationFilters())
 
-    if (this.isResident && this.userId) {
+    // Set resident ID filter to current user
+    if (this.userId) {
       this.store.dispatch(
         ReservationActions.setReservationFilters({
           filters: { residentId: this.userId },
@@ -162,44 +168,12 @@ export class ReservationListComponent implements OnInit, OnDestroy {
     this.reservationToDelete = null
   }
 
-  confirmReservation(id: string, scheduledDate: string): void {
-    this.store.dispatch(
-      ReservationActions.confirmReservation({
-        id,
-        scheduledDate,
-      }),
-    )
-  }
-
-  rejectReservation(id: string, adminNote: string): void {
-    this.store.dispatch(
-      ReservationActions.rejectReservation({
-        id,
-        adminNote,
-      }),
-    )
-  }
-
   cancelReservation(id: string): void {
     this.store.dispatch(
       ReservationActions.cancelReservation({
         id,
       }),
     )
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return ""
-    const date = new Date(dateString)
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }
-
-  formatStatus(status: ReservationStatus): string {
-    if (!status) return ""
-    return status
-      .replace("_", " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 }
 

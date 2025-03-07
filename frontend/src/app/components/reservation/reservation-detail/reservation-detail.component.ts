@@ -41,7 +41,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   confirmForm: FormGroup
   rejectForm: FormGroup
 
-  // Expose enums to template
   ReservationStatus = ReservationStatus
 
   constructor() {
@@ -55,7 +54,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Check user role
     const currentUser = this.authService.getCurrentUser()
     this.isManager = currentUser?.role === Role.RESIDENCE_MANAGER || currentUser?.role === Role.SUB_RESIDENCE_MANAGER
     this.isResident = currentUser?.role === Role.RESIDENT
@@ -69,7 +67,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     })
 
-    // Subscribe to reservation changes to set default scheduled date
     this.reservation$.pipe(takeUntil(this.destroy$)).subscribe((reservation) => {
       if (reservation) {
         const requestedDate = new Date(reservation.requestedDate)
@@ -188,12 +185,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   canModifyReservation(reservation: Reservation): boolean {
-    // Residents can only modify their own pending reservations
     if (this.isResident) {
       return reservation.resident?.id === this.userId && reservation.status === ReservationStatus.PENDING
     }
 
-    // Managers can modify any pending reservation
     if (this.isManager) {
       return reservation.status === ReservationStatus.PENDING
     }

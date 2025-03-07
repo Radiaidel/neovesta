@@ -114,6 +114,41 @@ export const routes: Routes = [
       import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
   },
   {
+    path: "reservations",
+    loadComponent: () =>
+      import("./components/reservation/reservation-list/reservation-list.component").then(
+        (m) => m.ReservationListComponent,
+      ),
+  },
+  {
+    path: "reservations/new",
+    loadComponent: () =>
+      import("./components/reservation/reservation-form/reservation-form.component").then(
+        (m) => m.ReservationFormComponent,
+      ),
+  },
+  {
+    path: "reservations/:id",
+    loadComponent: () =>
+      import("./components/reservation/reservation-detail/reservation-detail.component").then(
+        (m) => m.ReservationDetailComponent,
+      ),
+  },
+  {
+    path: "reservations/:id/edit",
+    loadComponent: () =>
+      import("./components/reservation/reservation-form/reservation-form.component").then(
+        (m) => m.ReservationFormComponent,
+      ),
+  },
+  {
+    path: "my-reservations",
+    loadComponent: () =>
+      import("./components/reservation/my-reservations/my-reservations.component").then(
+        (m) => m.MyReservationsComponent,
+      ),
+  },
+  {
     path: "**",
     loadComponent: () => import("./components/shared/not-found/not-found.component").then((m) => m.NotFoundComponent),
   },
