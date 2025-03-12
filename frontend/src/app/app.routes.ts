@@ -177,6 +177,43 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "profile",
+    loadComponent: () => import("./components/profile/profile.component").then((m) => m.ProfileComponent),
+    canActivate: [authGuard]
+  },
+  // {
+  //   path: "profile",
+  //   loadComponent: () => import("./components/profile/profile.component").then((m) => m.ProfileComponent),
+  //   canActivate: [authGuard],
+  //   children: [
+  //     { path: "", redirectTo: "info", pathMatch: "full" },
+  //     {
+  //       path: "info",
+  //       loadComponent: () =>
+  //         import("../../../testbyzegrfyblzeb/profile-info/profile-info.component").then((m) => m.ProfileInfoComponent),
+  //     },
+  //     {
+  //       path: "password",
+  //       loadComponent: () =>
+  //         import("../../../testbyzegrfyblzeb/profile-password/profile-password.component").then((m) => m.ProfilePasswordComponent),
+  //     },
+  //     {
+  //       path: "delete",
+  //       loadComponent: () =>
+  //         import("../../../testbyzegrfyblzeb/profile-delete/profile-delete.component").then((m) => m.ProfileDeleteComponent),
+  //     },
+  //     {
+  //       path: "residence",
+  //       loadComponent: () =>
+  //         import("../../../testbyzegrfyblzeb/residence-info/residence-info.component").then((m) => m.ResidenceInfoComponent),
+  //       canActivate: [roleGuard],
+  //       data: {
+  //         roles: [Role.RESIDENCE_MANAGER, Role.SUB_RESIDENCE_MANAGER],
+  //       },
+  //     },
+  //   ],
+  // },
+  {
     path: "**",
     loadComponent: () => import("./components/shared/not-found/not-found.component").then((m) => m.NotFoundComponent),
   },
