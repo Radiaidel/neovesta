@@ -38,21 +38,17 @@ public class SupabaseStorageService {
     }
 
     public String uploadDocument(MultipartFile file) throws IOException {
-        // Validation du fichier
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Le fichier est vide");
         }
 
-        // Génération d'un nom de fichier unique
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename()
-                .replace(" ", "_") // Remplace les espaces
-                .replaceAll("[^a-zA-Z0-9.-]", ""); // Supprime les caractères spéciaux
+                .replace(" ", "_") 
+                .replaceAll("[^a-zA-Z0-9.-]", ""); 
 
-        // Configuration du client OkHttp
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
 
-        // Création du corps de la requête multipart
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", fileName,
@@ -61,7 +57,6 @@ public class SupabaseStorageService {
                                         : "application/octet-stream")))
                 .build();
 
-        // Construction de la requête
         Request request = new Request.Builder()
                 .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fileName)
                 .post(body)
@@ -69,10 +64,8 @@ public class SupabaseStorageService {
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
 
-        // Exécution de la requête
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                // Log détaillé en cas d'échec
                 String errorBody = response.body() != null ? response.body().string() : "Aucun corps de réponse";
                 logger.error("Échec de l'upload Supabase. Code: {}, Erreur: {}",
                         response.code(), errorBody);
@@ -80,7 +73,6 @@ public class SupabaseStorageService {
                         ", Message: " + errorBody);
             }
 
-            // Construction de l'URL publique du fichier
             String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + fileName;
 
             logger.info("Fichier uploadé avec succès : {}", publicUrl);
@@ -93,7 +85,6 @@ public class SupabaseStorageService {
 
 
 
-    // SupabaseStorageService.java
     public void deleteDocumentByUrl(String url) throws IOException {
         String fileName = url.substring(url.lastIndexOf('/') + 1);
         deleteDocument(fileName);

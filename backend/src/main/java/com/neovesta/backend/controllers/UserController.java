@@ -16,7 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -56,23 +60,23 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.getUsersByRole(role, page, size));
     }
-
     @PutMapping("/{id}")
     @Operation(summary = "Update user information (except role and status)")
-    @PreAuthorize("@userSecurity.isCurrentUser(#id)")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @ModelAttribute UpdateUserRequest request) {  
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
+    
 
     @PutMapping("/{id}/password")
     @Operation(summary = "Update user password")
-    @PreAuthorize("@userSecurity.isCurrentUser(#id)")
+    @PreAuthorize("@securityUtils.isCurrentUser(#id) or hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updatePassword(
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePasswordRequest request) {
-        return ResponseEntity.ok(userService.updatePassword(id, request.getCurrentPassword(), request.getNewPassword()));
+        return ResponseEntity
+                .ok(userService.updatePassword(id, request.getCurrentPassword(), request.getNewPassword()));
     }
 
     @PutMapping("/{id}/toggle-status")
@@ -106,6 +110,19 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.getAllUsers(page, size));
     }
+
+    @PostMapping("/{id}/profile-image")
+    @Operation(summary = "Upload profile image")
+    @PreAuthorize("@userSecurity.isCurrentUser(#id)")
+    public ResponseEntity<Map<String, String>> uploadProfileImage(
+            @PathVariable UUID id,
+            @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+        String profilePictureUrl = userService.uploadProfileImage(id, profileImage);
+        Map<String, String> response = new HashMap<>();
+        response.put("profilePictureUrl", profilePictureUrl);
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }

@@ -6,7 +6,9 @@ import com.neovesta.backend.dtos.request.UserSearchRequest;
 import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.models.enums.Role;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public interface UserService {
@@ -29,4 +31,5 @@ public interface UserService {
     UserResponse getUserByEmail(String email);
 
     Page<UserResponse> getAllUsers(int page, int size);
+    String uploadProfileImage(UUID id, MultipartFile profileImage) throws IOException;
 }

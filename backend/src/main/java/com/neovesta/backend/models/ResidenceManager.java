@@ -30,6 +30,7 @@ public class ResidenceManager extends User {
     private Residence residence;
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<SubResidenceManager> subManagers = new ArrayList<>();
 
     @Override
