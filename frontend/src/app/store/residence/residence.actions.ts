@@ -132,7 +132,19 @@ export const setFilters = createAction(
 export const resetFilters = createAction(
   '[Residence] Reset Filters'
 )
+export const loadManagerResidence = createAction(
+  '[Residence] Load Manager Residence'
+);
 
+export const loadManagerResidenceSuccess = createAction(
+  '[Residence] Load Manager Residence Success',
+  props<{ residence: Residence }>()
+);
+
+export const loadManagerResidenceFailure = createAction(
+  '[Residence] Load Manager Residence Failure',
+  props<{ error: any }>()
+);
 export const ResidenceActions = {
   loadResidences,
   loadResidencesSuccess,
@@ -146,7 +158,10 @@ export const ResidenceActions = {
   createResidenceWithFiles,
   updateResidence,
   updateResidenceSuccess,
-  updateResidenceFailure,
+  resetFilters,
+  loadManagerResidence,
+  loadManagerResidenceSuccess,
+  loadManagerResidenceFailure,
   updateResidenceWithFiles,
   deleteResidence,
   deleteResidenceSuccess,
@@ -156,5 +171,4 @@ export const ResidenceActions = {
   loadCitiesFailure,
   resetSelectedResidence,
   setFilters,
-  resetFilters
 }

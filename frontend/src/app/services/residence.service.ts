@@ -57,7 +57,9 @@ export class ResidenceService {
   getResidenceByManager(managerId: string): Observable<Residence> {
     return this.http.get<Residence>(`${this.apiUrl}/manager/${managerId}`)
   }
-
+  getResidenceForManager(): Observable<Residence> {
+    return this.http.get<Residence>(`${this.apiUrl}/manager`)
+  }
   createResidence(
     residence: CreateResidenceRequest,
     images: File[],

@@ -1,10 +1,13 @@
 import { Injectable, inject } from "@angular/core"
 import { Actions, createEffect, ofType } from "@ngrx/effects"
-import { catchError, map, mergeMap, of, tap } from "rxjs"
+import { catchError, map, mergeMap, of, tap, switchMap } from "rxjs"
 import { ResidenceService } from "../../services/residence.service"
 import * as ResidenceActions from "./residence.actions"
 import { Router } from "@angular/router"
 import { ToastService } from "../../services/toast.service"
+import { Residence } from "../../models/residence.model"
+import { loadCurrentUser } from "../user.actions"
+import { AuthService } from "../../services/auth.service"
 
 @Injectable()
 export class ResidenceEffects {
@@ -12,6 +15,7 @@ export class ResidenceEffects {
   private residenceService = inject(ResidenceService)
   private router = inject(Router)
   private toastService = inject(ToastService)
+  private authService = inject(AuthService)
 
   loadResidences$ = createEffect(() =>
     this.actions$.pipe(
@@ -144,7 +148,18 @@ export class ResidenceEffects {
       ),
     ),
   )
-
+  loadManagerResidence$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ResidenceActions.loadManagerResidence),
+      switchMap(() => {
+        const currentUser = this.authService.getCurrentUser();
+        return this.residenceService.getResidenceByManager(currentUser!.id).pipe(
+          map((residence: Residence) => ResidenceActions.loadManagerResidenceSuccess({ residence })),
+          catchError((error) => of(ResidenceActions.loadManagerResidenceFailure({ error }))),
+        )},
+      ),
+    ),
+  )
   handleError$ = createEffect(
     () =>
       this.actions$.pipe(
