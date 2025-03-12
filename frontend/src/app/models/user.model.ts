@@ -10,7 +10,7 @@ export enum Role {
 
 export interface User {
   id: string
-  profileImage?: string
+  profilePictureUrl?: string
   email: string
   firstName: string
   lastName: string
@@ -70,9 +70,6 @@ export interface ApiError {
   status: number
 }
 
-
-
-
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   BLOCKED = 'BLOCKED'
@@ -80,10 +77,9 @@ export enum UserStatus {
 
 
 
-
 export interface UserResponse {
   id: string
-  profileImage?: string
+  profilePictureUrl?: string
   email: string
   firstName: string
   lastName: string
@@ -106,11 +102,14 @@ export interface CreateUserRequest {
   managerId?: string
 }
 
+
 export interface UpdateUserRequest {
   firstName: string
   lastName: string
   email: string
   phoneNumber: string
+  profilePictureUrl?: string
+  address?: string
 }
 
 

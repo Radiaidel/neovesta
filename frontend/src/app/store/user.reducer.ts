@@ -129,8 +129,8 @@ export const userReducer = createReducer(
     if (state.selectedUser?.id === userId) {
       updatedSelectedUser = {
         ...state.selectedUser,
-        status: !state.selectedUser.status,
-      }
+        status: !state.selectedUser!.status,
+      } as UserResponse
     }
 
     let updatedUsers = state.users
@@ -200,6 +200,39 @@ export const userReducer = createReducer(
     ...state,
     createdUser: null,
   })),
+  on(UserActions.loadCurrentUser, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(UserActions.loadCurrentUserSuccess, (state, { user }) => ({
+    ...state,
+    currentUser: user,
+    loading: false,
+  })),
+  on(UserActions.loadCurrentUserFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
 
+
+
+  // Update Password
+  on(UserActions.updatePassword, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(UserActions.updatePasswordSuccess, (state, { user }) => ({
+    ...state,
+    currentUser: user,
+    loading: false,
+  })),
+  on(UserActions.updatePasswordFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
 )
 
