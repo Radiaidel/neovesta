@@ -23,6 +23,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    
+    private String profilePictureUrl;
+
 
     @Column(unique = true, nullable = false)
     private String email;

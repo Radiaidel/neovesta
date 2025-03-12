@@ -17,7 +17,7 @@
         <div class="h-24 w-24 rounded-full bg-white p-1 shadow-md">
           <div class="h-full w-full rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <span class="text-3xl font-bold text-gray-700">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
-             <img *ngIf="user.profileImage" [src]="user.profileImage" alt="User avatar" class="h-full w-full object-cover">
+             <img *ngIf="user.profilePictureUrl" [src]="user.profilePictureUrl" alt="User avatar" class="h-full w-full object-cover">
           </div>
         </div>
       </div>

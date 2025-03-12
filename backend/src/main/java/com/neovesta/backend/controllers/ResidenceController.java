@@ -7,6 +7,7 @@ import com.neovesta.backend.dtos.request.UpdateResidenceRequest;
 import com.neovesta.backend.dtos.response.PageResponse;
 import com.neovesta.backend.dtos.response.ResidenceResponse;
 import com.neovesta.backend.services.ResidenceService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -30,63 +31,53 @@ import java.util.stream.Collectors;
 public class ResidenceController {
 
     private final ResidenceService residenceService;
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResidenceResponse> createResidence(
-        @Valid @RequestPart("data") String requestJson,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images,
-        @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles
-    ) throws IOException {
-        // Convertir le JSON en objet CreateResidenceRequest
+            @Valid @RequestPart("data") String requestJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         CreateResidenceRequest request = objectMapper.readValue(requestJson, CreateResidenceRequest.class);
-        
-        // Définir les images et documents
+
         request.setImages(images);
-        
-        // Convertir les fichiers en DocumentUploadRequest
-        List<DocumentUploadRequest> documents = documentFiles != null 
-            ? documentFiles.stream()
-                .map(file ->DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file).type(file.getContentType()).build())
-                .collect(Collectors.toList())
-            : null;
-        
+
+        List<DocumentUploadRequest> documents = documentFiles != null
+                ? documentFiles.stream()
+                        .map(file -> DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file)
+                                .type(file.getContentType()).build())
+                        .collect(Collectors.toList())
+                : null;
+
         request.setDocuments(documents);
-       
+
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(residenceService.createResidence(request));
+                .body(residenceService.createResidence(request));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResidenceResponse> updateResidence(
-        @PathVariable UUID id,
-        @Valid @RequestPart("data") String requestJson,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images,
-        @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles
-    ) throws IOException {
-        // Convertir le JSON en objet UpdateResidenceRequest
+            @PathVariable UUID id,
+            @Valid @RequestPart("data") String requestJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart(value = "documents", required = false) List<MultipartFile> documentFiles) throws IOException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         UpdateResidenceRequest request = objectMapper.readValue(requestJson, UpdateResidenceRequest.class);
-        
-        // Définir les images et documents
+
         request.setImages(images);
-        
-        // Convertir les fichiers en DocumentUploadRequest
+
         List<DocumentUploadRequest> documents = documentFiles != null
-            ? documentFiles.stream()
-                .map(file ->  DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file).type(file.getContentType()).build())
-                .collect(Collectors.toList())
-            : null;
-        
+                ? documentFiles.stream()
+                        .map(file -> DocumentUploadRequest.builder().name(file.getOriginalFilename()).file(file)
+                                .type(file.getContentType()).build())
+                        .collect(Collectors.toList())
+                : null;
+
         request.setDocuments(documents);
-       
+
         return ResponseEntity.ok(residenceService.updateResidence(id, request));
     }
-    // @PostMapping
-    // @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    // public ResponseEntity<ResidenceResponse> createResidence(
-    //         @Valid @RequestBody CreateResidenceRequest request) {
-    //     return ResponseEntity.ok(residenceService.createResidence(request));
-    // }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
@@ -141,6 +132,7 @@ public class ResidenceController {
         PageResponse<String> citiesPage = residenceService.getAllCities(pageable);
         return ResponseEntity.ok(citiesPage);
     }
+
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<PageResponse<ResidenceResponse>> searchResidences(
@@ -149,6 +141,7 @@ public class ResidenceController {
         PageResponse<ResidenceResponse> residencesPage = residenceService.searchByNameOrManagerName(query, pageable);
         return ResponseEntity.ok(residencesPage);
     }
+
     @GetMapping("/city/{city}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<PageResponse<ResidenceResponse>> getResidencesByCity(
@@ -159,4 +152,3 @@ public class ResidenceController {
     }
 
 }
-

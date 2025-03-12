@@ -23,6 +23,8 @@ public class UserResponse {
    private LocalDateTime createdAt;
    private LocalDateTime updatedAt;
     private boolean status;
+    private String profilePictureUrl;
+
 //
 //    private ResidenceResponse residence; // For RESIDENCE_MANAGER
 //    private UserEmbeddedDTO manager;        // For SUB_RESIDENCE_MANAGER

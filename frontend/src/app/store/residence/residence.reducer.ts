@@ -159,4 +159,20 @@ export const residenceReducer = createReducer(
     ...state,
     filters: initialFilters,
   })),
+
+  on(ResidenceActions.loadManagerResidence, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(ResidenceActions.loadManagerResidenceSuccess, (state, { residence }) => ({
+    ...state,
+    managerResidence: residence,
+    loading: false,
+  })),
+  on(ResidenceActions.loadManagerResidenceFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
 )

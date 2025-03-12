@@ -12,16 +12,22 @@ import com.neovesta.backend.models.SubResidenceManager;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.Role;
 import com.neovesta.backend.repositories.UserRepository;
+import com.neovesta.backend.services.CloudinaryService;
 import com.neovesta.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,39 +35,40 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     public UserResponse createUser(CreateUserRequest request) {
-    User newUser;
+        User newUser;
 
-    if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
+        if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
 
-        ResidenceManager manager = userRepository.findById(request.getManagerId())
-            .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
-            .map(user -> (ResidenceManager) user)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+            ResidenceManager manager = userRepository.findById(request.getManagerId())
+                    .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
+                    .map(user -> (ResidenceManager) user)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
 
-        newUser = SubResidenceManager.builder()
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .phoneNumber(request.getPhoneNumber())
-            .role(Role.SUB_RESIDENCE_MANAGER)
-            .manager(manager) // Assignation automatique du manager
-            .build();
-    } else {
-        newUser = User.builder()
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .phoneNumber(request.getPhoneNumber())
-            .role(request.getRole())
-            .build();
+            newUser = SubResidenceManager.builder()
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .phoneNumber(request.getPhoneNumber())
+                    .role(Role.SUB_RESIDENCE_MANAGER)
+                    .manager(manager) 
+                    .build();
+        } else {
+            newUser = User.builder()
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .phoneNumber(request.getPhoneNumber())
+                    .role(request.getRole())
+                    .build();
+        }
+
+        return userMapper.toResponse(userRepository.save(newUser));
     }
-
-    return  userMapper.toResponse(userRepository.save(newUser));
-}
 
     @Override
     public UserResponse getUserById(UUID id) {
@@ -75,8 +82,7 @@ public class UserServiceImpl implements UserService {
         PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize());
         return userRepository.searchUsers(
                 request.getSearchTerm(),
-                pageRequest
-        ).map(userMapper::toResponse);
+                pageRequest).map(userMapper::toResponse);
     }
 
     @Override
@@ -94,6 +100,19 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
+
+        if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
+            try {
+                if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+                    cloudinaryService.deleteImage(user.getProfilePictureUrl());
+                }
+
+                String imageUrl = cloudinaryService.uploadImage(request.getProfilePicture());
+                user.setProfilePictureUrl(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to process profile picture", e);
+            }
+        }
 
         return userMapper.toResponse(userRepository.save(user));
     }
@@ -135,10 +154,31 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-
     @Override
     public Page<UserResponse> getAllUsers(int page, int size) {
         Page<User> users = userRepository.findAll(PageRequest.of(page, size));
         return users.map(userMapper::toResponse);
     }
+
+    @Override
+    public String uploadProfileImage(UUID id, MultipartFile profileImage) throws IOException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        String imageUrl = cloudinaryService.uploadImage(profileImage);
+
+        if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            try {
+                cloudinaryService.deleteImage(user.getProfilePictureUrl());
+            } catch (Exception e) {
+                log.error("Error deleting old profile image", e);
+            }
+        }
+
+        user.setProfilePictureUrl(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
+    }
+
 }

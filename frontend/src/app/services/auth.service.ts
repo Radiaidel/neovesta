@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
-import {  Observable, BehaviorSubject, tap } from "rxjs"
-import  {
+import { Observable, BehaviorSubject, tap, throwError, catchError } from "rxjs"
+import {
   AuthResponse,
   LoginRequest,
   User,
@@ -10,6 +10,7 @@ import  {
   RegisterUserRequest,
   UpdatePasswordRequest,
 } from "../models/user.model"
+
 import { Router } from "@angular/router"
 import { environment } from "../../environments/environment"
 import { Role } from "../models/user.model"
@@ -64,15 +65,32 @@ export class AuthService {
     return this.http.post<void>(`${this.apiUrl}/reset-password`, request)
   }
 
+
   updatePassword(userId: string, request: UpdatePasswordRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/users/${userId}/update-password`, request)
+    return this.http.put<void>(
+      `${this.apiUrl}/users/${userId}/password`,
+      request
+    ).pipe(
+      catchError(error => {
+        // Gérer spécifiquement l'erreur 401 ici
+        if (error.status === 401) {
+          
+          return throwError(() => new Error('Current password is incorrect'));
+        }
+        return throwError(() => error);
+      })
+    );
   }
 
-  refreshToken(): Observable<AuthResponse> {
+  refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem("refreshToken")
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/refresh-token?refreshToken=${refreshToken}`, {})
-      .pipe(tap((response) => this.handleAuthResponse(response)))
+    if (!refreshToken) {
+      return throwError(() => new Error("No refresh token available"))
+    }
+
+    return this.http.post<any>(`${this.apiUrl}/refresh-token`, { refreshToken }).pipe(
+      tap((response) => this.handleAuthResponse(response))
+    )
   }
 
   registerUser(request: RegisterUserRequest): Observable<void> {
@@ -98,7 +116,7 @@ export class AuthService {
   getCurrentUser(): User | null {
     return this.currentUserSubject.value
   }
-  
+
   hasRole(roles: Role[]): boolean {
     const user = this.getCurrentUser()
     return user ? roles.includes(user.role) : false

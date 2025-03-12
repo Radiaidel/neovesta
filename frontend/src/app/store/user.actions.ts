@@ -5,6 +5,7 @@ import type {
   UpdateUserRequest,
   UserSearchRequest,
   PageResponse,
+  UpdatePasswordRequest,
 } from "../models/user.model"
 
 // Load Users
@@ -51,4 +52,31 @@ export const deleteUserSuccess = createAction("[User] Delete User Success", prop
 export const deleteUserFailure = createAction("[User] Delete User Failure", props<{ error: any }>())
 
 export const resetCreatedUser = createAction('[User] Reset Created User');
+
+export const loadCurrentUser = createAction("[User] Load Current User");
+
+export const loadCurrentUserSuccess = createAction(
+  "[User] Load Current User Success",
+  props<{ user: UserResponse }>()
+);
+
+export const loadCurrentUserFailure = createAction(
+  "[User] Load Current User Failure",
+  props<{ error: any }>()
+);
+
+export const updatePassword = createAction(
+  "[User] Update Password",
+  props<{ id: string; request: UpdatePasswordRequest }>()
+);
+
+export const updatePasswordSuccess = createAction(
+  "[User] Update Password Success",
+  props<{ user: UserResponse }>()
+);
+
+export const updatePasswordFailure = createAction(
+  "[User] Update Password Failure",
+  props<{ error: any }>()
+);
 

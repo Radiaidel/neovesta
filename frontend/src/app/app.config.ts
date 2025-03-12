@@ -19,6 +19,8 @@ import { reservationReducer } from './store/reservation/reservation.reducer';
 import { ReservationEffects } from './store/reservation/reservation.effects';
 import { subscriptionReducer } from './store/subscription/subscription.reducer';
 import { SubscriptionEffects } from './store/subscription/subscription.effects';
+import { profileReducer } from './store/profile/profile.reducer';
+import { ProfileEffects } from './store/profile/profile.effects';
 
 export const appConfig: ApplicationConfig = {
 
@@ -32,10 +34,10 @@ providers: [
     contract: contractReducer,
     feature: featureReducer,
     reservations : reservationReducer,
-    subscriptions : subscriptionReducer
-
+    subscriptions : subscriptionReducer,
+profile: profileReducer
   }),
-  provideEffects([UserEffects , ResidenceEffects , ContractEffects , FeatureEffects , ReservationEffects, SubscriptionEffects]),
+  provideEffects([UserEffects , ResidenceEffects , ContractEffects , FeatureEffects , ReservationEffects, SubscriptionEffects , ProfileEffects]),
   provideAnimations(),
   provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
 ],

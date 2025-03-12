@@ -76,9 +76,9 @@
                   <div class="flex items-center">
                     <div
                       class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
-                      <img *ngIf="user.profileImage" [src]="user.profileImage"
+                      <img *ngIf="user.profilePictureUrl" [src]="user.profilePictureUrl"
                         alt="Avatar" class="h-10 w-10 object-cover">
-                      <span *ngIf="!user.profileImage"
+                      <span *ngIf="!user.profilePictureUrl"
                         class="text-green-600 font-medium">{{
                         user.firstName.charAt(0) }}{{ user.lastName.charAt(0)
                         }}</span>
