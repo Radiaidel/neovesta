@@ -4,11 +4,12 @@ import { FormBuilder, type FormGroup, ReactiveFormsModule, Validators } from "@a
 import type { ProfileResidence } from "../../../models/profile.model"
 import type { Address } from "../../../models/residence.model"
 import { MapComponent } from "../../ui/map/map.component"
+import { ResidenceImageCarouselComponent } from "../profile-residence/residence-image-carousel/residence-image-carousel.component";
 
 @Component({
   selector: "app-profile-residence-edit",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MapComponent],
+  imports: [CommonModule, ReactiveFormsModule, MapComponent, ResidenceImageCarouselComponent],
   templateUrl: "./profile-residence-edit.component.html",
 })
 export class ProfileResidenceEditComponent implements OnInit {
@@ -21,6 +22,24 @@ export class ProfileResidenceEditComponent implements OnInit {
   residenceForm!: FormGroup
   mapAddress: Address | null = null
 
+  newImages: File[] = [];
+  imagePreviews: string[] = [];
+  
+  onImageSelected(event: any): void {
+    const files = event.target.files;
+    if (files) {
+      this.newImages = Array.from(files);
+      this.imagePreviews = [];
+      (Array.from(files) as File[]).forEach((file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imagePreviews.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+  
   ngOnInit(): void {
     this.initForm()
     this.mapAddress = this.residence.address
@@ -47,17 +66,32 @@ export class ProfileResidenceEditComponent implements OnInit {
     })
   }
 
+  // onSubmit(): void {
+  //   if (this.residenceForm.valid) {
+  //     const formValue = { ...this.residenceForm.value }
+  //     if (formValue.amenities) {
+  //       formValue.amenities = formValue.amenities
+  //         .split(",")
+  //         .map((item: string) => item.trim())
+  //         .filter((item: string) => item !== "")
+  //     }
+
+  //     this.save.emit(formValue)
+  //   }
+  // }
+
   onSubmit(): void {
     if (this.residenceForm.valid) {
-      const formValue = { ...this.residenceForm.value }
+      const formValue = { ...this.residenceForm.value };
+      // Process amenities
       if (formValue.amenities) {
         formValue.amenities = formValue.amenities
           .split(",")
           .map((item: string) => item.trim())
-          .filter((item: string) => item !== "")
+          .filter((item: string) => item !== "");
       }
-
-      this.save.emit(formValue)
+      // Emit form data and new images
+      this.save.emit({ formValue, newImages: this.newImages });
     }
   }
 

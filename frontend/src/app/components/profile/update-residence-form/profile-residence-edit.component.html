@@ -2,6 +2,23 @@
   <h3 class="text-xl font-semibold text-gray-800 mb-6">Edit Residence Information</h3>
   
   <form [formGroup]="residenceForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label for="images">Add New Images</label>
+      <input type="file" id="images" name="images" multiple (change)="onImageSelected($event)" accept="image/*">
+    </div>
+    
+    <div *ngIf="imagePreviews.length > 0">
+      <h4>New Images to Upload:</h4>
+      <div class="image-preview-container">
+        <div *ngFor="let preview of imagePreviews" class="image-preview">
+          <img [src]="preview" alt="Preview" class="img-thumbnail">
+        </div>
+      </div>
+    </div>
+    <app-residence-image-carousel
+    [residence]="residence"></app-residence-image-carousel>
+    
     <!-- Name -->
     <div class="mb-6">
       <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Residence Name</label>

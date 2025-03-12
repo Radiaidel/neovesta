@@ -12,11 +12,13 @@ import type { ProfileResidence } from "../../../models/profile.model"
 import { ProfileResidenceEditComponent } from "../update-residence-form/profile-residence-edit.component"
 import { ProfileActions } from "../../../store/profile/profile.actions"
 import { AuthService } from "../../../services/auth.service"
+import { Residence, UpdateResidenceRequest } from "../../../models/residence.model"
+import { ResidenceImageCarouselComponent } from "./residence-image-carousel/residence-image-carousel.component";
 
 @Component({
   selector: "app-profile-residence",
   standalone: true,
-  imports: [CommonModule, ProfileResidenceEditComponent],
+  imports: [CommonModule, ProfileResidenceEditComponent, ResidenceImageCarouselComponent],
   templateUrl: "./profile-residence.component.html",
 })
 export class ProfileResidenceComponent implements OnInit, OnDestroy {
@@ -24,7 +26,7 @@ export class ProfileResidenceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>()
   private authService = inject(AuthService)
 
-  residence: ProfileResidence | null = null
+  residence: Residence | null = null
   loading = false
   error: string | null = null
   activeImageIndex = 0
@@ -83,39 +85,52 @@ export class ProfileResidenceComponent implements OnInit, OnDestroy {
     this.error = null
   }
 
-  saveResidence(updatedResidence: any): void {
-    const currentUser = this.authService.getCurrentUser()
-    if (currentUser && this.residence) {
-      const request = {
-        ...updatedResidence,
-        id: this.residence.id,
-      }
-
-      console.log("Sending residence update request:", request)
-
+  saveResidence(updateData: { formValue: any, newImages: File[] }): void {
+    if (this.residence) {
+      const request: UpdateResidenceRequest = updateData.formValue;
       this.store.dispatch(
         ProfileActions.updateResidence({
           residenceId: this.residence.id,
           request,
-        }),
-      )
-
-      this.store
-        .select(selectProfileLoading)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((loading) => {
-          this.loading = loading
-
-          if (!loading && !this.error) {
-            this.updateSuccess = true
-            this.isEditing = false
-
-            setTimeout(() => {
-              this.updateSuccess = false
-            }, 5000)
-          }
+          images: updateData.newImages
         })
+      );
     }
   }
+
+  // saveResidence(updatedResidence: any): void {
+  //   const currentUser = this.authService.getCurrentUser()
+  //   if (currentUser && this.residence) {
+  //     const request = {
+  //       ...updatedResidence,
+  //       id: this.residence.id,
+  //     }
+
+  //     console.log("Sending residence update request:", request)
+
+  //     this.store.dispatch(
+  //       ProfileActions.updateResidence({
+  //         residenceId: this.residence.id,
+  //         request,
+  //       }),
+  //     )
+
+  //     this.store
+  //       .select(selectProfileLoading)
+  //       .pipe(takeUntil(this.destroy$))
+  //       .subscribe((loading) => {
+  //         this.loading = loading
+
+  //         if (!loading && !this.error) {
+  //           this.updateSuccess = true
+  //           this.isEditing = false
+
+  //           setTimeout(() => {
+  //             this.updateSuccess = false
+  //           }, 5000)
+  //         }
+  //       })
+  //   }
+  // }
 }
 

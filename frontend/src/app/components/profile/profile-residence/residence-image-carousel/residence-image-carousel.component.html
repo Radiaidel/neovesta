@@ -1,0 +1,58 @@
+<div class="relative group">
+  <!-- Image principale -->
+  <div class="aspect-w-16 aspect-h-9 bg-gray-100 rounded-xl overflow-hidden shadow-lg">
+    <img
+      [src]="residence.imageUrls[activeImageIndex]"
+      alt="Residence image"
+      class="object-cover w-full h-full transition-opacity duration-300"
+    >
+
+    <!-- Flèches de navigation -->
+    <div *ngIf="residence.imageUrls.length > 1"
+         class="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+      <button
+        (click)="previousImage()"
+        class="p-3 rounded-full bg-white/90 hover:bg-white shadow-lg hover:shadow-xl transition-all"
+        aria-label="Previous image">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <button
+        (click)="nextImage()"
+        class="p-3 rounded-full bg-white/90 hover:bg-white shadow-lg hover:shadow-xl transition-all"
+        aria-label="Next image">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Indicateurs de position -->
+    <div *ngIf="residence.imageUrls.length > 1"
+         class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div *ngFor="let _ of residence.imageUrls; let i = index"
+           class="w-3 h-3 rounded-full transition-colors"
+           [class.bg-white]="i === activeImageIndex"
+           [class.bg-white]="i !== activeImageIndex">
+      </div>
+    </div>
+  </div>
+
+  <!-- Miniatures -->
+  <div *ngIf="residence.imageUrls.length > 1"
+       class="mt-4 flex space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+    <button
+      *ngFor="let image of residence.imageUrls; let i = index"
+      (click)="setActiveImage(i)"
+      class="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 transition-all duration-200 relative"
+      [class.border-blue-500]="i === activeImageIndex"
+      [class.border-transparent]="i !== activeImageIndex">
+      <img
+        [src]="image"
+        alt="Thumbnail"
+        class="object-cover w-full h-full hover:opacity-75 transition-opacity">
+      <div class="absolute inset-0 bg-black/30" *ngIf="i === activeImageIndex"></div>
+    </button>
+  </div>
+</div>

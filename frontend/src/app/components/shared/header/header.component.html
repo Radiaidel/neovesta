@@ -83,10 +83,12 @@
                     <button
                         class="focus:outline-none rounded-full ring-2 ring-yellow-300 transition-all duration-200 hover:ring-4"
                         (click)="toggleDropdown()">
+
+                        
                         <img
-                            *ngIf="currentUser?.profileImage; else defaultProfileImage"
+                            *ngIf="currentUser?.profilePictureUrl; else defaultProfileImage"
                             class="w-10 h-10 rounded-full object-cover"
-                            [src]="currentUser?.profileImage"
+                            [src]="currentUser?.profilePictureUrl"
                             alt="Profile">
                         <ng-template #defaultProfileImage>
                             <div
