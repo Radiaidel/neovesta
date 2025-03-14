@@ -19,7 +19,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "users")
-public class User {
+public  class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -8,11 +8,12 @@ import { AuthService } from "../../../services/auth.service"
 import * as UserActions from "../../../store/user.actions"
 import { Subject, takeUntil } from "rxjs"
 import { selectUserCreationSuccess } from "../../../store/user.selectors"
+import { HeaderComponent } from "../../shared/header/header.component";
 
 @Component({
   selector: "app-user-create",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent],
   templateUrl: "./user-create.component.html",
 })
 export class UserCreateComponent implements OnInit {

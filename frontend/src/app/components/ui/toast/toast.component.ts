@@ -9,7 +9,7 @@ import { animate, state, style, transition, trigger } from "@angular/animations"
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed top-6 right-6 flex flex-col gap-3 max-w-md z-[9999]">
+    <div class="fixed top-6 right-6 flex flex-col gap-3 max-w-md z-[10000]">
       @for (toast of toasts; track toast.id) {
         <div 
           [@fadeInOut]

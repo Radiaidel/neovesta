@@ -6,8 +6,6 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +25,7 @@ public class SubResidenceManager extends User {
     @JoinColumn(name = "residence_manager_id")
     private ResidenceManager manager;
 
-    @PrePersist
-    @PreUpdate
+    
     @Override
     public void setRole(Role role) {
         super.setRole(Role.SUB_RESIDENCE_MANAGER);

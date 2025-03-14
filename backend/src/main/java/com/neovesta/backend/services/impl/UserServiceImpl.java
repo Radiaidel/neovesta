@@ -11,6 +11,7 @@ import com.neovesta.backend.models.Admin;
 import com.neovesta.backend.models.ResidenceManager;
 import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.SubResidenceManager;
+import com.neovesta.backend.models.SuperAdmin;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.Role;
 import com.neovesta.backend.repositories.UserRepository;
@@ -51,38 +52,112 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
     private final AuthenticationFacade authenticationFacade;
-    public UserResponse createUser(CreateUserRequest request) {
-        User newUser;
 
-        if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
 
+    @Override
+public UserResponse createUser(CreateUserRequest request) {
+    User newUser;
+
+    switch (request.getRole()) {
+        case ADMIN:
+            newUser = Admin.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .role(Role.ADMIN)
+                .build();
+            break;
+            
+        case SUPER_ADMIN:
+            newUser = SuperAdmin.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .role(Role.SUPER_ADMIN)
+                .build();
+            break;
+            
+        case RESIDENCE_MANAGER:
+            newUser = ResidenceManager.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .role(Role.RESIDENCE_MANAGER)
+                .build();
+            break;
+            
+        case SUB_RESIDENCE_MANAGER:
             ResidenceManager manager = userRepository.findById(request.getManagerId())
-                    .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
-                    .map(user -> (ResidenceManager) user)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+                .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
+                .map(user -> (ResidenceManager) user)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
 
             newUser = SubResidenceManager.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .phoneNumber(request.getPhoneNumber())
-                    .role(Role.SUB_RESIDENCE_MANAGER)
-                    .manager(manager) 
-                    .build();
-        } else {
-            newUser = User.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .phoneNumber(request.getPhoneNumber())
-                    .role(request.getRole())
-                    .build();
-        }
-
-        return userMapper.toResponse(userRepository.save(newUser));
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .manager(manager)
+                .role(Role.SUB_RESIDENCE_MANAGER) 
+                .build();
+            break;
+            
+        case RESIDENT:
+            newUser = Resident.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .role(Role.RESIDENT)
+                .build();
+            break;
+            
+        default:
+            throw new IllegalArgumentException("Unsupported role: " + request.getRole());
     }
+
+    return userMapper.toResponse(userRepository.save(newUser));
+}
+    // public UserResponse createUser(CreateUserRequest request) {
+    //     User newUser;
+
+    //     if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
+
+    //         ResidenceManager manager = userRepository.findById(request.getManagerId())
+    //                 .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
+    //                 .map(user -> (ResidenceManager) user)
+    //                 .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+
+    //         newUser = SubResidenceManager.builder()
+    //                 .email(request.getEmail())
+    //                 .password(passwordEncoder.encode(request.getPassword()))
+    //                 .firstName(request.getFirstName())
+    //                 .lastName(request.getLastName())
+    //                 .phoneNumber(request.getPhoneNumber())
+    //                 .role(Role.SUB_RESIDENCE_MANAGER)
+    //                 .manager(manager) 
+    //                 .build();
+    //     } else {
+    //         newUser = User.builder()
+    //                 .email(request.getEmail())
+    //                 .password(passwordEncoder.encode(request.getPassword()))
+    //                 .firstName(request.getFirstName())
+    //                 .lastName(request.getLastName())
+    //                 .phoneNumber(request.getPhoneNumber())
+    //                 .role(request.getRole())
+    //                 .build();
+    //     }
+
+    //     return userMapper.toResponse(userRepository.save(newUser));
+    // }
 
     @Override
     public UserResponse getUserById(UUID id) {
