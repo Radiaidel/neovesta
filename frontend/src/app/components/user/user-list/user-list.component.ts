@@ -18,7 +18,7 @@ import { HeaderComponent } from "../../shared/header/header.component";
 })
 export class UserListComponent implements OnInit, OnDestroy {
 
-  filteredUsersCount = 0;
+  // filteredUsersCount = 0;
 
   searchTerm = "";
   selectedRole: Role | null = null;
@@ -136,24 +136,26 @@ export class UserListComponent implements OnInit, OnDestroy {
     return this.authService.hasRole([Role.SUPER_ADMIN]);
   }
 
-  // ***************************************************
-
-  users$: Observable<UserResponse[]>;
+ 
   totalUsers = 0;
   currentPage = 0;
   pageSize = 10;
-
+  usersPage$: Observable<PageResponse<UserResponse>>;
+  filteredUsersCount = 0;
   constructor(
     private store: Store,
     private authService: AuthService,
   ) {
-    this.users$ = this.store.select(UserSelectors.selectUsers).pipe(
-      filter(users => !!users),
-      map(usersPage => {
-        this.totalUsers = usersPage.totalElements;
-        return usersPage.content;
-      })
+    this.usersPage$ = this.store.select(UserSelectors.selectUsers).pipe(
+      filter((users): users is PageResponse<UserResponse> => users !== null)
     );
+
+    // Ajoutez ceci :
+    this.usersPage$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(usersPage => {
+      this.filteredUsersCount = usersPage.totalElements;
+    });
   }
 
   loadUsers(): void {
@@ -164,9 +166,12 @@ export class UserListComponent implements OnInit, OnDestroy {
       page: this.currentPage,
       size: this.pageSize,
       role: this.selectedRole,
-      residenceId: this.currentUser.residenceId 
+      residenceId: this.currentUser.residenceId
     };
 
+    this.filteredUsersCount = 0; 
     this.store.dispatch(UserActions.loadUsers({ request }));
   }
+
+
 }
