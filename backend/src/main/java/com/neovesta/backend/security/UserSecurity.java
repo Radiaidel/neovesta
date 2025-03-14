@@ -16,6 +16,6 @@ public class UserSecurity {
         }
         
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        return userDetails.getId().equals(userId);
+        return userDetails.getUser().getId().equals(userId);
     }
 }

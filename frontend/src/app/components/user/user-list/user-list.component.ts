@@ -17,14 +17,12 @@ import { HeaderComponent } from "../../shared/header/header.component";
   templateUrl: "./user-list.component.html",
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  users$: Observable<PageResponse<UserResponse>>;
-  filteredUsers$: Observable<UserResponse[]>;
+
   filteredUsersCount = 0;
 
   searchTerm = "";
   selectedRole: Role | null = null;
-  currentPage = 0;
-  pageSize = 10;
+
   Math = Math;
   availableRoles: Role[] = [];
 
@@ -33,23 +31,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private currentUser = this.authService.getCurrentUser();
 
-  constructor(
-    private store: Store,
-    private authService: AuthService,
-  ) {
-    this.users$ = this.store.select(UserSelectors.selectUsers).pipe(
-      filter((users): users is PageResponse<UserResponse> => users !== null)
-    );
-
-    // Créer un observable pour les utilisateurs filtrés
-    this.filteredUsers$ = this.users$.pipe(
-      map(usersPage => {
-        const filtered = this.filterUsersByRole(usersPage.content || []);
-        this.filteredUsersCount = filtered.length;
-        return filtered;
-      })
-    );
-  }
 
   ngOnInit(): void {
     this.setAvailableRoles();
@@ -62,39 +43,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  filterUsersByRole(users: UserResponse[]): UserResponse[] {
-    if (!this.currentUser || !this.currentUser.role) {
-      return users;
-    }
 
-    let filtered = users;
-
-    // Filtrage basé sur le rôle de l'utilisateur actuel
-    switch (this.currentUser.role) {
-
-      case Role.SUPER_ADMIN:
-        filtered = filtered.filter(user => user.role === Role.ADMIN || user.role === Role.RESIDENCE_MANAGER);
-        break;
-      case Role.ADMIN:
-        filtered = filtered.filter(user => user.role === Role.RESIDENCE_MANAGER);
-        break;
-      case Role.RESIDENCE_MANAGER:
-        filtered = filtered.filter(user => user.role === Role.RESIDENT || user.role === Role.SUB_RESIDENCE_MANAGER);
-        break;
-      case Role.SUB_RESIDENCE_MANAGER:
-        filtered = filtered.filter(user => user.role === Role.RESIDENT);
-        break;
-      default:
-        filtered = [];
-    }
-
-    if (!this.selectedRole) {
-      return filtered;
-    }
-
-    return filtered.filter(user => user.role === this.selectedRole);
-
-  }
 
   setAvailableRoles(): void {
     const currentUserRole = this.currentUser?.role;
@@ -148,23 +97,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   onRoleChange(role: string | null): void {
-    // Si "All Roles" est sélectionné, ne pas appliquer de filtre de rôle
     const selectedRole = role && role !== "All Roles" ? (role as Role) : null;
     this.roleSelections.next(selectedRole);
-  }
-
-
-  loadUsers(): void {
-    if (!this.currentUser?.role) return;
-
-    const request: UserSearchRequest = {
-      searchTerm: this.searchTerm,
-      page: this.currentPage,
-      size: this.pageSize,
-      role: this.selectedRole,
-    };
-
-    this.store.dispatch(UserActions.loadUsers({ request }));
   }
 
   nextPage(): void {
@@ -200,5 +134,39 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   canDeleteUser(): boolean {
     return this.authService.hasRole([Role.SUPER_ADMIN]);
+  }
+
+  // ***************************************************
+
+  users$: Observable<UserResponse[]>;
+  totalUsers = 0;
+  currentPage = 0;
+  pageSize = 10;
+
+  constructor(
+    private store: Store,
+    private authService: AuthService,
+  ) {
+    this.users$ = this.store.select(UserSelectors.selectUsers).pipe(
+      filter(users => !!users),
+      map(usersPage => {
+        this.totalUsers = usersPage.totalElements;
+        return usersPage.content;
+      })
+    );
+  }
+
+  loadUsers(): void {
+    if (!this.currentUser?.role) return;
+
+    const request: UserSearchRequest = {
+      searchTerm: this.searchTerm,
+      page: this.currentPage,
+      size: this.pageSize,
+      role: this.selectedRole,
+      residenceId: this.currentUser.residenceId 
+    };
+
+    this.store.dispatch(UserActions.loadUsers({ request }));
   }
 }

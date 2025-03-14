@@ -37,6 +37,7 @@ public class SupabaseStorageService {
         this.bucketName = bucketName;
     }
 
+    @SuppressWarnings("null")
     public String uploadDocument(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Le fichier est vide");

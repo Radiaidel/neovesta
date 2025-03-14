@@ -3,7 +3,6 @@ package com.neovesta.backend.controllers;
 import com.neovesta.backend.dtos.request.CreateUserRequest;
 import com.neovesta.backend.dtos.request.UpdatePasswordRequest;
 import com.neovesta.backend.dtos.request.UpdateUserRequest;
-import com.neovesta.backend.dtos.request.UserSearchRequest;
 import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.models.enums.Role;
 import com.neovesta.backend.services.UserService;
@@ -43,13 +42,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @GetMapping("/search")
-    @Operation(summary = "Search users with pagination")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER') or (hasRole('RESIDENT') and #request.role == null)")
-    public ResponseEntity<Page<UserResponse>> searchUsers(@Valid UserSearchRequest request) {
-        log.info("Searching" + request);
-        return ResponseEntity.ok(userService.searchUsers(request));
-    }
+    // @GetMapping("/search")
+    // @Operation(summary = "Search users with pagination")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER') or (hasRole('RESIDENT') and #request.role == null)")
+    // public ResponseEntity<Page<UserResponse>> searchUsers(@Valid UserSearchRequest request) {
+    //     log.info("Searching" + request);
+    //     return ResponseEntity.ok(userService.searchUsers(request));
+    // }
 
     @GetMapping("/role/{role}")
     @Operation(summary = "Get users by role")
@@ -123,6 +122,19 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+
+
+
+    @GetMapping("/search")
+    @Operation(summary = "Search users with filters")
+    public ResponseEntity<Page<UserResponse>> searchUsers(
+        @RequestParam(defaultValue = "") String searchTerm,
+        @RequestParam(required = false) Role role,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+        
+        return ResponseEntity.ok(userService.searchUsers(searchTerm, role, page, size));
+    }
 
 
 }

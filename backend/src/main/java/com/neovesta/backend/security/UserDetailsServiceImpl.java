@@ -1,6 +1,6 @@
 package com.neovesta.backend.security;
 
-import com.neovesta.backend.exceptions.UserNotFoundException;
+import com.neovesta.backend.models.User;
 import com.neovesta.backend.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,8 +19,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .map(UserDetailsImpl::new)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        
+        return new UserDetailsImpl(user); // Passer l'entité User complète
     }
 }
