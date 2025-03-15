@@ -44,22 +44,6 @@ export class UserService {
     return this.http.get<PageResponse<UserResponse>>(`${this.apiUrl}/search`, { params });
   }
   
-  // searchUsers(request: UserSearchRequest): Observable<PageResponse<UserResponse>> {
-  //   let params = new HttpParams()
-  //     .set("page", request.page?.toString() || "0")
-  //     .set("size", request.size?.toString() || "10")
-  //     .set("searchTerm", request.searchTerm ?? "") 
-      
-  //   if (request.searchTerm) {
-  //     params = params.set("searchTerm", request.searchTerm)
-  //   }
-
-  //   if (request.role) {
-  //     params = params.set("role", request.role)
-  //   }
-
-  //   return this.http.get<PageResponse<UserResponse>>(`${this.apiUrl}/search`, { params })
-  // }
 
   getUsersByRole(role: Role, page = 0, size = 10): Observable<PageResponse<UserResponse>> {
     const params = new HttpParams().set("page", page.toString()).set("size", size.toString())

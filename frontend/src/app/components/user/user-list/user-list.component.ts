@@ -9,17 +9,17 @@ import { AuthService } from "../../../services/auth.service";
 import * as UserActions from "../../../store/user.actions";
 import * as UserSelectors from "../../../store/user.selectors";
 import { HeaderComponent } from "../../shared/header/header.component";
+import { ConfirmDialogComponent } from "../../ui/confirm-dialog/confirm-dialog.component";
 
 @Component({
   selector: "app-user-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, ConfirmDialogComponent],
   templateUrl: "./user-list.component.html",
 })
 export class UserListComponent implements OnInit, OnDestroy {
 
-  // filteredUsersCount = 0;
-
+  isDialogOpen = false;
   searchTerm = "";
   selectedRole: Role | null = null;
 
@@ -116,10 +116,16 @@ export class UserListComponent implements OnInit, OnDestroy {
   toggleUserStatus(userId: string): void {
     this.store.dispatch(UserActions.toggleUserStatus({ userId }));
   }
-
+  userIdToDelete: string | null = null;
   deleteUser(userId: string): void {
-    if (confirm("Are you sure you want to delete this user?")) {
-      this.store.dispatch(UserActions.deleteUser({ userId }));
+    this.isDialogOpen = true; 
+    this.userIdToDelete = userId;
+  }
+  confirmDelete(): void {
+    if (this.userIdToDelete) {
+      this.store.dispatch(UserActions.deleteUser({ userId: this.userIdToDelete }));
+      this.isDialogOpen = false;
+      this.userIdToDelete = null;
     }
   }
 

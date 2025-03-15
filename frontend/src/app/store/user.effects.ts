@@ -133,17 +133,22 @@ export class UserEffects {
 
 
   // Rediriger vers la page de connexion après la suppression du compte
-  deleteUserSuccess$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(UserActions.deleteUserSuccess),
-        tap(() => {
+deleteUserSuccess$ = createEffect(
+  () =>
+    this.actions$.pipe(
+      ofType(UserActions.deleteUserSuccess),
+      tap(({ userId }) => {
+        // Obtenir l'ID de l'utilisateur connecté
+        const currentUser = this.authService.getCurrentUser();
+        
+        // Ne déconnecter que si l'utilisateur supprimé est l'utilisateur connecté
+        if (currentUser && currentUser.id === userId) {
           this.authService.logout();
-          this.router.navigate(["/login"])
-        }),
-      ),
-    { dispatch: false },
-  )
-
+          this.router.navigate(["/login"]);
+        }
+      }),
+    ),
+  { dispatch: false },
+)
 }
 

@@ -89,8 +89,8 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-[#E8E1D7]">
-            <ng-container *ngIf="users$ | async as filteredUsers">
-              <tr *ngFor="let user of filteredUsers" class="hover:bg-[#E8E1D7]/10 transition-colors duration-150">
+            <ng-container *ngIf="usersPage$ | async as usersPage">
+              <tr *ngFor="let user of usersPage.content" class="hover:bg-[#E8E1D7]/10 transition-colors duration-150">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-[#0A1C26] to-[#2D4E5B] flex items-center justify-center text-white overflow-hidden">
@@ -162,7 +162,7 @@
                   </div>
                 </td>
               </tr>
-              <tr *ngIf="filteredUsers.length === 0">
+              <tr *ngIf="usersPage.content.length === 0">
                 <td colspan="5" class="px-6 py-10 text-center">
                   <div class="flex flex-col items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[#6B7D86]/50 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,8 +178,9 @@
         </table>
       </div>
 
+
       <!-- Pagination -->
-      <ng-container *ngIf="users$ | async as usersPage">
+      <ng-container *ngIf="usersPage$ | async as usersPage">
         <div class="px-6 py-4 bg-[#E8E1D7]/10 border-t border-[#E8E1D7]">
           <div class="flex flex-col sm:flex-row justify-between items-center">
             <div class="text-sm text-[#6B7D86] mb-4 sm:mb-0">
@@ -228,3 +229,12 @@
     </div>
   </div>
 </div>
+<app-confirm-dialog
+  [isOpen]="isDialogOpen"
+  [title]="'Delete User'"
+  [message]="'Are you sure you want to delete this user?'"
+  [confirmText]="'Delete'"
+  [cancelText]="'Cancel'"
+  (confirm)="confirmDelete()"
+  (cancel)="isDialogOpen = false"
+></app-confirm-dialog>

@@ -47,7 +47,7 @@ public  class User {
     private String resetToken;
     private LocalDateTime resetTokenExpiryDate;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
 

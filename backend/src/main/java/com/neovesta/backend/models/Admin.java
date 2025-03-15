@@ -4,6 +4,7 @@ import com.neovesta.backend.models.enums.Role;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -12,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "admins")
 @SuperBuilder
 @NoArgsConstructor
+@PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("ADMIN")
 public class Admin extends User {
 
