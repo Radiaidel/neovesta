@@ -18,12 +18,25 @@ import { selectLoading, selectSelectedResidence } from "../../../store/residence
 import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinner.component"
 import { MapComponent } from "../../ui/map/map.component"
 import { HeaderComponent } from "../../shared/header/header.component";
+import { trigger, transition, style, query, animate } from '@angular/animations';
 
 @Component({
   selector: "app-residence-form",
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent, MapComponent, HeaderComponent],
   templateUrl: `./residence-form.component.html`,
+  animations: [
+    trigger('stepAnimation', [
+      transition(':increment', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate('300ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
+      ]),
+      transition(':decrement', [
+        style({ transform: 'translateX(-100%)', opacity: 0 }),
+        animate('300ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
+      ])
+    ])
+  ]
 })
 export class ResidenceFormComponent implements OnInit, OnDestroy {
   private store = inject(Store)
@@ -408,6 +421,25 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
   // Track by function for ngFor
   trackByIndex(index: number): number {
     return index
+  }
+
+  currentStep = 0;
+  steps = ['Basic Information', 'Address', 'Images & Documents'];
+
+  setStep(index: number): void {
+    this.currentStep = index;
+  }
+
+  nextStep(): void {
+    if (this.currentStep < this.steps.length - 1) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
   }
 }
 
