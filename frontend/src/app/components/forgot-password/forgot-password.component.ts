@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common"
 import {  FormBuilder,  FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import  { Router } from "@angular/router"
 import { AuthService } from "../../services/auth.service"
-import { NotificationService } from "../../services/notification.service"
+import { ToastService } from "../../services/toast.service"
 
 
 enum ResetStep {
@@ -31,7 +31,7 @@ export class ForgotPasswordComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
   ) {
     this.emailForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
@@ -75,11 +75,11 @@ export class ForgotPasswordComponent {
       next: () => {
         this.isLoading = false
         this.currentStep = ResetStep.NEW_PASSWORD
-        this.notificationService.success("Reset token has been sent to your email")
+        this.toastService.show("Reset token has been sent to your email", "success")
       },
       error: (error) => {
         this.isLoading = false
-        this.notificationService.success("If the email exists, you will receive a reset token")
+        this.toastService.show("If the email exists, you will receive a reset token", "warning")
       },
     })
   }
@@ -97,12 +97,12 @@ export class ForgotPasswordComponent {
     this.authService.resetPassword(request).subscribe({
       next: () => {
         this.isLoading = false
-        this.notificationService.success("Password has been reset successfully")
+        this.toastService.show("Password has been reset successfully", "success")
         this.router.navigate(["/login"])
       },
       error: (error) => {
         this.isLoading = false
-        this.notificationService.error(error.error?.message || "Failed to reset password")
+        this.toastService.show(error.error?.message || "Failed to reset password", "error")
       },
     })
   }

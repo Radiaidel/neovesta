@@ -15,6 +15,7 @@ public class UserEmbeddedDTO {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+    private String profilePictureUrl;
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

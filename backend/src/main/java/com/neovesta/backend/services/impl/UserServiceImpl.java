@@ -7,24 +7,39 @@ import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.exceptions.UnauthorizedException;
 import com.neovesta.backend.mappers.UserMapper;
+import com.neovesta.backend.models.Admin;
 import com.neovesta.backend.models.ResidenceManager;
+import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.SubResidenceManager;
+import com.neovesta.backend.models.SuperAdmin;
 import com.neovesta.backend.models.User;
 import com.neovesta.backend.models.enums.Role;
 import com.neovesta.backend.repositories.UserRepository;
+import com.neovesta.backend.security.UserDetailsImpl;
 import com.neovesta.backend.services.CloudinaryService;
 import com.neovesta.backend.services.UserService;
+import com.neovesta.backend.utils.AuthenticationFacade;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -36,35 +51,76 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
+    private final AuthenticationFacade authenticationFacade;
 
+    @Override
     public UserResponse createUser(CreateUserRequest request) {
         User newUser;
 
-        if (request.getRole() == Role.SUB_RESIDENCE_MANAGER) {
+        switch (request.getRole()) {
+            case ADMIN:
+                newUser = Admin.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .role(Role.ADMIN)
+                        .build();
+                break;
 
-            ResidenceManager manager = userRepository.findById(request.getManagerId())
-                    .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
-                    .map(user -> (ResidenceManager) user)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+            case SUPER_ADMIN:
+                newUser = SuperAdmin.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .role(Role.SUPER_ADMIN)
+                        .build();
+                break;
 
-            newUser = SubResidenceManager.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .phoneNumber(request.getPhoneNumber())
-                    .role(Role.SUB_RESIDENCE_MANAGER)
-                    .manager(manager) 
-                    .build();
-        } else {
-            newUser = User.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .phoneNumber(request.getPhoneNumber())
-                    .role(request.getRole())
-                    .build();
+            case RESIDENCE_MANAGER:
+                newUser = ResidenceManager.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .role(Role.RESIDENCE_MANAGER)
+                        .build();
+                break;
+
+            case SUB_RESIDENCE_MANAGER:
+                ResidenceManager manager = userRepository.findById(request.getManagerId())
+                        .filter(user -> user.getRole() == Role.RESIDENCE_MANAGER)
+                        .map(user -> (ResidenceManager) user)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid Residence Manager ID."));
+
+                newUser = SubResidenceManager.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .manager(manager)
+                        .role(Role.SUB_RESIDENCE_MANAGER)
+                        .build();
+                break;
+
+            case RESIDENT:
+                newUser = Resident.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .role(Role.RESIDENT)
+                        .build();
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unsupported role: " + request.getRole());
         }
 
         return userMapper.toResponse(userRepository.save(newUser));
@@ -144,7 +200,7 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found with id: " + id);
         }
-        userRepository.deleteById(id);
+        userRepository.deleteUserWithCascade(id); 
     }
 
     @Override
@@ -179,6 +235,77 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return imageUrl;
+    }
+
+    @Override
+    public Page<UserResponse> searchUsers(String searchTerm, Role role, int page, int size) {
+        User currentUser = getCurrentUser();
+        Specification<User> spec = buildSearchSpecification(searchTerm, role, currentUser);
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(spec, pageable).map(userMapper::toResponse);
+    }
+
+    private Specification<User> buildSearchSpecification(String searchTerm, Role role, User currentUser) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            List<Predicate> rolePredicates = new ArrayList<>();
+
+            // Filtre de recherche
+            if (!searchTerm.isEmpty()) {
+                String term = "%" + searchTerm.toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("email")), term),
+                        cb.like(cb.lower(root.get("firstName")), term),
+                        cb.like(cb.lower(root.get("lastName")), term)));
+            }
+
+            // Filtre hiérarchique
+            switch (currentUser.getRole()) {
+                case SUPER_ADMIN:
+                    rolePredicates.add(cb.equal(root.type(), Admin.class));
+                    rolePredicates.add(cb.equal(root.type(), ResidenceManager.class));
+                    break;
+                case ADMIN:
+                    rolePredicates.add(cb.equal(root.type(), ResidenceManager.class));
+                    break;
+                case RESIDENCE_MANAGER:
+                    Join<User, ResidenceManager> rmJoin = root.join("residence", JoinType.INNER);
+                    rolePredicates.add(cb.or(
+                            cb.equal(root.type(), SubResidenceManager.class),
+                            cb.equal(root.type(), Resident.class)));
+                    predicates.add(cb.equal(rmJoin.get("id"), ((ResidenceManager) currentUser).getResidence().getId()));
+                    break;
+                case SUB_RESIDENCE_MANAGER:
+                    Join<User, SubResidenceManager> srmJoin = root.join("residence", JoinType.INNER);
+                    rolePredicates.add(cb.equal(root.type(), Resident.class));
+                    predicates.add(cb.equal(srmJoin.get("id"),
+                            ((SubResidenceManager) currentUser).getManager().getResidence().getId()));
+                    break;
+                default:
+                    return cb.disjunction();
+            }
+
+            // Combiner les prédicats de rôle
+            if (!rolePredicates.isEmpty()) {
+                predicates.add(cb.or(rolePredicates.toArray(new Predicate[0])));
+            }
+
+            // Filtre par rôle supplémentaire
+            if (role != null) {
+                predicates.add(cb.equal(root.get("role"), role));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication = authenticationFacade.getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        // Chargez l'entité complète avec les relations
+        return userRepository.findById(userDetails.getUser().getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
 }

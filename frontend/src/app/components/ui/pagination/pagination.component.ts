@@ -6,55 +6,43 @@ import { CommonModule } from "@angular/common"
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex items-center justify-between">
-      <div class="text-sm text-gray-700 dark:text-gray-300">
-        Page {{ currentPage + 1 }} of {{ totalPages }}
-      </div>
-      <div class="flex gap-2">
-        <button 
-          (click)="onPageChange(0)"
-          [disabled]="isFirstPage"
-          class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          First
-        </button>
-        <button 
-          (click)="onPageChange(currentPage - 1)"
-          [disabled]="isFirstPage"
-          class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        
-        @for (page of visiblePages; track page) {
-          <button 
-            (click)="onPageChange(page)"
-            [class.bg-indigo-600]="currentPage === page"
-            [class.text-white]="currentPage === page"
-            [class.hover:bg-indigo-700]="currentPage === page"
-            [class.border-indigo-600]="currentPage === page"
-            class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            {{ page + 1 }}
-          </button>
-        }
-        
-        <button 
-          (click)="onPageChange(currentPage + 1)"
-          [disabled]="isLastPage"
-          class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
-        <button 
-          (click)="onPageChange(totalPages - 1)"
-          [disabled]="isLastPage"
-          class="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Last
-        </button>
-      </div>
-    </div>
+    <div class="flex items-center justify-between border-t border-[#E8E1D7] pt-6">
+  <div class="text-sm text-[#6B7D86]">
+    Page {{ currentPage + 1 }} of {{ totalPages }}
+  </div>
+  <div class="flex gap-1.5">
+    <button 
+      (click)="onPageChange(currentPage - 1)"
+      [disabled]="isFirstPage"
+      class="px-3 py-1.5 rounded-lg border border-[#E8E1D7] text-[#0A1C26] hover:bg-[#E8E1D7]/30 transition-colors disabled:opacity-40"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    
+    @for (page of visiblePages; track page) {
+      <button 
+        (click)="onPageChange(page)"
+        [class.bg-[#0A1C26]]="currentPage === page"
+        [class.text-white]="currentPage === page"
+        class="px-3.5 py-1.5 rounded-lg border border-[#E8E1D7] text-[#0A1C26] hover:bg-[#E8E1D7]/30 transition-colors"
+      >
+        {{ page + 1 }}
+      </button>
+    }
+    
+    <button 
+      (click)="onPageChange(currentPage + 1)"
+      [disabled]="isLastPage"
+      class="px-3 py-1.5 rounded-lg border border-[#E8E1D7] text-[#0A1C26] hover:bg-[#E8E1D7]/30 transition-colors disabled:opacity-40"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
   `,
 })
 export class PaginationComponent {

@@ -9,22 +9,20 @@ import { AuthService } from "../../../services/auth.service";
 import * as UserActions from "../../../store/user.actions";
 import * as UserSelectors from "../../../store/user.selectors";
 import { HeaderComponent } from "../../shared/header/header.component";
+import { ConfirmDialogComponent } from "../../ui/confirm-dialog/confirm-dialog.component";
 
 @Component({
   selector: "app-user-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, ConfirmDialogComponent],
   templateUrl: "./user-list.component.html",
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  users$: Observable<PageResponse<UserResponse>>;
-  filteredUsers$: Observable<UserResponse[]>;
-  filteredUsersCount = 0;
 
+  isDialogOpen = false;
   searchTerm = "";
   selectedRole: Role | null = null;
-  currentPage = 0;
-  pageSize = 10;
+
   Math = Math;
   availableRoles: Role[] = [];
 
@@ -33,23 +31,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private currentUser = this.authService.getCurrentUser();
 
-  constructor(
-    private store: Store,
-    private authService: AuthService,
-  ) {
-    this.users$ = this.store.select(UserSelectors.selectUsers).pipe(
-      filter((users): users is PageResponse<UserResponse> => users !== null)
-    );
-
-    // Créer un observable pour les utilisateurs filtrés
-    this.filteredUsers$ = this.users$.pipe(
-      map(usersPage => {
-        const filtered = this.filterUsersByRole(usersPage.content || []);
-        this.filteredUsersCount = filtered.length;
-        return filtered;
-      })
-    );
-  }
 
   ngOnInit(): void {
     this.setAvailableRoles();
@@ -62,39 +43,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  filterUsersByRole(users: UserResponse[]): UserResponse[] {
-    if (!this.currentUser || !this.currentUser.role) {
-      return users;
-    }
 
-    let filtered = users;
-
-    // Filtrage basé sur le rôle de l'utilisateur actuel
-    switch (this.currentUser.role) {
-
-      case Role.SUPER_ADMIN:
-        filtered = filtered.filter(user => user.role === Role.ADMIN || user.role === Role.RESIDENCE_MANAGER);
-        break;
-      case Role.ADMIN:
-        filtered = filtered.filter(user => user.role === Role.RESIDENCE_MANAGER);
-        break;
-      case Role.RESIDENCE_MANAGER:
-        filtered = filtered.filter(user => user.role === Role.RESIDENT || user.role === Role.SUB_RESIDENCE_MANAGER);
-        break;
-      case Role.SUB_RESIDENCE_MANAGER:
-        filtered = filtered.filter(user => user.role === Role.RESIDENT);
-        break;
-      default:
-        filtered = [];
-    }
-
-    if (!this.selectedRole) {
-      return filtered;
-    }
-
-    return filtered.filter(user => user.role === this.selectedRole);
-
-  }
 
   setAvailableRoles(): void {
     const currentUserRole = this.currentUser?.role;
@@ -148,23 +97,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   onRoleChange(role: string | null): void {
-    // Si "All Roles" est sélectionné, ne pas appliquer de filtre de rôle
     const selectedRole = role && role !== "All Roles" ? (role as Role) : null;
     this.roleSelections.next(selectedRole);
-  }
-
-
-  loadUsers(): void {
-    if (!this.currentUser?.role) return;
-
-    const request: UserSearchRequest = {
-      searchTerm: this.searchTerm,
-      page: this.currentPage,
-      size: this.pageSize,
-      role: this.selectedRole,
-    };
-
-    this.store.dispatch(UserActions.loadUsers({ request }));
   }
 
   nextPage(): void {
@@ -182,10 +116,16 @@ export class UserListComponent implements OnInit, OnDestroy {
   toggleUserStatus(userId: string): void {
     this.store.dispatch(UserActions.toggleUserStatus({ userId }));
   }
-
+  userIdToDelete: string | null = null;
   deleteUser(userId: string): void {
-    if (confirm("Are you sure you want to delete this user?")) {
-      this.store.dispatch(UserActions.deleteUser({ userId }));
+    this.isDialogOpen = true; 
+    this.userIdToDelete = userId;
+  }
+  confirmDelete(): void {
+    if (this.userIdToDelete) {
+      this.store.dispatch(UserActions.deleteUser({ userId: this.userIdToDelete }));
+      this.isDialogOpen = false;
+      this.userIdToDelete = null;
     }
   }
 
@@ -201,4 +141,43 @@ export class UserListComponent implements OnInit, OnDestroy {
   canDeleteUser(): boolean {
     return this.authService.hasRole([Role.SUPER_ADMIN]);
   }
+
+ 
+  totalUsers = 0;
+  currentPage = 0;
+  pageSize = 10;
+  usersPage$: Observable<PageResponse<UserResponse>>;
+  filteredUsersCount = 0;
+  constructor(
+    private store: Store,
+    private authService: AuthService,
+  ) {
+    this.usersPage$ = this.store.select(UserSelectors.selectUsers).pipe(
+      filter((users): users is PageResponse<UserResponse> => users !== null)
+    );
+
+    // Ajoutez ceci :
+    this.usersPage$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(usersPage => {
+      this.filteredUsersCount = usersPage.totalElements;
+    });
+  }
+
+  loadUsers(): void {
+    if (!this.currentUser?.role) return;
+
+    const request: UserSearchRequest = {
+      searchTerm: this.searchTerm,
+      page: this.currentPage,
+      size: this.pageSize,
+      role: this.selectedRole,
+      residenceId: this.currentUser.residenceId
+    };
+
+    this.filteredUsersCount = 0; 
+    this.store.dispatch(UserActions.loadUsers({ request }));
+  }
+
+
 }

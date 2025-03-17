@@ -17,15 +17,15 @@ import java.util.UUID;
 @SuperBuilder
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "users")
-public class User {
+public  class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
-    private String profilePictureUrl;
 
+    private String profilePictureUrl;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -43,14 +43,22 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean status;
+    
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Contract> contract = new ArrayList<>();
+
+        
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reservation> reservation = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     private String resetToken;
     private LocalDateTime resetTokenExpiryDate;
-
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Subscription> subscriptions = new ArrayList<>();
 
 
     @PrePersist
@@ -63,22 +71,23 @@ public class User {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
     public boolean isAdmin() {
         return this.role == Role.ADMIN || this.role == Role.SUPER_ADMIN;
     }
-    
+
     public boolean isManager() {
         return this.role == Role.RESIDENCE_MANAGER;
     }
-    
+
     public boolean isSubManager() {
         return this.role == Role.SUB_RESIDENCE_MANAGER;
     }
-    
+
     public boolean isResident() {
         return this.role == Role.RESIDENT;
     }
-    
+
     public boolean isSuperAdmin() {
         return this.role == Role.SUPER_ADMIN;
     }

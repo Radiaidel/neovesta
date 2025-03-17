@@ -7,11 +7,12 @@ import  { Observable } from "rxjs"
 import  { UserResponse } from "../../../models/user.model"
 import * as UserActions from "../../../store/user.actions"
 import * as UserSelectors from "../../../store/user.selectors"
+import { HeaderComponent } from "../../shared/header/header.component";
 
 @Component({
   selector: "app-user-edit",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent],
   templateUrl: "./user-edit.component.html",
 })
 export class UserEditComponent implements OnInit {

@@ -2,41 +2,24 @@ package com.neovesta.backend.security;
 
 import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.models.User;
-import com.neovesta.backend.models.enums.Role;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
-    private final UUID id;
-    private final String email;
-    private final String password;
-    private final Role role;
-    private final boolean status;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private final User user; // Ajouter une référence à l'entité User
 
     public UserDetailsImpl(User user) {
-        this.id = user.getId();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
-        this.role = user.getRole();
-        this.status = user.isStatus();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.phoneNumber = user.getPhoneNumber();
-        this.createdAt = user.getCreatedAt();
-        this.updatedAt = user.getUpdatedAt();
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
 //    @Override
@@ -46,12 +29,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return user.getEmail();
     }
 
     @Override
@@ -71,25 +54,25 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status;
+        return user.isStatus();
     }
 
     public UserResponse toUserResponse() {
         return UserResponse.builder()
-                .id(id)
-                .email(email)
-                .firstName(firstName)
-                .lastName(lastName)
-                .phoneNumber(phoneNumber)
-                .role(role)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .status(status)
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .status(user.isStatus())
                 .build();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 }

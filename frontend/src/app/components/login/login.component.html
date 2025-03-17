@@ -1,123 +1,154 @@
-<div
-  class="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-gray-100 p-6">
-  <div
-    class="relative w-full md:w-1/2 h-full overflow-hidden bg-gray-900 flex flex-col">
-    <div class="absolute inset-0 z-0">
+<div class="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-gray-50">
+  <!-- Left Section with Enhanced Overlay -->
+  <div class="relative w-full md:w-1/2 h-full overflow-hidden bg-[#0A1C26] flex flex-col">
+    <div class="absolute inset-0 z-0 mix-blend-multiply">
       <img
-        src="https://i.pinimg.com/736x/a1/5f/b9/a15fb951f26f0b31bb81aae5e88ed73a.jpg"
-        alt="Motorcycle at night" class="w-full h-full object-cover" />
+        src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
+        alt="Modern residential building"
+        class="w-full h-full object-cover object-[center_top]"
+      />
     </div>
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-[#0A1C26]/90 via-[#2D4E5B]/70 to-[#C5A47E]/30"></div>
 
-    <div
-      class="relative z-10 m-4 md:m-8 lg:m-12 flex-1 rounded-3xl overflow-hidden flex flex-col">
-      <div class="absolute inset-0 bg-blue-900/40"></div>
+    <!-- Content -->
+    <div class="relative z-10 flex-1 flex flex-col p-8 lg:p-12">
+      <!-- Header -->
+      <div class="flex justify-between items-center">
+        <div class="text-[#E8E1D7] font-bold text-3xl tracking-wider font-montserrat">NEOVESTA</div>
+        <button class="bg-[#C5A47E]/90 text-[#0A1C26] rounded-full px-6 py-2 text-sm font-semibold hover:bg-[#C5A47E] transition-all duration-300 shadow-sm">
+          En savoir plus
+        </button>
+      </div>
 
-      <div class="relative z-10 flex justify-between items-center p-6">
-        <div class="text-white font-bold text-2xl">NEOVESTA</div>
-        <div class="flex space-x-2">
-          <button
-            class="bg-blue-600 text-white rounded-md px-4 py-2 text-sm hover:bg-blue-700 transition">Découvrir</button>
+      <!-- Center Content -->
+      <div class="flex-1 flex items-center justify-center">
+        <div class="text-center max-w-2xl">
+          <h2 class="text-[#E8E1D7] text-5xl font-bold mb-6 leading-tight font-playfair">
+            Gestion Résidentielle<br>d'Exception
+          </h2>
+          <p class="text-[#E8E1D7]/90 text-xl font-light tracking-wide">
+            L'excellence numérique au service de votre patrimoine immobilier
+          </p>
         </div>
       </div>
 
-      <div class="relative z-10 flex-1 flex items-center justify-center p-6">
-        <div class="text-center">
-          <h2 class="text-white text-4xl font-bold mb-4">VITESSE & LIBERTÉ</h2>
-          <p class="text-blue-200 text-xl max-w-md mx-auto">L'expérience motard
-            redéfinie pour l'ère moderne</p>
-        </div>
+      <!-- Decorative Line -->
+      <div class="h-px bg-[#C5A47E]/40 mb-4 mx-12"></div>
+      
+      <!-- Footer Note -->
+      <p class="text-center text-[#E8E1D7]/70 text-sm tracking-wide">
+        Partenaire des gestionnaires de résidences prestigieuses depuis 2015
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Section - Enhanced Form -->
+  <div class="w-full md:w-1/2 h-full flex flex-col p-8 lg:p-12 bg-white">
+    <!-- Header -->
+    <div class="text-3xl font-bold text-[#0A1C26] mb-8 font-montserrat tracking-tight">NEOVESTA</div>
+
+    <!-- Form Container -->
+    <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+      <div class="mb-10">
+        <h1 class="text-4xl font-bold text-[#2D4E5B] mb-3 font-playfair">Bienvenue</h1>
+        <p class="text-[#6B7D86] text-lg">Accédez à votre portail de gestion personnalisé</p>
       </div>
 
-      <div class="relative z-10 mt-auto p-6">
-        <div class="flex items-center">
-          <div
-            class="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-400">
-            <img src="/assets/images/rider-profile.jpg" alt="Profil Motard"
-              class="w-full h-full object-cover" />
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-semibold text-[#2D4E5B] mb-2">Identifiant</label>
+          <div class="relative">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="adresse@domaine.com"
+              class="w-full px-4 py-3 border-0 ring-1 ring-[#D3D9D6] rounded-xl focus:ring-2 focus:ring-[#C5A47E] bg-[#F8F7F3] placeholder-[#9BA8A5] text-[#2D4E5B] transition-all duration-200"
+              [ngClass]="{'ring-red-300': isFieldInvalid('email')}"
+            />
+            <div class="absolute right-4 top-4 text-[#9BA8A5]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+              </svg>
+            </div>
           </div>
-          <div class="ml-3">
-            <div class="text-white font-medium">Alex Rider</div>
-            <div class="text-blue-300 text-sm">Motard Professionnel</div>
-          </div>
-          <div class="ml-auto flex space-x-2">
-            <button
-              class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </div>
+
+        <!-- Password Input -->
+        <div>
+          <label class="block text-sm font-semibold text-[#2D4E5B] mb-2">Mot de passe</label>
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              class="w-full px-4 py-3 border-0 ring-1 ring-[#D3D9D6] rounded-xl focus:ring-2 focus:ring-[#C5A47E] bg-[#F8F7F3] placeholder-[#9BA8A5] text-[#2D4E5B] pr-12 transition-all duration-200"
+              [ngClass]="{'ring-red-300': isFieldInvalid('password')}"
+            />
+            <button 
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-4 top-4 text-[#9BA8A5] hover:text-[#C5A47E] transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="w-full md:w-1/2 h-full bg-white flex flex-col p-8 lg:p-12">
-    <div class="text-2xl font-bold text-blue-900">NEOVESTA</div>
-
-    <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-2">Bienvenue, Motard</h1>
-        <p class="text-gray-600">Connectez-vous à votre espace Neovesta</p>
-      </div>
-
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 mb-1">Identifiant</label>
-          <input
-            type="text"
-            formControlName="email"
-            placeholder="Votre nom d'utilisateur"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        <!-- Remember & Forgot -->
+        <div class="flex items-center justify-between pt-2">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input 
+              type="checkbox" 
+              formControlName="rememberMe"
+              class="h-5 w-5 rounded-md border-[#D3D9D6] text-[#C5A47E] focus:ring-[#C5A47E]"
+            />
+            <span class="text-[#6B7D86] text-sm">Se souvenir de moi</span>
+          </label>
+          <a routerLink="/forgot-password" class="text-sm text-[#6B7D86] hover:text-[#C5A47E] transition-colors">
+            Mot de passe oublié ?
+          </a>
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Mot de
-            passe</label>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Votre mot de passe"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <input type="checkbox" formControlName="rememberMe" id="remember"
-              class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-            <label for="remember" class="ml-2 block text-sm text-gray-700">Se
-              souvenir de moi</label>
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full bg-[#0A1C26] text-white py-4 rounded-xl font-semibold hover:bg-[#2D4E5B] transition-all duration-300 group"
+          [disabled]="loginForm.invalid || isLoading"
+        >
+          <div class="flex items-center justify-center">
+            @if (isLoading) {
+              <svg class="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              <span>Connexion en cours...</span>
+            } @else {
+              <span>Se connecter</span>
+              <svg class="w-5 h-5 ml-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            }
           </div>
-          <a routerLink="/forgot-password"
-            class="text-sm font-medium text-blue-600 hover:text-blue-800">Mot de
-            passe oublié?</a>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            class="w-full bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 transition flex items-center justify-center">
-            <span>Se connecter</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
-        </div>
+        </button>
       </form>
 
-      <div class="mt-10">
-        <p class="text-sm text-gray-600 mb-4">En vous connectant, vous acceptez
-          nos conditions d'utilisation et notre politique de
-          confidentialité.</p>
-        <div class="border-t border-gray-300 pt-4">
-          <p class="text-center text-gray-600 text-sm">© 2025 Neovesta. Tous
-            droits réservés.</p>
-        </div>
+      <!-- Footer -->
+      <div class="mt-12 pt-6 border-t border-[#EDEDED]">
+        <p class="text-center text-sm text-[#9BA8A5] leading-relaxed">
+          En continuant, vous acceptez nos 
+          <a href="#" class="text-[#C5A47E] hover:text-[#0A1C26] transition-colors">Conditions d'utilisation</a> 
+          et notre 
+          <a href="#" class="text-[#C5A47E] hover:text-[#0A1C26] transition-colors">Politique de confidentialité</a>
+        </p>
+        <p class="text-center text-xs text-[#9BA8A5] mt-4">
+          © 2025 Neovesta · Excellence Immobilière Numérique
+        </p>
       </div>
     </div>
   </div>

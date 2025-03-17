@@ -1,58 +1,122 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="container mx-auto px-4 max-w-4xl">
-    <div class="flex items-center mb-8">
+<app-header></app-header>
+<!-- Main Container -->
+<div class="flex items-center justify-center min-h-screen">
+  <div class="w-full rounded-lg shadow-xl max-w-2xl mx-4 max-h-[90vh] overflow-hidden bg-white">
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-[#E8E1D7] flex justify-between items-center">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#C5A47E] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        <h3 class="text-lg font-semibold text-[#0A1C26]">Edit User</h3>
+      </div>
       <button 
         (click)="goBack()"
-        class="mr-4 text-blue-900 hover:text-blue-700 transition-colors"
+        class="text-[#6B7D86] hover:text-[#0A1C26] transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      <h1 class="text-2xl font-bold text-blue-900">Edit User</h1>
     </div>
 
-    <div class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100">
-      <div class="bg-gradient-to-r from-blue-900 to-blue-800 h-16 relative">
-        <div class="absolute top-0 right-0 h-16 w-32 overflow-hidden">
-          <div class="absolute transform rotate-45 bg-yellow-500 w-16 h-64 -right-8 -top-32 opacity-20"></div>
-          <div class="absolute transform rotate-45 bg-yellow-400 w-8 h-64 -right-2 -top-32 opacity-20"></div>
-        </div>
-        <div class="flex items-center h-full px-6">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span class="ml-2 text-white font-medium">User Information</span>
-        </div>
-      </div>
-
-      <div class="px-6 py-8">
-        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-          <div class="mb-8">
-            <h2 class="text-lg font-medium text-blue-900 mb-4">Personal Details</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
-                <input type="text" id="firstName" formControlName="firstName" class="border-gray-300 rounded-lg w-full">
-              </div>
-              <div>
-                <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
-                <input type="text" id="lastName" formControlName="lastName" class="border-gray-300 rounded-lg w-full">
-              </div>
-            </div>
-          </div>
-          <div class="mb-8">
-            <h2 class="text-lg font-medium text-blue-900 mb-4">Contact Information</h2>
+    <!-- Modal Body -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Personal Information -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-[#0A1C26] mb-4 pb-2 border-b border-[#E8E1D7]">Personal Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-              <input type="email" id="email" formControlName="email" class="border-gray-300 rounded-lg w-full">
+              <label for="firstName" class="block text-sm font-medium text-[#0A1C26] mb-1">First Name</label>
+              <input 
+                type="text" 
+                id="firstName" 
+                formControlName="firstName"
+                class="shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] block w-full sm:text-sm border-[#E8E1D7] rounded-md"
+                placeholder="Enter first name"
+              >
+              <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" class="mt-1 text-red-500 text-xs">
+                <div *ngIf="firstName?.errors?.['required']">First name is required</div>
+              </div>
+            </div>
+
+            <div>
+              <label for="lastName" class="block text-sm font-medium text-[#0A1C26] mb-1">Last Name</label>
+              <input 
+                type="text" 
+                id="lastName" 
+                formControlName="lastName"
+                class="shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] block w-full sm:text-sm border-[#E8E1D7] rounded-md"
+                placeholder="Enter last name"
+              >
+              <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="mt-1 text-red-500 text-xs">
+                <div *ngIf="lastName?.errors?.['required']">Last name is required</div>
+              </div>
             </div>
           </div>
-          <div class="flex justify-end">
-            <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded-lg">Save Changes</button>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-[#0A1C26] mb-4 pb-2 border-b border-[#E8E1D7]">Contact Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="email" class="block text-sm font-medium text-[#0A1C26] mb-1">Email Address</label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email"
+                class="shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] block w-full sm:text-sm border-[#E8E1D7] rounded-md"
+                placeholder="name@example.com"
+              >
+              <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="mt-1 text-red-500 text-xs">
+                <div *ngIf="email?.errors?.['required']">Email is required</div>
+                <div *ngIf="email?.errors?.['email']">Please enter a valid email</div>
+              </div>
+            </div>
+
+            <div>
+              <label for="phoneNumber" class="block text-sm font-medium text-[#0A1C26] mb-1">Phone Number</label>
+              <input 
+                type="text" 
+                id="phoneNumber" 
+                formControlName="phoneNumber"
+                class="shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] block w-full sm:text-sm border-[#E8E1D7] rounded-md"
+                placeholder="+XX XXX XXX XXXX"
+              >
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <!-- Account Settings -->
+       
+
+        <!-- Form Actions -->
+        <div class="flex justify-end items-center pt-4 border-t border-[#E8E1D7]">
+          <button 
+            type="button" 
+            (click)="goBack()"
+            class="mr-4 inline-flex items-center px-4 py-2 border border-[#E8E1D7] shadow-sm text-sm font-medium rounded-md text-[#6B7D86] bg-white hover:bg-[#E8E1D7]/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2D4E5B] transition-colors"
+          >
+            Cancel
+          </button>
+
+          <button 
+            type="submit" 
+            [disabled]="userForm.invalid || isSubmitting"
+            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#0A1C26] hover:bg-[#0A1C26]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2D4E5B] disabled:opacity-50 transition-colors"
+          >
+            <span *ngIf="isSubmitting" class="mr-2">
+              <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            Save Changes
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

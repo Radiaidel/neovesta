@@ -26,6 +26,10 @@ export class HeaderComponent implements OnInit {
     });
   }
  
+  get isResident(): boolean {
+    return this.currentUser?.role === Role.RESIDENT;
+  }
+
   get isAdminOrSuperAdmin(): boolean {
     return this.currentUser?.role === Role.ADMIN || this.currentUser?.role === Role.SUPER_ADMIN;
   }

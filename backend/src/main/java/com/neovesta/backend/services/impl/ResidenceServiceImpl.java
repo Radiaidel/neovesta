@@ -9,8 +9,10 @@ import com.neovesta.backend.exceptions.UserNotFoundException;
 import com.neovesta.backend.mappers.ResidenceMapper;
 import com.neovesta.backend.models.Residence;
 import com.neovesta.backend.models.ResidenceManager;
+import com.neovesta.backend.models.User;
 import com.neovesta.backend.repositories.ResidenceManagerRepository;
 import com.neovesta.backend.repositories.ResidenceRepository;
+import com.neovesta.backend.repositories.UserRepository;
 import com.neovesta.backend.services.ResidenceService;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
@@ -33,13 +35,13 @@ import java.util.stream.Collectors;
 public class ResidenceServiceImpl implements ResidenceService {
 
     private final ResidenceRepository residenceRepository;
-    private final ResidenceManagerRepository residenceManagerRepository;
+    private final UserRepository residenceManagerRepository;
     private final ResidenceMapper residenceMapper;
     private final CloudinaryService cloudinaryService;
     private final SupabaseStorageService supabaseStorageService;
 
     public ResidenceServiceImpl(ResidenceRepository residenceRepository,
-            ResidenceManagerRepository residenceManagerRepository, ResidenceMapper residenceMapper,
+            UserRepository residenceManagerRepository, ResidenceMapper residenceMapper,
             CloudinaryService cloudinaryService, SupabaseStorageService supabaseStorageService) {
         this.residenceRepository = residenceRepository;
         this.residenceManagerRepository = residenceManagerRepository;
@@ -71,10 +73,19 @@ public class ResidenceServiceImpl implements ResidenceService {
         residence.setDocuments(documents);
 
         if (request.getManagerId() != null) {
-            ResidenceManager manager = residenceManagerRepository.findById(request.getManagerId())
-                    .orElseThrow(() -> new UserNotFoundException("Residence manager not found"));
-            residence.setManager(manager);
-            manager.setResidence(residence);
+            System.out.println("Searching for manager with ID: " + request.getManagerId()); // Debug log
+            User user = residenceManagerRepository.findById(request.getManagerId())
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+    
+            // Check if the user is a ResidenceManager
+            if (user instanceof ResidenceManager) {
+                ResidenceManager manager = (ResidenceManager) user; // Safe cast
+                System.out.println("Found manager: " + manager.getEmail() + ", Role: " + manager.getRole()); // Debug log
+                residence.setManager(manager);
+                manager.setResidence(residence);
+            } else {
+                throw new IllegalArgumentException("The provided user is not a ResidenceManager");
+            }
         }
 
         residence = residenceRepository.save(residence);

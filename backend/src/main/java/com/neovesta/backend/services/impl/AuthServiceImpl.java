@@ -131,7 +131,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             UserDetailsImpl currentUser = (UserDetailsImpl) authentication.getPrincipal();
-            validateRoleCreation(currentUser.getRole(), request.getRole());
+            validateRoleCreation(currentUser.getUser().getRole(), request.getRole());
 
             User user = createUserByRole(request);
             String password = request.getPassword();

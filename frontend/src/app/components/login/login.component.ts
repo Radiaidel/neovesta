@@ -3,13 +3,14 @@ import { CommonModule } from "@angular/common"
 import { FormBuilder, type FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { Router, ActivatedRoute, RouterLink } from "@angular/router"
 import { AuthService } from "../../services/auth.service"
-import { NotificationService } from "../../services/notification.service"
 import { finalize } from "rxjs"
+import { ToastComponent } from "../ui/toast/toast.component"
+import { ToastService } from "../../services/toast.service"
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule , RouterLink],
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.css"],
 })
@@ -18,7 +19,7 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService)
   private router = inject(Router)
   private route = inject(ActivatedRoute)
-  private notificationService = inject(NotificationService)
+  private toastService = inject(ToastService)
 
   loginForm!: FormGroup
   isLoading = false
@@ -59,10 +60,10 @@ export class LoginComponent implements OnInit {
         next: () => {
           const returnUrl = this.route.snapshot.queryParams["dashboard"] || "dashboard"
           this.router.navigate([returnUrl])
-          this.notificationService.success("Login successful")
+          this.toastService.show("Login successful", "success")
         },
         error: (err) => {
-          this.notificationService.error(
+          this.toastService.show(
             err.error?.message || "Login failed. Please check your credentials and try again.",
           )
         },
