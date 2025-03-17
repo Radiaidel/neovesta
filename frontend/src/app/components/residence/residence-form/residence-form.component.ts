@@ -19,6 +19,8 @@ import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinne
 import { MapComponent } from "../../ui/map/map.component"
 import { HeaderComponent } from "../../shared/header/header.component";
 import { trigger, transition, style, query, animate } from '@angular/animations';
+import { Role, UserResponse } from "../../../models/user.model"
+import { UserService } from "../../../services/user.service"
 
 @Component({
   selector: "app-residence-form",
@@ -41,7 +43,7 @@ import { trigger, transition, style, query, animate } from '@angular/animations'
 export class ResidenceFormComponent implements OnInit, OnDestroy {
   private store = inject(Store)
   private route = inject(ActivatedRoute)
-  private router = inject(Router)
+  private userService = inject(UserService)
   private fb = inject(FormBuilder)
   private destroy$ = new Subject<void>()
 
@@ -51,7 +53,7 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
   isEditMode = false
   residenceId: string | null = null
   formErrors: Record<string, string> = {}
-
+  residenceManagers: UserResponse[] = [];
   // File uploads
   previewUrls: string[] = [];
   selectedImages: File[] = []
@@ -72,6 +74,7 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loadResidenceManagers();
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const id = params.get("id")
       if (id && id !== "new") {
@@ -113,6 +116,19 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
     if (this.isEditMode) {
       this.store.dispatch(ResidenceActions.resetSelectedResidence())
     }
+  }
+
+  loadResidenceManagers(): void {
+    this.userService
+      .getUsersByRole(Role.RESIDENCE_MANAGER) // Replace with your Role enum or string
+      .subscribe({
+        next: (response) => {
+          this.residenceManagers = response.content; // Assuming response is paginated
+        },
+        error: (error) => {
+          console.error("Failed to load residence managers:", error);
+        },
+      });
   }
 
   createForm(): FormGroup {
@@ -204,6 +220,11 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
         this.formErrors["availableApartments"] = "Available apartments must be at least 0"
       }
     }
+
+
+    if (this.residenceForm.get("managerId")?.invalid) {
+      this.formErrors["managerId"] = "Please select a residence manager.";
+    }
   }
 
   onSubmit(): void {
@@ -214,7 +235,7 @@ export class ResidenceFormComponent implements OnInit, OnDestroy {
 
     this.isSubmitting = true
     const formValue = this.residenceForm.value
-
+    const managerId = formValue.managerId;
     // Filter out empty values from arrays
     const amenities = formValue.amenities.filter((amenity: string) => amenity.trim() !== "")
 
