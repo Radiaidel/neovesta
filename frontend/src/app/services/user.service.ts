@@ -58,7 +58,7 @@ export class UserService {
   }
 
   updateUser(id: string, user: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.apiUrl}/${id}`, user)
+    return this.http.put<UserResponse>(`${this.apiUrl}/updateUser/${id}`, user)
   }
 
   updatePassword(id: string, request: UpdatePasswordRequest): Observable<UserResponse> {

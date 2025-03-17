@@ -67,6 +67,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
     
+    @PutMapping("/updateUser/{id}")
+    @Operation(summary = "Update user information (except role and status)")
+    public ResponseEntity<UserResponse> updateUserWithoutFile(
+            @PathVariable UUID id,
+            @RequestBody UpdateUserRequest request) {  
+        return ResponseEntity.ok(userService.updateUser(id, request));
+    }
+    
 
     @PutMapping("/{id}/password")
     @Operation(summary = "Update user password")
