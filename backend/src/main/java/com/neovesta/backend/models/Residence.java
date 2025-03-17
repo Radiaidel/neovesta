@@ -50,10 +50,13 @@ public class Residence {
     @CollectionTable(name = "residence_documents", joinColumns = @JoinColumn(name = "residence_id"))
     private List<Document> documents = new ArrayList<>();
 
-    @OneToMany(mappedBy = "residence", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "residence", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feature> features = new ArrayList<>();
     
-    @OneToOne(mappedBy = "residence", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "residence", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contract> contracts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "residence", fetch = FetchType.LAZY )
     private ResidenceManager manager;
 
     @Column(columnDefinition = "TEXT")

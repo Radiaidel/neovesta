@@ -43,13 +43,23 @@ public  class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean status;
+    
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Contract> contract = new ArrayList<>();
+
+        
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reservation> reservation = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     private String resetToken;
     private LocalDateTime resetTokenExpiryDate;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    @Builder.Default
-    private List<Subscription> subscriptions = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

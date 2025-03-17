@@ -64,9 +64,13 @@ public class Feature {
     @Column(name = "requires_manager_approval")
     private Boolean requiresManagerApproval;
 
-    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
