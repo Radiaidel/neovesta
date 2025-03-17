@@ -34,20 +34,16 @@ export class UserService {
 
   searchUsers(request: UserSearchRequest): Observable<PageResponse<UserResponse>> {
     let params = new HttpParams()
-      .set("page", request.page?.toString() || "0")
-      .set("size", request.size?.toString() || "10")
-      .set("searchTerm", request.searchTerm ?? "") 
-      
-    if (request.searchTerm) {
-      params = params.set("searchTerm", request.searchTerm)
-    }
-
-    if (request.role) {
-      params = params.set("role", request.role)
-    }
-
-    return this.http.get<PageResponse<UserResponse>>(`${this.apiUrl}/search`, { params })
+      .set("page", request.page.toString())
+      .set("size", request.size.toString())
+      .set("searchTerm", request.searchTerm || "");
+  
+    if (request.role) params = params.set("role", request.role);
+    if (request.residenceId) params = params.set("residenceId", request.residenceId);
+  
+    return this.http.get<PageResponse<UserResponse>>(`${this.apiUrl}/search`, { params });
   }
+  
 
   getUsersByRole(role: Role, page = 0, size = 10): Observable<PageResponse<UserResponse>> {
     const params = new HttpParams().set("page", page.toString()).set("size", size.toString())
@@ -62,7 +58,7 @@ export class UserService {
   }
 
   updateUser(id: string, user: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.apiUrl}/${id}`, user)
+    return this.http.put<UserResponse>(`${this.apiUrl}/updateUser/${id}`, user)
   }
 
   updatePassword(id: string, request: UpdatePasswordRequest): Observable<UserResponse> {

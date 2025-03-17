@@ -32,4 +32,6 @@ public interface UserService {
 
     Page<UserResponse> getAllUsers(int page, int size);
     String uploadProfileImage(UUID id, MultipartFile profileImage) throws IOException;
+
+    Page<UserResponse> searchUsers(String searchTerm, Role role, int page, int size);
 }

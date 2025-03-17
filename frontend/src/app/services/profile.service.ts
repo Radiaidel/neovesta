@@ -22,10 +22,12 @@ export class ProfileService {
   }
 
   updateUserProfile(id: string, request: ProfileUpdateRequest | FormData): Observable<ProfileUser> {
+
+    console.log(request)
     if (request instanceof FormData) {
       return this.http.put<ProfileUser>(`${this.apiUrl}/users/${id}`, request);
     }
-    return this.http.put<ProfileUser>(`${this.apiUrl}/users/${id}`, request);
+    return this.http.put<ProfileUser>(`${this.apiUrl}/users/updateUser/${id}`, request);
   }
 
   updatePassword(id: string, request: { currentPassword: string; newPassword: string }): Observable<any> {

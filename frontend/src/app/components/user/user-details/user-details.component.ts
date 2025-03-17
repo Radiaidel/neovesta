@@ -8,11 +8,12 @@ import  { AuthService } from "../../../services/auth.service"
 import { Role } from "../../../models/user.model"
 import * as UserActions from "../../../store/user.actions"
 import * as UserSelectors from "../../../store/user.selectors"
+import { HeaderComponent } from "../../shared/header/header.component";
 
 @Component({
   selector: "app-user-details",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: "./user-details.component.html",
 })
 export class UserDetailsComponent implements OnInit {

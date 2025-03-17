@@ -10,7 +10,7 @@ export enum Role {
 
 export interface User {
   id: string
-  profilePictureUrl?: string
+  profilePictureUrl: string
   email: string
   firstName: string
   lastName: string
@@ -114,10 +114,11 @@ export interface UpdateUserRequest {
 
 
 export interface UserSearchRequest {
-  searchTerm?: string
-  page?: number
-  size?: number
+  searchTerm: string
+  page: number
+  size: number
   role?: Role | undefined | null
+  residenceId?: string
 }
 
 export interface PageResponse<T> {

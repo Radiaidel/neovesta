@@ -24,7 +24,6 @@ spring:
           auth: false
           starttls:
             enable: false
-
   logging:
     level:
       com.neovesta: DEBUG

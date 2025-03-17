@@ -47,16 +47,16 @@ public class JwtService {
     public String generateToken(UserDetailsImpl userDetails, boolean rememberMe) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("remember_me", rememberMe);
-        claims.put("user_id", userDetails.getId());
-        claims.put("role", userDetails.getRole().name());
+        claims.put("user_id", userDetails.getUser().getId());
+        claims.put("role", userDetails.getUser().getRole().name());
         return buildToken(claims, userDetails, rememberMe ? rememberMeExpiration : jwtExpiration);
     }
 
     public String generateRefreshToken(UserDetailsImpl userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("token_type", "refresh");
-        claims.put("user_id", userDetails.getId());
-        claims.put("role", userDetails.getRole().name());
+        claims.put("user_id", userDetails.getUser().getId());
+        claims.put("role", userDetails.getUser().getRole().name());
         return buildToken(claims, userDetails, refreshExpiration);
     }
 
@@ -64,8 +64,8 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("remember_me", true);
         claims.put("token_type", "remember_me");
-        claims.put("user_id", userDetails.getId());
-        claims.put("role", userDetails.getRole().name());
+        claims.put("user_id", userDetails.getUser().getId());
+        claims.put("role", userDetails.getUser().getRole().name());
         return buildToken(claims, userDetails, rememberMeExpiration);
     }
 
