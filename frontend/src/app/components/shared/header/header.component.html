@@ -40,14 +40,26 @@
 
             <!-- Manager/Sub Manager -->
             <ng-container *ngIf="isManagerOrSubManager">
+              <a routerLink="/users"
+                class="px-3 py-2 text-[#0A1C26] hover:text-[#0A1C26] rounded-md text-sm font-medium transition-all duration-200 hover:bg-[#E8E1D7]">
+                Users
+              </a>
               <a routerLink="/contracts"
                 class="px-3 py-2 text-[#0A1C26] hover:text-[#0A1C26] rounded-md text-sm font-medium transition-all duration-200 hover:bg-[#E8E1D7]">
                 Contracts
               </a>
               <a routerLink="/reservations"
+              class="px-3 py-2 text-[#0A1C26] hover:text-[#0A1C26] rounded-md text-sm font-medium transition-all duration-200 hover:bg-[#E8E1D7]">
+              features
+            </a>
+              <a routerLink="/reservations"
                 class="px-3 py-2 text-[#0A1C26] hover:text-[#0A1C26] rounded-md text-sm font-medium transition-all duration-200 hover:bg-[#E8E1D7]">
                 Reservations
               </a>
+              <a routerLink="/reservations"
+              class="px-3 py-2 text-[#0A1C26] hover:text-[#0A1C26] rounded-md text-sm font-medium transition-all duration-200 hover:bg-[#E8E1D7]">
+              subscriptions
+            </a>
             </ng-container>
 
             <!-- Resident -->

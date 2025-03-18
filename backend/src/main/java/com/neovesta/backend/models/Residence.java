@@ -28,7 +28,7 @@ public class Residence {
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "residence_images", joinColumns = @JoinColumn(name = "residence_id") )
+    @CollectionTable(name = "residence_images", joinColumns = @JoinColumn(name = "residence_id"))
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
 
@@ -52,11 +52,11 @@ public class Residence {
 
     @OneToMany(mappedBy = "residence", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feature> features = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "residence", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contract> contracts = new ArrayList<>();
 
-    @OneToOne(mappedBy = "residence", fetch = FetchType.LAZY )
+    @OneToOne(mappedBy = "residence", fetch = FetchType.LAZY)
     private ResidenceManager manager;
 
     @Column(columnDefinition = "TEXT")

@@ -33,15 +33,16 @@ import lombok.experimental.SuperBuilder;
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class ResidenceManager extends User {
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "residence_id" )
-    private Residence residence;
 
+    @OneToOne
+    @JoinColumn(name = "residence_id")
+    private Residence residence;    
+
+    
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SubResidenceManager> subManagers = new ArrayList<>();
 
-    
     @Override
     public void setRole(Role role) {
         super.setRole(Role.RESIDENCE_MANAGER);

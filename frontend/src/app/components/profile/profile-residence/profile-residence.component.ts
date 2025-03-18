@@ -98,6 +98,7 @@ export class ProfileResidenceComponent implements OnInit, OnDestroy {
     }
   }
 
+  
   // saveResidence(updatedResidence: any): void {
   //   const currentUser = this.authService.getCurrentUser()
   //   if (currentUser && this.residence) {
