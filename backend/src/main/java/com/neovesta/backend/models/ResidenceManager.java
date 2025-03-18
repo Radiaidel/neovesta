@@ -36,8 +36,9 @@ public class ResidenceManager extends User {
 
     @OneToOne
     @JoinColumn(name = "residence_id")
-    private Residence residence;
+    private Residence residence;    
 
+    
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SubResidenceManager> subManagers = new ArrayList<>();
