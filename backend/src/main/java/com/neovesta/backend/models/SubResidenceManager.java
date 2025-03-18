@@ -23,10 +23,11 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("SUB_RESIDENCE_MANAGER")
 public class SubResidenceManager extends User {
 
-    @ManyToOne
-    @JoinColumn(name = "residence_manager_id")
-    private ResidenceManager manager;
 
+
+    @ManyToOne
+@JoinColumn(name = "residence_manager_id")
+private ResidenceManager manager;
     
     @Override
     public void setRole(Role role) {
