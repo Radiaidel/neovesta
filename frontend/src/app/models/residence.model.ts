@@ -1,3 +1,5 @@
+import { User, UserResponse } from "./user.model"
+
 export interface Address {
   street: string
   city: string
@@ -44,6 +46,7 @@ export interface Residence {
   updatedAt: string
   status: ResidenceStatus
   managerId?: string
+  manager?: UserResponse
 }
 
 export interface CreateResidenceRequest {

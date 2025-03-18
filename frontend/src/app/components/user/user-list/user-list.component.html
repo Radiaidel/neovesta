@@ -141,6 +141,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </a>
+                    <ng-container *ngIf="user.role === 'RESIDENT'">
+                      <a [routerLink]="['/contracts/new']" [queryParams]="{ residentId: user.id }"
+                        class="text-[#C5A47E] hover:text-[#C5A47E]/70 bg-[#E8E1D7]/30 hover:bg-[#E8E1D7]/50 p-1.5 rounded-md transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </a>
+                    </ng-container>
                     <a [routerLink]="['/users', user.id, 'edit']"
                       class="text-[#2D4E5B] hover:text-[#2D4E5B]/70 bg-[#E8E1D7]/30 hover:bg-[#E8E1D7]/50 p-1.5 rounded-md transition-colors duration-200">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

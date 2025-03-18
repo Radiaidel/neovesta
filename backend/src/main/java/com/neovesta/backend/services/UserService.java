@@ -24,7 +24,7 @@ public interface UserService {
 
     UserResponse getUserById(UUID id);
 
-    Page<UserResponse> searchUsers(UserSearchRequest request);
+    // Page<UserResponse> searchUsers(UserSearchRequest request);
 
     Page<UserResponse> getUsersByRole(Role role, int page, int size);
     

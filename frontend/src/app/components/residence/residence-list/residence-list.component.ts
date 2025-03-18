@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common"
 import { RouterModule } from "@angular/router"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { Store } from "@ngrx/store"
-import { type Observable, Subject, takeUntil } from "rxjs"
+import { map, type Observable, Subject, takeUntil } from "rxjs"
 import type { PageResponse, Residence, ResidenceFilters } from "../../../models/residence.model"
 import { ResidenceActions } from "../../../store/residence/residence.actions"
 import {
@@ -22,6 +22,8 @@ import { ResidenceCardComponent } from "../residence-card/residence-card.compone
 import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinner.component"
 import { PaginationComponent } from "../../ui/pagination/pagination.component"
 import { HeaderComponent } from "../../shared/header/header.component";
+import { AuthService } from "../../../services/auth.service"
+import { Role, User } from "../../../models/user.model"
 
 @Component({
   selector: "app-residence-list",
@@ -36,12 +38,14 @@ import { HeaderComponent } from "../../shared/header/header.component";
     LoadingSpinnerComponent,
     PaginationComponent,
     HeaderComponent
-],
+  ],
   templateUrl: "./residence-list.component.html",
 })
 export class ResidenceListComponent implements OnInit, OnDestroy {
   private store = inject(Store)
   private fb = inject(FormBuilder)
+  private authService = inject(AuthService)
+
   private destroy$ = new Subject<void>()
 
   residences$: Observable<PageResponse<Residence> | null> = this.store.select(selectAllResidences)
@@ -56,7 +60,8 @@ export class ResidenceListComponent implements OnInit, OnDestroy {
   selectedAmenities: string[] = []
   showDeleteConfirm = false
   residenceToDelete: Residence | null = null
-
+  showSidebar = true
+  isAdmin: boolean = false 
   commonAmenities = ["Wifi", "Parking", "Pool", "Gym", "Security", "Elevator", "Air Conditioning"]
 
   constructor() {
@@ -71,6 +76,13 @@ export class ResidenceListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    this.authService.currentUser$.subscribe(user => {
+      this.isAdmin = user?.role === Role.ADMIN || user?.role === Role.SUPER_ADMIN ? true : false;
+    });
+
+
+
     this.store.dispatch(ResidenceActions.loadCities({ page: 0, size: 100 }))
 
     this.store
@@ -117,7 +129,7 @@ export class ResidenceListComponent implements OnInit, OnDestroy {
       amenities: this.selectedAmenities.length ? this.selectedAmenities : undefined,
       sortBy: formValues.sortBy,
       sortDir: formValues.sortDir,
-      page: 0, 
+      page: 0,
     }
 
     this.store.dispatch(ResidenceActions.setFilters({ filters }))
@@ -156,5 +168,51 @@ export class ResidenceListComponent implements OnInit, OnDestroy {
     this.showDeleteConfirm = false
     this.residenceToDelete = null
   }
+  // Helper method for formatting status
+  formatStatus(status: string): string {
+    if (!status) return '';
+    return status
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+
+  // Add this property to your class
+  viewMode: 'grid' | 'list' = 'grid';
+
+  // Add this method to your class
+  toggleViewMode(mode: 'grid' | 'list'): void {
+    this.viewMode = mode;
+  }
+
+
+
+  // Add these properties for the statistics in the hero section
+  totalItems$: Observable<number> = this.residences$.pipe(
+    map(response => response?.totalElements || 0)
+  );
+
+  activeCount$: Observable<number> = this.residences$.pipe(
+    map(response => response?.content?.filter(r => r.status === 'ACTIVE')?.length || 0)
+  );
+
+  availableUnits$: Observable<number> = this.residences$.pipe(
+    map(response => response?.content?.reduce((sum, r) => sum + (r.availableApartments || 0), 0) || 0)
+  );
+
+  // Add this for the advanced filters toggle
+  showAdvancedFilters = false;
+
+  // Add this method for toggling advanced filters
+  toggleSidebar(): void {
+    this.showSidebar = !this.showSidebar
+  }
+
+  toggleAdvancedFilters(): void {
+    this.showAdvancedFilters = !this.showAdvancedFilters
+  }
+
+
 }
 

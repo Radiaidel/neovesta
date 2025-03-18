@@ -10,6 +10,8 @@ import { ConfirmDialogComponent } from '../../ui/confirm-dialog/confirm-dialog.c
 import { LoadingSpinnerComponent } from '../../ui/loading-spinner/loading-spinner.component';
 import { MapComponent } from '../../ui/map/map.component';
 import { HeaderComponent } from "../../shared/header/header.component";
+import { AuthService } from '../../../services/auth.service';
+import { Role } from '../../../models/user.model';
 
 @Component({
   selector: 'app-residence-detail',
@@ -21,7 +23,7 @@ import { HeaderComponent } from "../../shared/header/header.component";
     LoadingSpinnerComponent,
     MapComponent,
     HeaderComponent
-],
+  ],
   templateUrl: `./residence-detail.component.html`,
 })
 export class ResidenceDetailComponent implements OnInit, OnDestroy {
@@ -29,14 +31,22 @@ export class ResidenceDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
+  private authService = inject(AuthService)
 
   residence$: Observable<Residence | null> = this.store.select(selectSelectedResidence);
   loading$: Observable<boolean> = this.store.select(selectLoading);
+
+  isAdmin: boolean = false
 
   showDeleteConfirm = false;
   residenceId: string | null = null;
 
   ngOnInit(): void {
+
+    this.authService.currentUser$.subscribe(user => {
+      this.isAdmin = user?.role === Role.ADMIN || user?.role === Role.SUPER_ADMIN ? true : false;
+    });
+
     this.route.paramMap
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {

@@ -42,13 +42,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // @GetMapping("/search")
-    // @Operation(summary = "Search users with pagination")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'RESIDENCE_MANAGER', 'SUB_RESIDENCE_MANAGER') or (hasRole('RESIDENT') and #request.role == null)")
-    // public ResponseEntity<Page<UserResponse>> searchUsers(@Valid UserSearchRequest request) {
-    //     log.info("Searching" + request);
-    //     return ResponseEntity.ok(userService.searchUsers(request));
-    // }
 
     @GetMapping("/role/{role}")
     @Operation(summary = "Get users by role")

@@ -1,5 +1,7 @@
 package com.neovesta.backend.dtos.response;
 
+import com.neovesta.backend.dtos.embedded.ResidenceEmbeddedDTO;
+import com.neovesta.backend.dtos.embedded.ResidentEmbeddedDTO;
 import com.neovesta.backend.models.enums.ContractStatus;
 import com.neovesta.backend.models.enums.ContractType;
 import com.neovesta.backend.models.enums.PaymentFrequency;
@@ -13,6 +15,8 @@ import java.util.UUID;
 @Builder
 public record ContractResponse(
         UUID id,
+        ResidentEmbeddedDTO resident ,
+         ResidenceEmbeddedDTO residence,
         UUID residentId,
         UUID residenceId,
         LocalDate startDate,

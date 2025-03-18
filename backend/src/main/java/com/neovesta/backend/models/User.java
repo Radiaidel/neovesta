@@ -19,7 +19,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "users")
-public  class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -43,11 +43,18 @@ public  class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean status;
-
     private String resetToken;
     private LocalDateTime resetTokenExpiryDate;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Contract> contracts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resident", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Subscription> subscriptions = new ArrayList<>();
 

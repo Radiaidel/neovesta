@@ -1,183 +1,432 @@
-<app-header></app-header>
+<div class="flex flex-col h-screen overflow-hidden">
 
-<div class="container mx-auto px-4 py-8">
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Residences</h1>
-      <p class="text-gray-600 dark:text-gray-300 mt-1">Manage all properties in the Neovesta system</p>
-    </div>
-    <a 
-      routerLink="/residences/new" 
-      class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
+  <app-header></app-header>
+
+  <!-- Main Content with Fixed Sidebar -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Fixed Sidebar -->
+    <aside 
+      class="fixed top-0 left-0 h-full bg-white shadow-lg z-20 transition-all duration-300 overflow-y-auto"
+      [ngClass]="{
+        'w-80': showSidebar,
+        'w-0': !showSidebar
+      }"
+      style="margin-top: 90px; height: calc(100vh - 100px);"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-      </svg>
-      Add Residence
-    </a>
-  </div>
-
-  <!-- Filters -->
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
-    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Filters</h2>
-    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Search -->
-      <div class="col-span-1 md:col-span-2">
-        <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+      <div class="p-6" [ngClass]="{'hidden': !showSidebar}">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-[#0A1C26] flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#C5A47E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-          </div>
-          <input 
-            type="text" 
-            id="search" 
-            formControlName="search"
-            placeholder="Search by name or manager..." 
-            class="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
+            Filters
+          </h2>
         </div>
-      </div>
 
-      <!-- City -->
-      <div>
-        <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
-        <select 
-          id="city" 
-          formControlName="city"
-          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-        >
-          <option value="">All Cities</option>
-          @for (city of (cities$ | async)?.content || []; track city) {
-            <option [value]="city">{{ city }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Price Range -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price Range</label>
-        <div class="grid grid-cols-2 gap-2">
-          <input 
-            type="number" 
-            formControlName="minPrice"
-            placeholder="Min" 
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
-          <input 
-            type="number" 
-            formControlName="maxPrice"
-            placeholder="Max" 
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
-        </div>
-      </div>
-
-      <!-- Amenities -->
-      <div class="col-span-1 md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amenities</label>
-        <div class="flex flex-wrap gap-2">
-          @for (amenity of commonAmenities; track amenity) {
-            <label class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-700 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="space-y-6">
+          <!-- Search -->
+          <div>
+            <label for="search" class="block text-sm font-medium text-[#2D4E5B] mb-2">Search</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
               <input 
-                type="checkbox" 
-                [value]="amenity" 
-                (change)="toggleAmenity(amenity)"
-                class="form-checkbox h-4 w-4 text-indigo-600 mr-2"
+                type="text" 
+                id="search" 
+                formControlName="search"
+                placeholder="Search by name or manager..." 
+                class="pl-10 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none transition-all"
               />
-              {{ amenity }}
-            </label>
-          }
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <!-- Sort -->
-      <div>
-        <label for="sortBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
-        <select 
-          id="sortBy" 
-          formControlName="sortBy"
-          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-        >
-          <option value="createdAt">Date Created</option>
-          <option value="name">Name</option>
-          <option value="startingPrice">Price</option>
-          <option value="totalApartments">Total Apartments</option>
-        </select>
-      </div>
+          <!-- City -->
+          <div>
+            <label for="city" class="block text-sm font-medium text-[#2D4E5B] mb-2">City</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <select 
+                id="city" 
+                formControlName="city"
+                class="pl-10 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option value="">All Cities</option>
+                @for (city of (cities$ | async)?.content || []; track city) {
+                  <option [value]="city">{{ city }}</option>
+                }
+              </select>
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-      <div>
-        <label for="sortDir" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort Direction</label>
-        <select 
-          id="sortDir" 
-          formControlName="sortDir"
-          class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-        >
-          <option value="desc">Descending</option>
-          <option value="asc">Ascending</option>
-        </select>
-      </div>
+          <!-- Price Range -->
+          <div>
+            <label class="block text-sm font-medium text-[#2D4E5B] mb-2">Price Range</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-[#6B7D86] text-sm">$</span>
+                </div>
+                <input 
+                  type="number" 
+                  formControlName="minPrice"
+                  placeholder="Min" 
+                  class="pl-8 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none transition-all"
+                />
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-[#6B7D86] text-sm">$</span>
+                </div>
+                <input 
+                  type="number" 
+                  formControlName="maxPrice"
+                  placeholder="Max" 
+                  class="pl-8 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none transition-all"
+                />
+              </div>
+            </div>
+          </div>
 
-      <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end gap-3">
-        <button 
-          type="button" 
-          (click)="resetFilters()"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          Reset
-        </button>
-        <button 
-          type="submit" 
-          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          Apply Filters
-        </button>
+          <!-- Sort -->
+          <div>
+            <label for="sortBy" class="block text-sm font-medium text-[#2D4E5B] mb-2">Sort By</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+              </div>
+              <select 
+                id="sortBy" 
+                formControlName="sortBy"
+                class="pl-10 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option value="createdAt">Date Created</option>
+                <option value="name">Name</option>
+                <option value="startingPrice">Price</option>
+                <option value="totalApartments">Total Apartments</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="sortDir" class="block text-sm font-medium text-[#2D4E5B] mb-2">Sort Direction</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </div>
+              <select 
+                id="sortDir" 
+                formControlName="sortDir"
+                class="pl-10 w-full rounded-lg border border-[#E8E1D7] bg-white text-[#0A1C26] py-3 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Amenities -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-sm font-medium text-[#2D4E5B]">Amenities</label>
+              <button 
+                type="button" 
+                (click)="toggleAdvancedFilters()" 
+                class="text-[#C5A47E] hover:text-[#0A1C26] text-sm font-medium transition-colors"
+              >
+                {{ showAdvancedFilters ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2" [ngClass]="{'hidden': !showAdvancedFilters}">
+              @for (amenity of commonAmenities; track amenity) {
+                <label class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-[#E8E1D7] text-[#2D4E5B] cursor-pointer hover:bg-[#C5A47E]/20 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    [value]="amenity" 
+                    (change)="toggleAmenity(amenity)"
+                    class="form-checkbox h-4 w-4 text-[#C5A47E] border-[#6B7D86] rounded mr-2 focus:ring-[#C5A47E]"
+                  />
+                  {{ amenity }}
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-col gap-3">
+            <button 
+              type="button" 
+              (click)="resetFilters()"
+              class="w-full px-5 py-3 border border-[#E8E1D7] rounded-lg text-[#2D4E5B] hover:bg-[#E8E1D7] transition-colors flex items-center justify-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reset Filters
+            </button>
+            <button 
+              type="submit"
+              class="w-full px-5 py-3 bg-[#2D4E5B] text-white rounded-lg hover:bg-[#0A1C26] transition-colors flex items-center justify-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Apply Filters
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </aside>
+
+    <!-- Toggle Button for Sidebar (Fixed) -->
+    <button 
+      (click)="toggleSidebar()" 
+      class="fixed z-30 top-[120px] bg-white shadow-md rounded-r-lg p-2 transition-all"
+      [ngClass]="{
+        'left-80': showSidebar,
+        'left-0': !showSidebar
+      }"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#2D4E5B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" [ngClass]="{'rotate-180': !showSidebar}">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <!-- Main Content Area with Scrolling -->
+    <main 
+      class="flex-1 overflow-y-auto bg-[#F8F5F2]  transition-all duration-300"
+      [ngClass]="{
+        'ml-80': showSidebar,
+        'ml-0': !showSidebar
+      }"
+    >
+  <div class="w-full text-end p-6" *ngIf="isAdmin">
+    <button routerLink="/residences/new" class="px-6 py-3 bg-[#2D4E5B] text-white rounded-lg hover:bg-[#0A1C26] transition-colors ">
+      Add Residence
+    </button>
   </div>
+      <div class="p-6">
+        
+        <!-- View Toggle and Results Count -->
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-[#0A1C26] flex items-center">
+            Properties <span class="ml-2 text-sm font-normal text-[#6B7D86]">{{ (totalItems$ | async) || 0 }} found</span>
+          </h3>
 
-  <!-- Loading State -->
-  @if (loading$ | async) {
-    <div class="flex justify-center my-12">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-  } @else {
-    <!-- Results -->
-    @if ((residences$ | async)?.content?.length) {
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        @for (residence of (residences$ | async)?.content || []; track residence.id) {
-          <app-residence-card 
-            [residence]="residence"
-            (delete)="confirmDelete(residence)"
-          ></app-residence-card>
+          <div class="flex items-center gap-2">
+            <button
+              (click)="toggleViewMode('grid')"
+              [class.text-[#C5A47E]]="viewMode === 'grid'"
+              class="p-2 rounded-lg hover:bg-[#E8E1D7]/50 transition-all"
+              title="Grid View"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button
+              (click)="toggleViewMode('list')"
+              [class.text-[#C5A47E]]="viewMode === 'list'"
+              class="p-2 rounded-lg hover:bg-[#E8E1D7]/50 transition-all"
+              title="List View"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        @if (loading$ | async) {
+          <div class="flex justify-center my-12">
+            <app-loading-spinner></app-loading-spinner>
+          </div>
+        } @else {
+          <!-- Results -->
+          @if ((residences$ | async)?.content?.length) {
+            <!-- Grid View -->
+            @if (viewMode === 'grid') {
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                @for (residence of (residences$ | async)?.content || []; track residence.id) {
+                  <app-residence-card 
+                    [residence]="residence"
+                    (delete)="confirmDelete(residence)"
+                  ></app-residence-card>
+                }
+              </div>
+            }
+
+            <!-- List View -->
+            @if (viewMode === 'list') {
+              <div class="space-y-4 mb-8">
+                @for (residence of (residences$ | async)?.content || []; track residence.id) {
+                  <div class="bg-white rounded-xl shadow-md overflow-hidden border border-[#E8E1D7]/50 hover:shadow-lg transition-all">
+                    <div class="flex flex-col md:flex-row">
+                      <div class="w-full md:w-1/4 h-48 md:h-auto relative">
+                        @if (residence.imageUrls && residence.imageUrls.length > 0) {
+                          <img 
+                            [src]="residence.imageUrls[0]" 
+                            [alt]="residence.name" 
+                            class="w-full h-full object-cover"
+                          />
+                        } @else {
+                          <div class="w-full h-full bg-[#E8E1D7]/50 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10" />
+                            </svg>
+                          </div>
+                        }
+                        <div 
+                          class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm"
+                          [ngClass]="{
+                            'bg-[#C5A47E]/90 text-white': residence.status === 'ACTIVE',
+                            'bg-[#6B7D86]/90 text-white': residence.status === 'INACTIVE',
+                            'bg-[#E8E1D7]/90 text-[#0A1C26]': residence.status === 'UNDER_MAINTENANCE',
+                            'bg-[#2D4E5B]/90 text-white': residence.status === 'COMING_SOON'
+                          }"
+                        >
+                          {{ formatStatus(residence.status) }}
+                        </div>
+                      </div>
+                      <div class="p-6 w-full md:w-3/4 flex flex-col">
+                        <div class="flex justify-between items-start mb-3">
+                          <h3 class="text-xl font-bold text-[#0A1C26]">{{ residence.name }}</h3>
+                          <div class="text-xl font-bold text-[#C5A47E]\">${{ residence.startingPrice | number: '1.0-0' }}</div>
+                        </div>
+
+                        <div class="flex items-center text-[#6B7D86] text-sm mb-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-[#C5A47E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {{ residence.address.city }}, {{ residence.address.state }}
+                        </div>
+
+                        <div class="flex gap-6 text-sm text-[#6B7D86] mb-4">
+                          <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[#C5A47E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            {{ residence.totalApartments }} Units
+                          </div>
+                          <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[#C5A47E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ residence.availableApartments }} Available
+                          </div>
+                        </div>
+
+                        @if (residence.amenities && residence.amenities.length > 0) {
+                          <div class="flex flex-wrap gap-2 mb-4">
+                            @for (amenity of residence.amenities.slice(0, 5); track amenity) {
+                              <span class="px-2 py-1 bg-[#E8E1D7]/50 rounded-full text-xs text-[#2D4E5B]">
+                                {{ amenity }}
+                              </span>
+                            }
+                            @if (residence.amenities.length > 5) {
+                              <span class="px-2 py-1 bg-[#C5A47E]/20 rounded-full text-xs text-[#2D4E5B]">
+                                +{{ residence.amenities.length - 5 }} more
+                              </span>
+                            }
+                          </div>
+                        }
+
+                        <div class="mt-auto pt-4 flex justify-between items-center border-t border-[#E8E1D7]/50">
+                          <a 
+                            [routerLink]="['/residences', residence.id]" 
+                            class="text-[#2D4E5B] hover:text-[#0A1C26] font-medium flex items-center transition-colors"
+                          >
+                            <span>View Details</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </a>
+                          <div class="flex gap-3">
+                            <a 
+                              [routerLink]="['/residences', residence.id, 'edit']" 
+                              class="text-[#6B7D86] hover:text-[#2D4E5B] transition-colors"
+                              title="Edit Residence"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </a>
+                            <button 
+                              (click)="confirmDelete(residence)" 
+                              class="text-[#6B7D86] hover:text-red-600 transition-colors"
+                              title="Delete Residence"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Pagination -->
+            <app-pagination
+              [currentPage]="(currentPage$ | async) || 0"
+              [totalPages]="(totalPages$ | async) || 0"
+              [isFirstPage]="(isFirstPage$ | async) || true"
+              [isLastPage]="(isLastPage$ | async) || true"
+              (pageChange)="onPageChange($event)"
+            ></app-pagination>
+          } @else {
+            <div class="bg-white rounded-xl shadow-md p-12 text-center border border-[#E8E1D7]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <h3 class="mt-6 text-xl font-semibold text-[#0A1C26]">No residences found</h3>
+              <p class="mt-2 text-[#6B7D86]">Try adjusting your search or filter criteria</p>
+              <button 
+                (click)="resetFilters()"
+                class="mt-6 px-6 py-3 bg-[#2D4E5B] text-white rounded-lg hover:bg-[#0A1C26] transition-colors flex items-center mx-auto"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset Filters
+              </button>
+            </div>
+          }
         }
       </div>
-      
-      <!-- Pagination -->
-      <app-pagination
-        [currentPage]="(currentPage$ | async) || 0"
-        [totalPages]="(totalPages$ | async) || 0"
-        [isFirstPage]="(isFirstPage$ | async) || true"
-        [isLastPage]="(isLastPage$ | async) || true"
-        (pageChange)="onPageChange($event)"
-      ></app-pagination>
-    } @else {
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No residences found</h3>
-        <p class="mt-1 text-gray-500 dark:text-gray-400">Try adjusting your search or filter criteria</p>
-        <button 
-          (click)="resetFilters()"
-          class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          Reset Filters
-        </button>
-      </div>
-    }
-  }
+    </main>
+  </div>
 
   <!-- Confirmation Dialog -->
   <app-confirm-dialog

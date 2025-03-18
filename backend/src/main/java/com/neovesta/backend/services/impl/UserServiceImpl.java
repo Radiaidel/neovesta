@@ -8,6 +8,8 @@ import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.exceptions.UnauthorizedException;
 import com.neovesta.backend.mappers.UserMapper;
 import com.neovesta.backend.models.Admin;
+import com.neovesta.backend.models.Contract;
+import com.neovesta.backend.models.Residence;
 import com.neovesta.backend.models.ResidenceManager;
 import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.SubResidenceManager;
@@ -24,6 +26,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -133,13 +137,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
-    @Override
-    public Page<UserResponse> searchUsers(UserSearchRequest request) {
-        PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize());
-        return userRepository.searchUsers(
-                request.getSearchTerm(),
-                pageRequest).map(userMapper::toResponse);
-    }
+    // @Override
+    // public Page<UserResponse> searchUsers(UserSearchRequest request) {
+    // PageRequest pageRequest = PageRequest.of(request.getPage(),
+    // request.getSize());
+    // return userRepository.searchUsers(
+    // request.getSearchTerm(),
+    // pageRequest).map(userMapper::toResponse);
+    // }
 
     @Override
     public Page<UserResponse> getUsersByRole(Role role, int page, int size) {
@@ -200,7 +205,7 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found with id: " + id);
         }
-        userRepository.deleteUserWithCascade(id); 
+        userRepository.deleteUserWithCascade(id);
     }
 
     @Override
@@ -242,6 +247,7 @@ public class UserServiceImpl implements UserService {
         User currentUser = getCurrentUser();
         Specification<User> spec = buildSearchSpecification(searchTerm, role, currentUser);
         Pageable pageable = PageRequest.of(page, size);
+        System.out.println(userRepository.findAll(spec, pageable).map(userMapper::toResponse));
         return userRepository.findAll(spec, pageable).map(userMapper::toResponse);
     }
 
@@ -268,19 +274,62 @@ public class UserServiceImpl implements UserService {
                 case ADMIN:
                     rolePredicates.add(cb.equal(root.type(), ResidenceManager.class));
                     break;
-                case RESIDENCE_MANAGER:
-                    Join<User, ResidenceManager> rmJoin = root.join("residence", JoinType.INNER);
+
+                    case RESIDENCE_MANAGER:
+                    ResidenceManager residenceManager = (ResidenceManager) currentUser;
+                    UUID residenceId = residenceManager.getResidence().getId();
+                    
+                    // Prédicats pour les sous-managers
+                    Predicate subManagerPredicate = cb.and(
+                        cb.equal(root.type(), SubResidenceManager.class),
+                        cb.equal(root.get("role"), Role.SUB_RESIDENCE_MANAGER)
+                    );
+                    
+                    // Joindre la table SubResidenceManager pour vérifier le manager_id
+                    Subquery<UUID> subManagerQuery = query.subquery(UUID.class);
+                    Root<SubResidenceManager> subManagerRoot = subManagerQuery.from(SubResidenceManager.class);
+                    subManagerQuery.select(subManagerRoot.get("id"));
+                    subManagerQuery.where(cb.equal(subManagerRoot.get("manager").get("id"), residenceManager.getId()));
+                    
+                    // Pour les résidents via contrats
+                    Subquery<UUID> residentQuery = query.subquery(UUID.class);
+                    Root<Contract> contractRoot = residentQuery.from(Contract.class);
+                    residentQuery.select(contractRoot.get("resident").get("id"));
+                    residentQuery.where(cb.equal(contractRoot.get("residence").get("id"), residenceId));
+                    
+                    Predicate residentPredicate = cb.and(
+                        cb.equal(root.type(), Resident.class),
+                        cb.equal(root.get("role"), Role.RESIDENT),
+                        root.get("id").in(residentQuery)
+                    );
+                    
+                    // Combiner les prédicats
                     rolePredicates.add(cb.or(
-                            cb.equal(root.type(), SubResidenceManager.class),
-                            cb.equal(root.type(), Resident.class)));
-                    predicates.add(cb.equal(rmJoin.get("id"), ((ResidenceManager) currentUser).getResidence().getId()));
+                        cb.and(subManagerPredicate, root.get("id").in(subManagerQuery)),
+                        residentPredicate
+                    ));
                     break;
+                
                 case SUB_RESIDENCE_MANAGER:
-                    Join<User, SubResidenceManager> srmJoin = root.join("residence", JoinType.INNER);
-                    rolePredicates.add(cb.equal(root.type(), Resident.class));
-                    predicates.add(cb.equal(srmJoin.get("id"),
-                            ((SubResidenceManager) currentUser).getManager().getResidence().getId()));
+                    SubResidenceManager subManager = (SubResidenceManager) currentUser;
+                    ResidenceManager manager = subManager.getManager();
+                    UUID managerResidenceId = manager.getResidence().getId();
+                    
+                    // Pour les résidents via contrats - identique à la logique du RESIDENCE_MANAGER
+                    Subquery<UUID> subResidentQuery = query.subquery(UUID.class);
+                    Root<Contract> subContractRoot = subResidentQuery.from(Contract.class);
+                    subResidentQuery.select(subContractRoot.get("resident").get("id"));
+                    subResidentQuery.where(cb.equal(subContractRoot.get("residence").get("id"), managerResidenceId));
+                    
+                    Predicate subResidentPredicate = cb.and(
+                        cb.equal(root.type(), Resident.class),
+                        cb.equal(root.get("role"), Role.RESIDENT),
+                        root.get("id").in(subResidentQuery)
+                    );
+                    
+                    rolePredicates.add(subResidentPredicate);
                     break;
+                
                 default:
                     return cb.disjunction();
             }

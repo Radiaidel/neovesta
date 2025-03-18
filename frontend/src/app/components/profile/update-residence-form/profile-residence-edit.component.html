@@ -1,140 +1,217 @@
-<div class="bg-white rounded-lg shadow-md p-6">
-  <h3 class="text-xl font-semibold text-gray-800 mb-6">Edit Residence Information</h3>
-  
-  <form [formGroup]="residenceForm" (ngSubmit)="onSubmit()">
-
-    <div class="form-group">
-      <label for="images">Add New Images</label>
-      <input type="file" id="images" name="images" multiple (change)="onImageSelected($event)" accept="image/*">
-    </div>
-    
-    <div *ngIf="imagePreviews.length > 0">
-      <h4>New Images to Upload:</h4>
-      <div class="image-preview-container">
-        <div *ngFor="let preview of imagePreviews" class="image-preview">
-          <img [src]="preview" alt="Preview" class="img-thumbnail">
+<div class="p-1">
+  <form [formGroup]="residenceForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <!-- Images Section -->
+    <div class="space-y-6">
+      <div>
+        <label for="images" class="block text-sm font-medium text-[#0A1C26] mb-2">Ajouter de nouvelles images</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <input 
+            type="file" 
+            id="images" 
+            name="images" 
+            multiple 
+            (change)="onImageSelected($event)" 
+            accept="image/*"
+            class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
         </div>
       </div>
+
+      <!-- Image Previews -->
+      <div *ngIf="imagePreviews.length > 0" class="mt-4">
+        <h4 class="text-sm font-medium text-[#0A1C26] mb-2">Nouvelles images à télécharger:</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div *ngFor="let preview of imagePreviews; let i = index" class="relative group">
+            <img [src]="preview" alt="Preview" class="h-32 w-full object-cover rounded-lg shadow-sm">
+            <!-- <button 
+              type="button" 
+              (click)="removeImage(i)" 
+              class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing Images -->
+      <div class="mt-4">
+        <app-residence-image-carousel [residence]="residence"></app-residence-image-carousel>
+      </div>
     </div>
-    <app-residence-image-carousel
-    [residence]="residence"></app-residence-image-carousel>
-    
-    <!-- Name -->
-    <div class="mb-6">
-      <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Residence Name</label>
-      <input 
-        id="name" 
-        type="text" 
-        formControlName="name"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        [class.border-red-500]="residenceForm.get('name')?.invalid && residenceForm.get('name')?.touched"
-      >
-      <p *ngIf="residenceForm.get('name')?.invalid && residenceForm.get('name')?.touched" class="mt-1 text-sm text-red-600">
-        Residence name is required
-      </p>
+
+    <!-- Residence Name -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-[#0A1C26] mb-2">Nom de la résidence</label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <input 
+          id="name" 
+          type="text" 
+          formControlName="name"
+          class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+      </div>
+      <div 
+        *ngIf="residenceForm.get('name')?.invalid && residenceForm.get('name')?.touched"
+        class="text-red-600 text-sm mt-2">
+        Le nom de la résidence est requis
+      </div>
     </div>
-    
+
     <!-- Description -->
-    <div class="mb-6">
-      <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-      <textarea 
-        id="description" 
-        formControlName="description"
-        rows="4"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        [class.border-red-500]="residenceForm.get('description')?.invalid && residenceForm.get('description')?.touched"
-      ></textarea>
-      <p *ngIf="residenceForm.get('description')?.invalid && residenceForm.get('description')?.touched" class="mt-1 text-sm text-red-600">
-        Description is required
-      </p>
+    <div>
+      <label for="description" class="block text-sm font-medium text-[#0A1C26] mb-2">Description</label>
+      <div class="relative">
+        <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+        </div>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          rows="4"
+          class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"></textarea>
+      </div>
+      <div 
+        *ngIf="residenceForm.get('description')?.invalid && residenceForm.get('description')?.touched"
+        class="text-red-600 text-sm mt-2">
+        La description est requise
+      </div>
     </div>
-    
+
     <!-- Map -->
-    <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-      <p class="text-sm text-gray-500 mb-3">Click on the map to set the residence location or use "My Location" button to find your current position</p>
+    <div>
+      <label class="block text-sm font-medium text-[#0A1C26] mb-2">Emplacement</label>
+      <p class="text-sm text-[#6B7D86] mb-3">Cliquez sur la carte pour définir l'emplacement de la résidence ou utilisez le bouton "Ma position" pour trouver votre position actuelle</p>
       <app-map 
         [address]="mapAddress" 
         [editable]="true" 
-        (addressChange)="onAddressChange($event)"
-      ></app-map>
+        (addressChange)="onAddressChange($event)"></app-map>
     </div>
-    
+
     <!-- Address -->
-    <div formGroupName="address" class="mb-6 p-4 bg-gray-50 rounded-lg">
-      <h4 class="text-md font-medium text-gray-800 mb-3">Address</h4>
+    <div formGroupName="address" class="p-5 bg-[#F8F5F2] rounded-lg space-y-6">
+      <h4 class="text-md font-medium text-[#0A1C26]">Adresse</h4>
       
-      <div class="mb-4">
-        <label for="street" class="block text-sm font-medium text-gray-700 mb-1">Street</label>
-        <input 
-          id="street" 
-          type="text" 
-          formControlName="street"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          [class.border-red-500]="residenceForm.get('address.street')?.invalid && residenceForm.get('address.street')?.touched"
-        >
-        <p *ngIf="residenceForm.get('address.street')?.invalid && residenceForm.get('address.street')?.touched" class="mt-1 text-sm text-red-600">
-          Street is required
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+      <!-- Street -->
+      <div>
+        <label for="street" class="block text-sm font-medium text-[#0A1C26] mb-2">Rue</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            </svg>
+          </div>
           <input 
-            id="city" 
+            id="street" 
             type="text" 
-            formControlName="city"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="residenceForm.get('address.city')?.invalid && residenceForm.get('address.city')?.touched"
-          >
-          <p *ngIf="residenceForm.get('address.city')?.invalid && residenceForm.get('address.city')?.touched" class="mt-1 text-sm text-red-600">
-            City is required
-          </p>
+            formControlName="street"
+            class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
         </div>
-        
-        <div>
-          <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
-          <input 
-            id="state" 
-            type="text" 
-            formControlName="state"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="residenceForm.get('address.state')?.invalid && residenceForm.get('address.state')?.touched"
-          >
-          <p *ngIf="residenceForm.get('address.state')?.invalid && residenceForm.get('address.state')?.touched" class="mt-1 text-sm text-red-600">
-            State is required
-          </p>
+        <div 
+          *ngIf="residenceForm.get('address.street')?.invalid && residenceForm.get('address.street')?.touched"
+          class="text-red-600 text-sm mt-2">
+          La rue est requise
         </div>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- City and State -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">Zip/Postal Code</label>
-          <input 
-            id="postalCode" 
-            type="text" 
-            formControlName="postalCode"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="residenceForm.get('address.postalCode')?.invalid && residenceForm.get('address.postalCode')?.touched"
-          >
-          <p *ngIf="residenceForm.get('address.postalCode')?.invalid && residenceForm.get('address.postalCode')?.touched" class="mt-1 text-sm text-red-600">
-            Zip code is required
-          </p>
+          <label for="city" class="block text-sm font-medium text-[#0A1C26] mb-2">Ville</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <input 
+              id="city" 
+              type="text" 
+              formControlName="city"
+              class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+          </div>
+          <div 
+            *ngIf="residenceForm.get('address.city')?.invalid && residenceForm.get('address.city')?.touched"
+            class="text-red-600 text-sm mt-2">
+            La ville est requise
+          </div>
         </div>
         
         <div>
-          <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
-          <input 
-            id="country" 
-            type="text" 
-            formControlName="country"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-500]="residenceForm.get('address.country')?.invalid && residenceForm.get('address.country')?.touched"
-          >
-          <p *ngIf="residenceForm.get('address.country')?.invalid && residenceForm.get('address.country')?.touched" class="mt-1 text-sm text-red-600">
-            Country is required
-          </p>
+          <label for="state" class="block text-sm font-medium text-[#0A1C26] mb-2">État/Province</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </div>
+            <input 
+              id="state" 
+              type="text" 
+              formControlName="state"
+              class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+          </div>
+          <div 
+            *ngIf="residenceForm.get('address.state')?.invalid && residenceForm.get('address.state')?.touched"
+            class="text-red-600 text-sm mt-2">
+            L'état est requis
+          </div>
+        </div>
+      </div>
+      
+      <!-- Postal Code and Country -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="postalCode" class="block text-sm font-medium text-[#0A1C26] mb-2">Code postal</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input 
+              id="postalCode" 
+              type="text" 
+              formControlName="postalCode"
+              class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+          </div>
+          <div 
+            *ngIf="residenceForm.get('address.postalCode')?.invalid && residenceForm.get('address.postalCode')?.touched"
+            class="text-red-600 text-sm mt-2">
+            Le code postal est requis
+          </div>
+        </div>
+        
+        <div>
+          <label for="country" class="block text-sm font-medium text-[#0A1C26] mb-2">Pays</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <input 
+              id="country" 
+              type="text" 
+              formControlName="country"
+              class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+          </div>
+          <div 
+            *ngIf="residenceForm.get('address.country')?.invalid && residenceForm.get('address.country')?.touched"
+            class="text-red-600 text-sm mt-2">
+            Le pays est requis
+          </div>
         </div>
       </div>
       
@@ -144,76 +221,110 @@
     </div>
     
     <!-- Apartment Information -->
-    <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div>
-        <label for="totalApartments" class="block text-sm font-medium text-gray-700 mb-1">Total Apartments</label>
-        <input 
-          id="totalApartments" 
-          type="number" 
-          formControlName="totalApartments"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          [class.border-red-500]="residenceForm.get('totalApartments')?.invalid && residenceForm.get('totalApartments')?.touched"
-        >
-        <p *ngIf="residenceForm.get('totalApartments')?.invalid && residenceForm.get('totalApartments')?.touched" class="mt-1 text-sm text-red-600">
-          Total apartments is required and must be a positive number
-        </p>
+        <label for="totalApartments" class="block text-sm font-medium text-[#0A1C26] mb-2">Nombre total d'appartements</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
+          </div>
+          <input 
+            id="totalApartments" 
+            type="number" 
+            formControlName="totalApartments"
+            class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+        </div>
+        <div 
+          *ngIf="residenceForm.get('totalApartments')?.invalid && residenceForm.get('totalApartments')?.touched"
+          class="text-red-600 text-sm mt-2">
+          Le nombre total d'appartements est requis et doit être positif
+        </div>
       </div>
       
       <div>
-        <label for="availableApartments" class="block text-sm font-medium text-gray-700 mb-1">Available Apartments</label>
-        <input 
-          id="availableApartments" 
-          type="number" 
-          formControlName="availableApartments"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          [class.border-red-500]="residenceForm.get('availableApartments')?.invalid && residenceForm.get('availableApartments')?.touched"
-        >
-        <p *ngIf="residenceForm.get('availableApartments')?.invalid && residenceForm.get('availableApartments')?.touched" class="mt-1 text-sm text-red-600">
-          Available apartments is required and must be a positive number
-        </p>
+        <label for="availableApartments" class="block text-sm font-medium text-[#0A1C26] mb-2">Appartements disponibles</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <input 
+            id="availableApartments" 
+            type="number" 
+            formControlName="availableApartments"
+            class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+        </div>
+        <div 
+          *ngIf="residenceForm.get('availableApartments')?.invalid && residenceForm.get('availableApartments')?.touched"
+          class="text-red-600 text-sm mt-2">
+          Le nombre d'appartements disponibles est requis et doit être positif
+        </div>
       </div>
       
       <div>
-        <label for="startingPrice" class="block text-sm font-medium text-gray-700 mb-1">Starting Price</label>
-        <input 
-          id="startingPrice" 
-          type="number" 
-          formControlName="startingPrice"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          [class.border-red-500]="residenceForm.get('startingPrice')?.invalid && residenceForm.get('startingPrice')?.touched"
-        >
-        <p *ngIf="residenceForm.get('startingPrice')?.invalid && residenceForm.get('startingPrice')?.touched" class="mt-1 text-sm text-red-600">
-          Starting price is required and must be a positive number
-        </p>
+        <label for="startingPrice" class="block text-sm font-medium text-[#0A1C26] mb-2">Prix de départ</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <input 
+            id="startingPrice" 
+            type="number" 
+            formControlName="startingPrice"
+            class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white">
+        </div>
+        <div 
+          *ngIf="residenceForm.get('startingPrice')?.invalid && residenceForm.get('startingPrice')?.touched"
+          class="text-red-600 text-sm mt-2">
+          Le prix de départ est requis et doit être positif
+        </div>
       </div>
     </div>
     
     <!-- Amenities -->
-    <div class="mb-6">
-      <label for="amenities" class="block text-sm font-medium text-gray-700 mb-1">Amenities (comma-separated)</label>
-      <textarea 
-        id="amenities" 
-        formControlName="amenities"
-        rows="2"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        placeholder="Pool, Gym, Parking, etc."
-      ></textarea>
-      <p class="mt-1 text-xs text-gray-500">Enter amenities separated by commas (e.g., "Pool, Gym, Parking")</p>
+    <div>
+      <label for="amenities" class="block text-sm font-medium text-[#0A1C26] mb-2">Équipements (séparés par des virgules)</label>
+      <div class="relative">
+        <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+        </div>
+        <textarea 
+          id="amenities" 
+          formControlName="amenities"
+          rows="2"
+          placeholder="Piscine, Salle de sport, Parking, etc."
+          class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"></textarea>
+      </div>
+      <p class="mt-1 text-xs text-[#6B7D86]">Entrez les équipements séparés par des virgules (ex: "Piscine, Salle de sport, Parking")</p>
     </div>
     
     <!-- Contact Information -->
-    <div class="mb-6">
-      <label for="contactInformation" class="block text-sm font-medium text-gray-700 mb-1">Contact Information</label>
-      <textarea 
-        id="contactInformation" 
-        formControlName="contactInformation"
-        rows="3"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        [class.border-red-500]="residenceForm.get('contactInformation')?.invalid && residenceForm.get('contactInformation')?.touched"
-      ></textarea>
-      <p *ngIf="residenceForm.get('contactInformation')?.invalid && residenceForm.get('contactInformation')?.touched" class="mt-1 text-sm text-red-600">
-        Contact information is required
-      </p>
+    <div>
+      <label for="contactInformation" class="block text-sm font-medium text-[#0A1C26] mb-2">Informations de contact</label>
+      <div class="relative">
+        <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <textarea 
+          id="contactInformation" 
+          formControlName="contactInformation"
+          rows="3"
+          class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"></textarea>
+      </div>
+      <div 
+        *ngIf="residenceForm.get('contactInformation')?.invalid && residenceForm.get('contactInformation')?.touched"
+        class="text-red-600 text-sm mt-2">
+        Les informations de contact sont requises
+      </div>
     </div>
     
     <!-- Form Actions -->
@@ -221,19 +332,26 @@
       <button 
         type="button" 
         (click)="onCancel()"
-        class="px-6 py-2 bg-gray-200 text-gray-800 font-medium rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-      >
-        Cancel
+        class="px-6 py-3 bg-[#E8E1D7] text-[#0A1C26] font-medium rounded-lg shadow-md hover:bg-[#D8D1C7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C5A47E] transition-colors">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span>Annuler</span>
+        </div>
       </button>
       <button 
         type="submit" 
         [disabled]="residenceForm.invalid"
-        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Save Changes
+        class="px-8 py-3 bg-[#2D4E5B] text-white font-medium rounded-lg shadow-md hover:bg-[#0A1C26] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C5A47E] transition-colors disabled:opacity-50">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Enregistrer les modifications</span>
+        </div>
       </button>
     </div>
   </form>
-  </div>
-  
-  
+</div>
+

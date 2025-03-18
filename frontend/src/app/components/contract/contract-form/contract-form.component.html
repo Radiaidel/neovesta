@@ -1,211 +1,304 @@
 <app-header></app-header>
 <div class="container mx-auto px-4 py-8">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-          <a routerLink="/contracts" class="hover:underline">Contracts</a>
-          <span>/</span>
-          <span>{{ isEditMode ? 'Edit' : 'New' }} Contract</span>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
-          {{ isEditMode ? 'Edit' : 'Create' }} Contract
-        </h1>
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-[#6B7D86] mb-1">
+        <a routerLink="/contracts" class="hover:underline">Contracts</a>
+        <span>/</span>
+        <span>{{ isEditMode ? 'Edit' : 'New' }} Contract</span>
       </div>
+      <h1 class="text-3xl font-bold text-[#0A1C26]">
+        {{ isEditMode ? 'Edit' : 'Create' }} Contract
+      </h1>
     </div>
+  </div>
 
-    <!-- Loading State -->
-    <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
+  <!-- Loading State -->
+  <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
 
-    <!-- Form -->
-    <form [formGroup]="contractForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Basic Information Section -->
-        <div class="md:col-span-2">
-          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Contract Information</h2>
-        </div>
-
-        <!-- Resident -->
-        <div>
-          <label for="residentId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Resident *</label>
-          <select 
-            id="residentId" 
-            formControlName="residentId"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-            [attr.disabled]="residentIdFromRoute ? true : null"
-          >
-            <option [ngValue]="null" disabled>Select resident</option>
-            <option *ngFor="let resident of residents" [value]="resident.id">{{ resident.firstName }} {{ resident.lastName }}</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['residentId']">{{ formErrors['residentId'] }}</p>
-        </div>
-
-        <!-- Residence -->
-        <div>
-          <label for="residenceId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Residence *</label>
-          <select 
-            id="residenceId" 
-            formControlName="residenceId"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          >
-            <option [ngValue]="null" disabled>Select residence</option>
-            <option *ngFor="let residence of residences" [value]="residence.id">{{ residence.name }}</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['residenceId']">{{ formErrors['residenceId'] }}</p>
-        </div>
-
-        <!-- Contract Type -->
-        <div>
-          <label for="contractType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Type *</label>
-          <select 
-            id="contractType" 
-            formControlName="contractType"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          >
-            <option [ngValue]="null" disabled>Select contract type</option>
-            <option [ngValue]="ContractType.LEASE">Lease</option>
-            <option [ngValue]="ContractType.RENT">Rent</option>
-            <option [ngValue]="ContractType.PURCHASE">Purchase</option>
-            <option [ngValue]="ContractType.TEMPORARY">Temporary</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['contractType']">{{ formErrors['contractType'] }}</p>
-        </div>
-
-        <!-- Start Date -->
-        <div>
-          <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
-          <input 
-            type="date" 
-            id="startDate" 
-            formControlName="startDate"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['startDate']">{{ formErrors['startDate'] }}</p>
-        </div>
-
-        <!-- End Date -->
-        <div>
-          <label for="endDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
-          <input 
-            type="date" 
-            id="endDate" 
-            formControlName="endDate"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          />
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['endDate']">{{ formErrors['endDate'] }}</p>
-        </div>
-
-        <!-- Total Amount -->
-        <div>
-          <label for="totalAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Amount *</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-500 dark:text-gray-400">$</span>
+  <!-- Form -->
+  <form [formGroup]="contractForm" (ngSubmit)="onSubmit()" class="bg-white rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
+    <div class="space-y-8">
+      <!-- Basic Information Section -->
+      <div>
+        <h2 class="text-xl font-semibold mb-6 text-[#0A1C26]">Contract Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Resident -->
+          <div>
+            <label for="residentId" class="block text-sm font-medium text-[#0A1C26] mb-2">Resident *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <select 
+                id="residentId" 
+                formControlName="residentId"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+                [attr.disabled]="residentIdFromRoute ? true : null"
+              >
+                <option [ngValue]="null" disabled>Select resident</option>
+                <option *ngFor="let resident of residents" [value]="resident.id">{{ resident.firstName }} {{ resident.lastName }}</option>
+              </select>
             </div>
-            <input 
-              type="number" 
-              id="totalAmount" 
-              formControlName="totalAmount"
-              class="pl-8 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-            />
-          </div>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['totalAmount']">{{ formErrors['totalAmount'] }}</p>
-        </div>
-
-        <!-- Paid Amount -->
-        <div>
-          <label for="paidAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paid Amount *</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-500 dark:text-gray-400">$</span>
+            <div *ngIf="formErrors['residentId']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['residentId'] }}
             </div>
-            <input 
-              type="number" 
-              id="paidAmount" 
-              formControlName="paidAmount"
-              class="pl-8 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-            />
           </div>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paidAmount']">{{ formErrors['paidAmount'] }}</p>
-        </div>
 
-        <!-- Payment Frequency -->
-        <div>
-          <label for="paymentFrequency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Frequency *</label>
-          <select 
-            id="paymentFrequency" 
-            formControlName="paymentFrequency"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          >
-            <option [ngValue]="null" disabled>Select payment frequency</option>
-            <option [ngValue]="PaymentFrequency.MONTHLY">Monthly</option>
-            <option [ngValue]="PaymentFrequency.QUARTERLY">Quarterly</option>
-            <option [ngValue]="PaymentFrequency.SEMI_ANNUALLY">Semi-Annually</option>
-            <option [ngValue]="PaymentFrequency.ANNUALLY">Annually</option>
-            <option [ngValue]="PaymentFrequency.ONE_TIME">One Time</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paymentFrequency']">{{ formErrors['paymentFrequency'] }}</p>
-        </div>
+          <!-- Residence -->
+          <div>
+            <label for="residenceId" class="block text-sm font-medium text-[#0A1C26] mb-2">Residence *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <select 
+                id="residenceId" 
+                formControlName="residenceId"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              >
+                <option [ngValue]="null" disabled>Select residence</option>
+                <option *ngFor="let residence of residences" [value]="residence.id">{{ residence.name }}</option>
+              </select>
+            </div>
+            <div *ngIf="formErrors['residenceId']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['residenceId'] }}
+            </div>
+          </div>
 
-        <!-- Payment Method -->
-        <div>
-          <label for="paymentMethod" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method *</label>
-          <select 
-            id="paymentMethod" 
-            formControlName="paymentMethod"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-          >
-            <option [ngValue]="null" disabled>Select payment method</option>
-            <option [ngValue]="PaymentMethod.BANK_TRANSFER">Bank Transfer</option>
-            <option [ngValue]="PaymentMethod.CREDIT_CARD">Credit Card</option>
-            <option [ngValue]="PaymentMethod.CASH">Cash</option>
-            <option [ngValue]="PaymentMethod.CHECK">Check</option>
-            <option [ngValue]="PaymentMethod.DIRECT_DEBIT">Direct Debit</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['paymentMethod']">{{ formErrors['paymentMethod'] }}</p>
-        </div>
+          <!-- Contract Type -->
+          <div>
+            <label for="contractType" class="block text-sm font-medium text-[#0A1C26] mb-2">Contract Type *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <select 
+                id="contractType" 
+                formControlName="contractType"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              >
+                <option [ngValue]="null" disabled>Select contract type</option>
+                <option [ngValue]="ContractType.LEASE">Lease</option>
+                <option [ngValue]="ContractType.RENT">Rent</option>
+                <option [ngValue]="ContractType.PURCHASE">Purchase</option>
+                <option [ngValue]="ContractType.TEMPORARY">Temporary</option>
+              </select>
+            </div>
+            <div *ngIf="formErrors['contractType']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['contractType'] }}
+            </div>
+          </div>
 
-        <!-- Contract Rules -->
-        <div class="md:col-span-2">
-          <label for="contractRules" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Rules</label>
-          <textarea 
-            id="contractRules" 
-            formControlName="contractRules"
-            rows="6"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-            placeholder="Enter contract rules and additional terms..."
-          ></textarea>
+          <!-- Start Date -->
+          <div>
+            <label for="startDate" class="block text-sm font-medium text-[#0A1C26] mb-2">Start Date *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <input 
+                type="date" 
+                id="startDate" 
+                formControlName="startDate"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              />
+            </div>
+            <div *ngIf="formErrors['startDate']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['startDate'] }}
+            </div>
+          </div>
+
+          <!-- End Date -->
+          <div>
+            <label for="endDate" class="block text-sm font-medium text-[#0A1C26] mb-2">End Date *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <input 
+                type="date" 
+                id="endDate" 
+                formControlName="endDate"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              />
+            </div>
+            <div *ngIf="formErrors['endDate']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['endDate'] }}
+            </div>
+          </div>
+
+          <!-- Total Amount -->
+          <div>
+            <label for="totalAmount" class="block text-sm font-medium text-[#0A1C26] mb-2">Total Amount *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <input 
+                type="number" 
+                id="totalAmount" 
+                formControlName="totalAmount"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div *ngIf="formErrors['totalAmount']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['totalAmount'] }}
+            </div>
+          </div>
+
+          <!-- Paid Amount -->
+          <div>
+            <label for="paidAmount" class="block text-sm font-medium text-[#0A1C26] mb-2">Paid Amount *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <input 
+                type="number" 
+                id="paidAmount" 
+                formControlName="paidAmount"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div *ngIf="formErrors['paidAmount']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['paidAmount'] }}
+            </div>
+          </div>
+
+          <!-- Payment Frequency -->
+          <div>
+            <label for="paymentFrequency" class="block text-sm font-medium text-[#0A1C26] mb-2">Payment Frequency *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <select 
+                id="paymentFrequency" 
+                formControlName="paymentFrequency"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              >
+                <option [ngValue]="null" disabled>Select payment frequency</option>
+                <option [ngValue]="PaymentFrequency.MONTHLY">Monthly</option>
+                <option [ngValue]="PaymentFrequency.QUARTERLY">Quarterly</option>
+                <option [ngValue]="PaymentFrequency.SEMI_ANNUALLY">Semi-Annually</option>
+                <option [ngValue]="PaymentFrequency.ANNUALLY">Annually</option>
+                <option [ngValue]="PaymentFrequency.ONE_TIME">One Time</option>
+              </select>
+            </div>
+            <div *ngIf="formErrors['paymentFrequency']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['paymentFrequency'] }}
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div>
+            <label for="paymentMethod" class="block text-sm font-medium text-[#0A1C26] mb-2">Payment Method *</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </div>
+              <select 
+                id="paymentMethod" 
+                formControlName="paymentMethod"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+              >
+                <option [ngValue]="null" disabled>Select payment method</option>
+                <option [ngValue]="PaymentMethod.BANK_TRANSFER">Bank Transfer</option>
+                <option [ngValue]="PaymentMethod.CREDIT_CARD">Credit Card</option>
+                <option [ngValue]="PaymentMethod.CASH">Cash</option>
+                <option [ngValue]="PaymentMethod.CHECK">Check</option>
+                <option [ngValue]="PaymentMethod.DIRECT_DEBIT">Direct Debit</option>
+              </select>
+            </div>
+            <div *ngIf="formErrors['paymentMethod']" class="text-red-600 text-sm mt-2">
+              {{ formErrors['paymentMethod'] }}
+            </div>
+          </div>
+
+          <!-- Contract Rules -->
+          <div class="md:col-span-2">
+            <label for="contractRules" class="block text-sm font-medium text-[#0A1C26] mb-2">Contract Rules</label>
+            <div class="relative">
+              <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6B7D86]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+              </div>
+              <textarea 
+                id="contractRules" 
+                formControlName="contractRules"
+                rows="6"
+                class="w-full pl-10 pr-4 py-3 border border-[#9BA8A5] rounded-lg shadow-sm focus:ring-[#2D4E5B] focus:border-[#2D4E5B] bg-white"
+                placeholder="Enter contract rules and additional terms..."
+              ></textarea>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex justify-end gap-3 pt-6 border-t border-[#E8E1D7]">
         <button 
-        [disabled]="isFormDirty && !isSubmitting"
+          type="button"
+          [disabled]="isFormDirty && !isSubmitting"
           routerLink="/contracts"
-          class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          class="px-6 py-3 border border-[#9BA8A5] rounded-lg text-[#0A1C26] hover:bg-[#F8F5F2] transition-colors flex items-center"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
           Cancel
-      </button>
+        </button>
         <button 
           type="submit" 
           [disabled]="contractForm.invalid || (loading$ | async) || isSubmitting"
-          class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-8 py-3 bg-[#2D4E5B] text-white font-medium rounded-lg shadow-md hover:bg-[#0A1C26] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C5A47E] transition-colors disabled:opacity-50 flex items-center"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
           {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Contract' }}
         </button>
       </div>
-    </form>
+    </div>
+  </form>
 
-    <div class="unsaved-changes" *ngIf="isFormDirty">
-        ⚠ Vous avez des modifications non sauvegardées !
-      </div>
+  <div class="unsaved-changes bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-6 rounded-r-md" *ngIf="isFormDirty">
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span class="text-yellow-700">Vous avez des modifications non sauvegardées !</span>
+    </div>
   </div>
+</div>
+
