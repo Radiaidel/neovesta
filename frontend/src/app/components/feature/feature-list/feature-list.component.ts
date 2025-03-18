@@ -61,6 +61,7 @@ export class FeatureListComponent implements OnInit, OnDestroy {
   featureToDelete: Feature | null = null
   isManager = false
   residenceName: string | null = null
+  Math = Math
 
   // Expose enums to template
   FeatureType = FeatureType
@@ -84,13 +85,35 @@ export class FeatureListComponent implements OnInit, OnDestroy {
     [FeatureCategory.OTHER]: "ellipsis-h",
   }
 
+  // Category color mapping
+  getCategoryColor(category: FeatureCategory): string {
+    const colorMap = {
+      [FeatureCategory.LEISURE]: "bg-blue-100 text-blue-800",
+      [FeatureCategory.WELLNESS]: "bg-purple-100 text-purple-800",
+      [FeatureCategory.MAINTENANCE]: "bg-gray-100 text-gray-800",
+      [FeatureCategory.TRANSPORT]: "bg-green-100 text-green-800",
+      [FeatureCategory.CLEANING]: "bg-cyan-100 text-cyan-800",
+      [FeatureCategory.CATERING]: "bg-orange-100 text-orange-800",
+      [FeatureCategory.EDUCATION]: "bg-yellow-100 text-yellow-800",
+      [FeatureCategory.SECURITY]: "bg-red-100 text-red-800",
+      [FeatureCategory.ENTERTAINMENT]: "bg-pink-100 text-pink-800",
+      [FeatureCategory.SPORT]: "bg-emerald-100 text-emerald-800",
+      [FeatureCategory.HEALTH]: "bg-rose-100 text-rose-800",
+      [FeatureCategory.KIDS]: "bg-indigo-100 text-indigo-800",
+      [FeatureCategory.BUSINESS]: "bg-slate-100 text-slate-800",
+      [FeatureCategory.OTHER]: "bg-gray-100 text-gray-800",
+    }
+
+    return colorMap[category] || "bg-gray-100 text-gray-800"
+  }
+
   constructor() {
     this.filterForm = this.fb.group({
       search: [""],
       featureType: [null],
       featureCategory: [null],
       active: [null],
-      sortBy: ["created_at"], // Utiliser le nom de colonne correct pour la base de données
+      sortBy: ["created_at"],
       sortDir: ["desc"],
     })
   }
@@ -100,10 +123,10 @@ export class FeatureListComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser()
     this.isManager = currentUser?.role === Role.RESIDENCE_MANAGER || currentUser?.role === Role.SUB_RESIDENCE_MANAGER
 
-    // Obtenir la résidence associée au manager ou au sous-manager
+    // Get residence associated with the manager or sub-manager
     if (currentUser) {
       if (currentUser.role === Role.RESIDENCE_MANAGER) {
-        // Si l'utilisateur est un manager, obtenir sa résidence
+        // If user is a manager, get their residence
         this.residenceService
           .getResidenceByManager(currentUser.id)
           .pipe(takeUntil(this.destroy$))
@@ -112,7 +135,7 @@ export class FeatureListComponent implements OnInit, OnDestroy {
             this.loadFeaturesForResidence()
           })
       } else if (currentUser.role === Role.SUB_RESIDENCE_MANAGER && currentUser.managerId) {
-        // Si l'utilisateur est un sous-manager, obtenir la résidence de son manager
+        // If user is a sub-manager, get their manager's residence
         this.residenceService
           .getResidenceByManager(currentUser.managerId)
           .pipe(takeUntil(this.destroy$))
@@ -121,17 +144,17 @@ export class FeatureListComponent implements OnInit, OnDestroy {
             this.loadFeaturesForResidence()
           })
       } else {
-        // Pour les autres rôles, charger tous les services
+        // For other roles, load all services
         this.loadFeaturesWithCurrentFilters()
       }
     } else {
-      // Si pas d'utilisateur connecté, charger tous les services
+      // If no user is logged in, load all services
       this.loadFeaturesWithCurrentFilters()
     }
   }
 
   loadFeaturesForResidence(): void {
-    // Mettre à jour le formulaire avec le nom de la résidence
+    // Update form with residence name
     this.store
       .select(selectFeatureFilters)
       .pipe(takeUntil(this.destroy$))
@@ -145,13 +168,13 @@ export class FeatureListComponent implements OnInit, OnDestroy {
           sortDir: filters.sortDir,
         })
 
-        // Créer des filtres avec le nom de la résidence
+        // Create filters with residence name
         const updatedFilters: FeatureFilters = {
           ...filters,
           residenceName: this.residenceName || undefined,
         }
 
-        // Charger les services avec les filtres mis à jour
+        // Load services with updated filters
         this.store.dispatch(FeatureActions.loadFeatures({ filters: updatedFilters }))
       })
   }
@@ -170,7 +193,7 @@ export class FeatureListComponent implements OnInit, OnDestroy {
           sortDir: filters.sortDir,
         })
 
-        // Charger les services avec les filtres actuels
+        // Load services with current filters
         this.store.dispatch(FeatureActions.loadFeatures({ filters }))
       })
   }
@@ -198,12 +221,22 @@ export class FeatureListComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
-    // Conserver le filtre de résidence lors de la réinitialisation
+    // Keep residence filter when resetting
     const resetFilters = {
       residenceName: this.residenceName || undefined,
     }
     this.store.dispatch(FeatureActions.setFeatureFilters({ filters: resetFilters }))
     this.store.dispatch(FeatureActions.resetFeatureFilters())
+  }
+
+  selectCategory(category: FeatureCategory): void {
+    this.filterForm.patchValue({ featureCategory: category })
+    this.applyFilters()
+  }
+
+  resetCategory(): void {
+    this.filterForm.patchValue({ featureCategory: null })
+    this.applyFilters()
   }
 
   onPageChange(page: number): void {

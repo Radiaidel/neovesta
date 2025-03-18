@@ -48,6 +48,26 @@ export class FeatureCardComponent {
     [FeatureCategory.OTHER]: "ellipsis-h",
   };
 
+  categoryDefaultImages: Record<FeatureCategory, string> = {
+    [FeatureCategory.LEISURE]: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.WELLNESS]: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.MAINTENANCE]: 'https://plus.unsplash.com/premium_photo-1721830791498-ec809d9d94ec?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Outils de réparation
+    [FeatureCategory.TRANSPORT]: 'https://images.unsplash.com/photo-1502872364588-894d7d6ddfab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Bus
+    [FeatureCategory.CLEANING]: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.CATERING]: 'https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.EDUCATION]: 'https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Salle de classe
+    [FeatureCategory.SECURITY]: 'https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.ENTERTAINMENT]: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.SPORT]: 'https://images.unsplash.com/photo-1547347298-4074fc3086f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Football
+    [FeatureCategory.HEALTH]: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.KIDS]: 'https://images.unsplash.com/photo-1577896852336-9e9c1452f5e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Enfant qui joue
+    [FeatureCategory.BUSINESS]: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.OTHER]: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Bureau générique
+  };
+  // Ajoutez cette méthode
+  getCategoryImage(category: FeatureCategory): string {
+    return this.categoryDefaultImages[category] || '/assets/images/categories/default.jpg';
+  }
   getCategoryColor(category: FeatureCategory): string {
     return this.categoryColors[category] || "bg-gray-100 text-gray-800";
   }
