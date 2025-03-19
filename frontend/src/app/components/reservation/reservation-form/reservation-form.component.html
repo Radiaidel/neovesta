@@ -19,12 +19,8 @@
 
     <!-- Loading State -->
     <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
-      <div class="custom-spinner">
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <span>Loading...</span>
-      </div>
+      <app-loading-spinner></app-loading-spinner>
+
     </div>
 
     <!-- Multi-step form with animations -->

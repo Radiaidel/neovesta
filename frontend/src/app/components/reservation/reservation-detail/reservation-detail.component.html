@@ -11,13 +11,8 @@
   <div class="container mx-auto px-4 py-8 relative z-10">
     <!-- Loading State -->
     <div class="flex justify-center my-12" *ngIf="loading$ | async">
-      <div class="flex flex-col items-center">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-[#C5A47E]/30 rounded-full"></div>
-          <div class="w-16 h-16 border-4 border-transparent border-t-[#C5A47E] rounded-full absolute top-0 left-0 animate-spin"></div>
-        </div>
-        <p class="mt-4 text-[#6B7D86] animate-pulse">Loading reservation details...</p>
-      </div>
+      <app-loading-spinner></app-loading-spinner>
+
     </div>
   
     <ng-container *ngIf="!(loading$ | async)">

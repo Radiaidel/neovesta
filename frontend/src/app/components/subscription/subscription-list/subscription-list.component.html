@@ -296,13 +296,8 @@
 
   <!-- Loading State -->
   <div class="container mx-auto px-4 py-12" *ngIf="loading$ | async">
-    <div class="flex flex-col items-center justify-center">
-      <div class="relative">
-        <div class="w-16 h-16 border-4 border-[#1a2942]/20 rounded-full"></div>
-        <div class="w-16 h-16 border-4 border-transparent border-t-[#C5A47E] rounded-full absolute top-0 left-0 animate-spin"></div>
-      </div>
-      <p class="mt-4 text-[#1a2942] font-medium">Loading subscriptions...</p>
-    </div>
+    <app-loading-spinner></app-loading-spinner>
+
   </div>
 
   <!-- Results -->
