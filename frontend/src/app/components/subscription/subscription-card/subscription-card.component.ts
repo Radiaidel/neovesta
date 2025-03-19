@@ -9,6 +9,7 @@ import { PaymentStatus, type Subscription, SubscriptionType } from "../../../mod
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: "./subscription-card.component.html",
+  styleUrl: "./subscription-card.component.css"
 })
 export class SubscriptionCardComponent {
   @Input() subscription!: Subscription
@@ -95,20 +96,76 @@ export class SubscriptionCardComponent {
       .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
+  // getPaymentStatusColor(status: PaymentStatus): string {
+  //   switch (status) {
+  //     case PaymentStatus.PENDING:
+  //       return "bg-yellow-100 text-yellow-800"
+  //     case PaymentStatus.PAID:
+  //       return "bg-green-100 text-green-800"
+  //     case PaymentStatus.FAILED:
+  //       return "bg-red-100 text-red-800"
+  //     case PaymentStatus.REFUNDED:
+  //       return "bg-blue-100 text-blue-800"
+  //     case PaymentStatus.CANCELLED:
+  //       return "bg-gray-100 text-gray-800"
+  //     default:
+  //       return "bg-gray-100 text-gray-800"
+  //   }
+  // }
+
+  formatPrice(price: number): string {
+    if (!price) return ""
+    return new Intl.NumberFormat("fr-MA", { style: "currency", currency: "MAD" }).format(price)
+  }
   getPaymentStatusColor(status: PaymentStatus): string {
     switch (status) {
       case PaymentStatus.PENDING:
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-amber-100/80 text-amber-800 dark:bg-amber-900/80 dark:text-amber-300"
       case PaymentStatus.PAID:
-        return "bg-green-100 text-green-800"
+        return "bg-green-100/80 text-green-800 dark:bg-green-900/80 dark:text-green-300"
       case PaymentStatus.FAILED:
-        return "bg-red-100 text-red-800"
+        return "bg-red-100/80 text-red-800 dark:bg-red-900/80 dark:text-red-300"
       case PaymentStatus.REFUNDED:
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100/80 text-blue-800 dark:bg-blue-900/80 dark:text-blue-300"
       case PaymentStatus.CANCELLED:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100/80 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100/80 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300"
+    }
+  }
+
+  
+  getPaymentStatusTextColor(status: PaymentStatus): string {
+    switch (status) {
+      case PaymentStatus.PENDING:
+        return "text-amber-600"
+      case PaymentStatus.PAID:
+        return "text-green-600"
+      case PaymentStatus.FAILED:
+        return "text-red-600"
+      case PaymentStatus.REFUNDED:
+        return "text-blue-600"
+      case PaymentStatus.CANCELLED:
+        return "text-gray-600"
+      default:
+        return "text-gray-600"
+    }
+  }
+
+  getPaymentStatusDotColor(status: PaymentStatus): string {
+    switch (status) {
+      case PaymentStatus.PENDING:
+        return "bg-amber-500"
+      case PaymentStatus.PAID:
+        return "bg-green-500"
+      case PaymentStatus.FAILED:
+        return "bg-red-500"
+      case PaymentStatus.REFUNDED:
+        return "bg-blue-500"
+      case PaymentStatus.CANCELLED:
+        return "bg-gray-500"
+      default:
+        return "bg-gray-500"
     }
   }
 }
