@@ -26,7 +26,7 @@ import { PaginationComponent } from "../../ui/pagination/pagination.component"
 import { AuthService } from "../../../services/auth.service"
 import { ReservationCardComponent } from "../reservation-card/reservation-card.component"
 import { HeaderComponent } from "../../shared/header/header.component";
-
+import { trigger, transition, style, animate, query, stagger } from "@angular/animations"
 @Component({
   selector: "app-my-reservations",
   standalone: true,
@@ -41,6 +41,21 @@ import { HeaderComponent } from "../../shared/header/header.component";
     HeaderComponent
 ],
   templateUrl: "./my-reservations.component.html",
+  styleUrl:"./my-reservations.component.scss",
+  animations: [
+    trigger("cardAnimation", [
+      transition("* => *", [
+        query(
+          ":enter",
+          [
+            style({ opacity: 0, transform: "translateY(15px)" }),
+            stagger(100, [animate("0.3s ease-out", style({ opacity: 1, transform: "translateY(0)" }))]),
+          ],
+          { optional: true },
+        ),
+      ]),
+    ]),
+  ],
 })
 export class MyReservationsComponent implements OnInit, OnDestroy {
   private store = inject(Store)
@@ -59,6 +74,7 @@ export class MyReservationsComponent implements OnInit, OnDestroy {
   showDeleteConfirm = false
   reservationToDelete: Reservation | null = null
   userId: string | null = null
+  showFilters = true
 
   // Expose enums to template
   ReservationStatus = ReservationStatus
@@ -174,6 +190,44 @@ export class MyReservationsComponent implements OnInit, OnDestroy {
         id,
       }),
     )
+  }
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters
+  }
+  isPending(reservation: any): boolean {
+    return reservation.status === ReservationStatus.PENDING
+  }
+
+  formatStatus(status: ReservationStatus): string {
+    return status ? status.charAt(0) + status.slice(1).toLowerCase() : ""
+  }
+
+  formatDate(date: string): string {
+    if (!date) return ""
+    return new Date(date).toLocaleString("fr-MA", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  getStatusClass(status: ReservationStatus): string {
+    switch (status) {
+      case ReservationStatus.PENDING:
+        return "status-pending"
+      case ReservationStatus.CONFIRMED:
+        return "status-confirmed"
+      case ReservationStatus.REJECTED:
+        return "status-rejected"
+      case ReservationStatus.CANCELLED:
+        return "status-cancelled"
+      case ReservationStatus.COMPLETED:
+        return "status-completed"
+      default:
+        return ""
+    }
   }
 }
 
