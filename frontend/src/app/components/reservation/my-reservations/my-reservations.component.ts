@@ -37,7 +37,6 @@ import { trigger, transition, style, animate, query, stagger } from "@angular/an
     ConfirmDialogComponent,
     LoadingSpinnerComponent,
     PaginationComponent,
-    ReservationCardComponent,
     HeaderComponent
 ],
   templateUrl: "./my-reservations.component.html",

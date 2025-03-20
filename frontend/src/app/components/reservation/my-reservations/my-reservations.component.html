@@ -149,12 +149,8 @@
 
     <!-- Loading State -->
     <div class="loading-container" *ngIf="loading$ | async">
-      <div class="custom-spinner">
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <span>Loading your reservations...</span>
-      </div>
+      <app-loading-spinner></app-loading-spinner>
+
     </div>
 
     <!-- Results -->
