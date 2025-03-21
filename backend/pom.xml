@@ -32,7 +32,7 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.30</lombok.version>
 		<jjwt.version>0.12.5</jjwt.version>
-
+		<mockito.version>5.5.0</mockito.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -67,6 +67,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<!-- Exclure JUnit 4 si nécessaire -->
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
@@ -105,11 +119,6 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
-		<!--		<dependency>-->
-		<!--			<groupId>org.springframework.boot</groupId>-->
-		<!--			<artifactId>spring-boot-starter-test</artifactId>-->
-		<!--			<scope>test</scope>-->
-		<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
@@ -127,6 +136,30 @@
 			<artifactId>jjwt-impl</artifactId>
 			<version>${jjwt.version}</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -203,6 +236,18 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.3</version> <!-- Version plus récente -->
+				<configuration>
+					<argLine>
+						--add-opens java.base/java.lang=ALL-UNNAMED
+						--add-opens java.base/java.util=ALL-UNNAMED
+					</argLine>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
