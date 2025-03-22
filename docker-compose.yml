@@ -1,7 +1,6 @@
-
 services:
   backend:
-    build:  # Changed from image
+    build:
       context: ./backend
       dockerfile: ../backend.Dockerfile
     ports:
@@ -17,7 +16,7 @@ services:
       - neovesta-network
 
   frontend:
-    build:  # Changed from image
+    build:
       context: .
       dockerfile: frontend.Dockerfile
     ports:
