@@ -22,7 +22,7 @@ export const ProfileActions = createActionGroup({
 
     // Update password
     "Update Password": props<{ id: string; request: ProfilePasswordUpdateRequest }>(),
-    "Update Password Success": emptyProps(),
+    "Update Password Success": props<{ user: ProfileUser }>(),  // Changed from emptyProps()
     "Update Password Failure": props<{ error: any }>(),
 
     // Upload profile image
