@@ -76,14 +76,14 @@ jobs:
           outputs: type=docker,dest=/tmp/frontend-image.tar
       
       - name: Upload backend image as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2  # Changed from v3 to v2
         with:
           name: backend-image
           path: /tmp/backend-image.tar
           retention-days: 1
       
       - name: Upload frontend image as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2  # Changed from v3 to v2
         with:
           name: frontend-image
           path: /tmp/frontend-image.tar
