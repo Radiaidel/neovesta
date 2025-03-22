@@ -73,14 +73,12 @@ public class ResidenceServiceImpl implements ResidenceService {
         residence.setDocuments(documents);
 
         if (request.getManagerId() != null) {
-            System.out.println("Searching for manager with ID: " + request.getManagerId()); // Debug log
             User user = residenceManagerRepository.findById(request.getManagerId())
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
     
             // Check if the user is a ResidenceManager
             if (user instanceof ResidenceManager) {
                 ResidenceManager manager = (ResidenceManager) user; // Safe cast
-                System.out.println("Found manager: " + manager.getEmail() + ", Role: " + manager.getRole()); // Debug log
                 residence.setManager(manager);
                 manager.setResidence(residence);
             } else {

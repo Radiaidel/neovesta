@@ -87,6 +87,7 @@ export class SubscriptionFormComponent implements OnInit, OnDestroy {
       this.subscriptionForm.get("userId")?.setValue(this.currentUserId);
       this.subscriptionForm.get("userId")?.disable();
     }
+    
 
     this.store.dispatch(FeatureActions.loadFeatures({ filters: {
         page: 0, size: 100,
@@ -94,9 +95,22 @@ export class SubscriptionFormComponent implements OnInit, OnDestroy {
         sortDir: "asc"
     } }));
 
-    if (this.isManager) {
-      this.store.dispatch(UserActions.loadUsers({ request: {} }));
-    }
+    // if (this.isManager) {
+    //   this.store.dispatch(UserActions.loadUsers({ request: {} }));
+    // }
+
+    // In ngOnInit() where you dispatch loadUsers
+if (this.isManager) {
+  this.store.dispatch(UserActions.loadUsers({ 
+    request: { 
+      page: 0,      // Add default page
+      size: 10,     // Add default size
+      searchTerm: "",
+      role: undefined,
+      residenceId: undefined
+    } 
+  }));
+}
 
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const id = params.get("id");

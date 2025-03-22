@@ -13,12 +13,14 @@ import { AuthService } from "../../../services/auth.service";
 import { FeatureService } from "../../../services/feature.service";
 import { ResidenceService } from "../../../services/residence.service";
 import { Role } from "../../../models/user.model";
+import { HeaderComponent } from "../../shared/header/header.component";
 
 @Component({
   selector: "app-reservation-form",
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent, HeaderComponent],
   templateUrl: "./reservation-form.component.html",
+  styleUrls: ["./residence-form.component.scss"],
 })
 export class ReservationFormComponent implements OnInit, OnDestroy {
   private store = inject(Store);
@@ -232,4 +234,65 @@ export class ReservationFormComponent implements OnInit, OnDestroy {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
+
+  currentStep = 1;
+  showTerms = false;
+  showCancellation = false;
+  setupFormListeners(): void {
+    // Listen for changes to the featureId control
+    this.reservationForm.get('featureId')?.valueChanges.subscribe(featureId => {
+      if (featureId) {
+        this.selectedFeature = this.availableFeatures.find(f => f.id === featureId) ?? null;
+      } else {
+        this.selectedFeature = null;
+      }
+    });
+  }
+
+  selectService(featureId: string): void {
+    this.reservationForm.get('featureId')?.setValue(featureId);
+  }
+
+  nextStep(): void {
+    if (this.currentStep < 3) {
+      this.currentStep++;
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number): void {
+    // Only allow going to a step if previous steps are completed
+    if (step === 1 || 
+        (step === 2 && this.reservationForm.get('featureId')?.valid) || 
+        (step === 3 && this.reservationForm.get('featureId')?.valid && this.reservationForm.get('requestedDate')?.valid)) {
+      this.currentStep = step;
+    }
+  }
+
+  toggleTerms(): void {
+    this.showTerms = !this.showTerms;
+  }
+
+  toggleCancellation(): void {
+    this.showCancellation = !this.showCancellation;
+  }
+
+  formatDateTime(dateTime: string): string {
+    if (!dateTime) return '';
+    const date = new Date(dateTime);
+    return date.toLocaleString('fr-MA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
 }

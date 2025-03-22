@@ -55,9 +55,11 @@ export class ContractListComponent implements OnInit, OnDestroy {
   filterForm: FormGroup
   showDeleteConfirm = false
   contractToDelete: Contract | null = null
-
+  Math = Math
   ContractType = ContractType
   ContractStatus = ContractStatus
+  viewMode: "table" | "grid" = "table"
+  showFilters = true
 
   constructor() {
     this.filterForm = this.fb.group({
@@ -101,6 +103,12 @@ export class ContractListComponent implements OnInit, OnDestroy {
     this.destroy$.complete()
   }
 
+  toggleView(): void {
+    this.viewMode = this.viewMode === "table" ? "grid" : "table"
+  }
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters
+  }
   applyFilters(): void {
     const formValues = this.filterForm.value
 
@@ -124,7 +132,15 @@ export class ContractListComponent implements OnInit, OnDestroy {
   resetFilters(): void {
     this.store.dispatch(ContractActions.resetContractFilters())
   }
+  selectStatus(status: ContractStatus): void {
+    this.filterForm.get('status')?.setValue(status);
+    this.applyFilters();
+  }
 
+  resetStatus(): void {
+    this.filterForm.get('status')?.setValue(null);
+    this.applyFilters();
+  }
   onPageChange(page: number): void {
     this.store.dispatch(
       ContractActions.setContractFilters({
@@ -174,6 +190,11 @@ export class ContractListComponent implements OnInit, OnDestroy {
       .replace("_", " ")
       .toLowerCase()
       .replace(/\b\w/g, (l) => l.toUpperCase())
+  }
+
+  formatPrice(amount: number): string {
+    if (amount === undefined || amount === null) return ""
+    return new Intl.NumberFormat("fr-MA", { style: "currency", currency: "MAD" }).format(amount)
   }
 }
 

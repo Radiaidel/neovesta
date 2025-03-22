@@ -1,134 +1,256 @@
-<div class="container mx-auto px-4 py-8">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-          <a routerLink="/reservations" class="hover:underline">Reservations</a>
-          <span>/</span>
-          <span>{{ isEditMode ? 'Edit' : 'New' }} Reservation</span>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
-          {{ isEditMode ? 'Edit' : 'Create' }} Reservation
-        </h1>
-      </div>
+<div class="bg-gradient-to-b from-[#f0f4f8] to-white">
+<app-header></app-header>
+<div class="form-container ">
+
+
+  <div class="container mx-auto px-4 py-8 relative z-10">
+    <!-- Breadcrumb with animation -->
+    <div class="breadcrumb-container mb-6">
+      <a routerLink="/reservations" class="breadcrumb-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        <span>Back to Reservations</span>
+      </a>
     </div>
-  
+
+    <!-- Page title with animation -->
+    <h1 class="page-title">{{ isEditMode ? 'Edit' : 'Create' }} Reservation</h1>
+
     <!-- Loading State -->
     <div class="flex justify-center my-12" *ngIf="(loading$ | async) && isEditMode">
       <app-loading-spinner></app-loading-spinner>
+
     </div>
-  
-    <!-- Form -->
-    <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6" *ngIf="!((loading$ | async) && isEditMode)">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Basic Information Section -->
-        <div class="md:col-span-2">
-          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Reservation Details</h2>
+
+    <!-- Multi-step form with animations -->
+    <div class="form-wrapper" *ngIf="!((loading$ | async) && isEditMode)">
+      <!-- Progress indicator -->
+      <div class="progress-bar" [class.step-2]="currentStep === 2" [class.step-3]="currentStep === 3"></div>
+      
+      <div class="steps-indicator">
+        <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1" (click)="goToStep(1)">
+          <div class="step-number">1</div>
+          <div class="step-label">Select Service</div>
         </div>
-  
-        <!-- Service Selection -->
-        <div class="md:col-span-2">
-          <label for="featureId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service *</label>
-          <select 
-            id="featureId" 
-            formControlName="featureId"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
-            [disabled]="isEditMode"
-          >
-            <option [ngValue]="null" disabled>Select a service</option>
-            <option *ngFor="let feature of availableFeatures" [value]="feature.id">{{ feature.name }}</option>
-          </select>
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['featureId']">{{ formErrors['featureId'] }}</p>
+        <div class="step-connector"></div>
+        <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2" (click)="goToStep(2)">
+          <div class="step-number">2</div>
+          <div class="step-label">Schedule</div>
         </div>
-  
-        <!-- Selected Service Details -->
-        <div class="md:col-span-2 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" *ngIf="selectedFeature">
-          <div class="flex items-start gap-4">
-            <div class="w-24 h-24 rounded-lg overflow-hidden">
+        <div class="step-connector"></div>
+        <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3" (click)="goToStep(3)">
+          <div class="step-number">3</div>
+          <div class="step-label">Confirm</div>
+        </div>
+      </div>
+
+      <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
+        <!-- Step 1: Service Selection -->
+        <div class="form-step" [class.active]="currentStep === 1" [class.previous]="currentStep > 1">
+          <h2 class="step-title">Select a Service</h2>
+          
+          <div class="service-grid">
+            <div 
+              *ngFor="let feature of availableFeatures" 
+              class="service-card" 
+              [class.selected]="reservationForm.get('featureId')?.value === feature.id"
+              (click)="selectService(feature.id)"
+            >
+              <div class="service-image">
+                <img 
+                  *ngIf="feature.imageUrl" 
+                  [src]="feature.imageUrl" 
+                  [alt]="feature.name"
+                />
+                <div *ngIf="!feature.imageUrl" class="service-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="service-content">
+                <h3 class="service-name">{{ feature.name }}</h3>
+                <p class="service-description">{{ feature.description }}</p>
+                <div class="service-badges">
+                  <span class="service-badge type-badge">
+                    {{ feature.featureType === 'RESERVATION_BASED' ? 'Reservation' : 'Subscription' }}
+                  </span>
+                  <span *ngIf="feature.requiresManagerApproval" class="service-badge approval-badge">
+                    Approval Required
+                  </span>
+                </div>
+              </div>
+              <div class="service-check">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          <p class="error-message" *ngIf="formErrors['featureId']">{{ formErrors['featureId'] }}</p>
+          
+          <div class="step-actions">
+            <button type="button" class="next-button" [disabled]="!reservationForm.get('featureId')?.value" (click)="nextStep()">
+              <span>Continue</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Schedule -->
+        <div class="form-step" [class.active]="currentStep === 2" [class.previous]="currentStep > 2" [class.next]="currentStep < 2">
+          <h2 class="step-title">Schedule Your Reservation</h2>
+          
+          <div class="selected-service-summary" *ngIf="selectedFeature">
+            <div class="service-image">
               <img 
                 *ngIf="selectedFeature.imageUrl" 
                 [src]="selectedFeature.imageUrl" 
                 [alt]="selectedFeature.name"
-                class="w-full h-full object-cover"
               />
-              <div 
-                *ngIf="!selectedFeature.imageUrl" 
-                class="w-full h-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div *ngIf="!selectedFeature.imageUrl" class="service-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
             </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ selectedFeature.name }}</h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ selectedFeature.description }}</p>
-              <div class="mt-2 flex flex-wrap gap-2">
-                <span class="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 rounded-full text-xs">
-                  {{ selectedFeature.featureType === 'RESERVATION_BASED' ? 'Reservation Based' : 'Subscription Based' }}
+            <div class="service-details">
+              <h3>{{ selectedFeature.name }}</h3>
+              <div class="service-badges">
+                <span class="service-badge type-badge">
+                  {{ selectedFeature.featureType === 'RESERVATION_BASED' ? 'Reservation' : 'Subscription' }}
                 </span>
-                <span *ngIf="selectedFeature.requiresManagerApproval" class="px-2 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded-full text-xs">
-                  Requires Approval
+                <span *ngIf="selectedFeature.requiresManagerApproval" class="service-badge approval-badge">
+                  Approval Required
                 </span>
               </div>
             </div>
           </div>
-          <div class="mt-3 text-sm text-gray-500 dark:text-gray-400" *ngIf="selectedFeature.requiresManagerApproval">
-            <div class="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          
+          <div class="date-time-picker">
+            <label for="requestedDate">When would you like to reserve?</label>
+            <div class="date-time-input">
+              <div class="date-time-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <input 
+                type="datetime-local" 
+                id="requestedDate" 
+                formControlName="requestedDate"
+                [min]="minDate"
+                class="date-time-field"
+              />
+            </div>
+            <p class="error-message" *ngIf="formErrors['requestedDate']">{{ formErrors['requestedDate'] }}</p>
+          </div>
+          
+          <div class="step-actions">
+            <button type="button" class="back-button" (click)="prevStep()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <button type="button" class="next-button" [disabled]="!reservationForm.get('requestedDate')?.value" (click)="nextStep()">
+              <span>Continue</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Confirm -->
+        <div class="form-step" [class.active]="currentStep === 3" [class.next]="currentStep < 3">
+          <h2 class="step-title">Confirm Your Reservation</h2>
+          
+          <div class="confirmation-card" *ngIf="selectedFeature">
+            <div class="confirmation-header">
+              <h3>Reservation Summary</h3>
+            </div>
+            
+            <div class="confirmation-body">
+              <div class="confirmation-item">
+                <div class="confirmation-label">Service</div>
+                <div class="confirmation-value">{{ selectedFeature.name }}</div>
+              </div>
+              
+              <div class="confirmation-item">
+                <div class="confirmation-label">Date & Time</div>
+                <div class="confirmation-value">{{ formatDateTime(reservationForm.get('requestedDate')?.value) }}</div>
+              </div>
+              
+              <div class="confirmation-item" *ngIf="selectedFeature.requiresManagerApproval">
+                <div class="confirmation-label">Status</div>
+                <div class="confirmation-value status-pending">
+                  <span class="status-dot"></span>
+                  Pending Approval
+                </div>
+              </div>
+            </div>
+            
+            <div class="confirmation-info" *ngIf="selectedFeature.requiresManagerApproval">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>This service requires manager approval. Your reservation will be pending until approved.</span>
+              <p>This service requires manager approval. Your reservation will be pending until approved.</p>
             </div>
           </div>
-        </div>
-  
-        <!-- Requested Date -->
-        <div class="md:col-span-2">
-          <label for="requestedDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested Date & Time *</label>
-          <input 
-            type="datetime-local" 
-            id="requestedDate" 
-            formControlName="requestedDate"
-            [min]="minDate"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
-          />
-          <p class="mt-1 text-sm text-red-600" *ngIf="formErrors['requestedDate']">{{ formErrors['requestedDate'] }}</p>
-        </div>
-  
-        <!-- Terms and Conditions -->
-        <div class="md:col-span-2 mt-4" *ngIf="selectedFeature?.termsAndConditions">
-          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Terms and Conditions</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ selectedFeature?.termsAndConditions }}</p>
+          
+          <!-- Terms and Conditions -->
+          <div class="terms-section" *ngIf="selectedFeature?.termsAndConditions">
+            <div class="terms-header" (click)="toggleTerms()">
+              <h3>Terms and Conditions</h3>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [class.rotate]="showTerms" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div class="terms-content" [class.expanded]="showTerms">
+              <p>{{ selectedFeature?.termsAndConditions }}</p>
+            </div>
+          </div>
+          
+          <!-- Cancellation Policy -->
+          <div class="terms-section" *ngIf="selectedFeature?.cancellationPolicy">
+            <div class="terms-header" (click)="toggleCancellation()">
+              <h3>Cancellation Policy</h3>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [class.rotate]="showCancellation" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div class="terms-content" [class.expanded]="showCancellation">
+              <p>{{ selectedFeature?.cancellationPolicy }}</p>
+            </div>
+          </div>
+          
+          <div class="step-actions">
+            <button type="button" class="back-button" (click)="prevStep()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <button 
+              type="submit" 
+              class="submit-button" 
+              [disabled]="reservationForm.invalid || (loading$ | async) || isSubmitting || !userId"
+            >
+              <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update' : 'Confirm' }} Reservation</span>
+              <div *ngIf="isSubmitting" class="button-spinner">
+                <div class="spinner"></div>
+                <span>Processing...</span>
+              </div>
+            </button>
           </div>
         </div>
-  
-        <!-- Cancellation Policy -->
-        <div class="md:col-span-2 mt-2" *ngIf="selectedFeature?.cancellationPolicy">
-          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Cancellation Policy</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ selectedFeature?.cancellationPolicy }}</p>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <a 
-          routerLink="/reservations"
-          class="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          Cancel
-        </a>
-        <button 
-          type="submit" 
-          [disabled]="reservationForm.invalid || (loading$ | async) || isSubmitting || !userId"
-          class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') + ' Reservation' }}
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-  
+</div>
+</div>

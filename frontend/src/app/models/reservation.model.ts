@@ -19,6 +19,7 @@ export interface Reservation {
   id: string
   requestedDate: string 
   scheduledDate?: string 
+  price: number
   status: ReservationStatus
   adminNote?: string
   resident?: User

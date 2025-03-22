@@ -39,6 +39,7 @@ import { HeaderComponent } from "../../shared/header/header.component";
     HeaderComponent
 ],
   templateUrl: "./subscription-list.component.html",
+  styleUrls: ["./subscription-list.component.css"]
 })
 export class SubscriptionListComponent implements OnInit, OnDestroy {
   private store = inject(Store);
@@ -46,6 +47,7 @@ export class SubscriptionListComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private residenceService = inject(ResidenceService);
   private destroy$ = new Subject<void>();
+
 
   subscriptions$: Observable<PageResponse<Subscription> | null> = this.store.select(selectAllSubscriptions);
   loading$: Observable<boolean> = this.store.select(selectSubscriptionLoading);
@@ -62,6 +64,7 @@ export class SubscriptionListComponent implements OnInit, OnDestroy {
   userId: string | null = null;
   residenceId: string | null = null;
   residenceName = "";
+  showFilters = true
 
   SubscriptionType = SubscriptionType;
   PaymentStatus = PaymentStatus;
@@ -296,4 +299,8 @@ export class SubscriptionListComponent implements OnInit, OnDestroy {
       .toLowerCase()
       .replace(/\b\w/g, (l) => l.toUpperCase());
   }
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters
+  }
+
 }
