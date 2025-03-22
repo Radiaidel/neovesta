@@ -62,6 +62,7 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   isManager = false
   isResident = false
   userId: string | null = null
+  showFilters = true
 
   ReservationStatus = ReservationStatus
 
@@ -100,6 +101,19 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters
+  }
+
+  selectStatus(status: ReservationStatus): void {
+    this.filterForm.get("status")?.setValue(status)
+    this.applyFilters()
+  }
+  resetStatus(): void {
+    this.filterForm.get("status")?.setValue(null)
+    this.applyFilters()
   }
 
   applyFilters(): void {

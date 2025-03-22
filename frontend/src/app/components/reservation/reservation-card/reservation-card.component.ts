@@ -95,6 +95,10 @@ export class ReservationCardComponent {
         }
     }
 
+    formatPrice(price: number): string {
+        if (!price) return ""
+        return new Intl.NumberFormat("fr-MA", { style: "currency", currency: "MAD" }).format(price)
+      }
     formatStatus(status: ReservationStatus): string {
         if (!status) return ""
         return status
@@ -108,5 +112,39 @@ export class ReservationCardComponent {
             return true
         return false
     }
+
+    getStatusTextColor(status: ReservationStatus): string {
+        switch (status) {
+          case ReservationStatus.PENDING:
+            return "text-[#7B4D00]"
+          case ReservationStatus.CONFIRMED:
+            return "text-[#2E5931]"
+          case ReservationStatus.REJECTED:
+            return "text-[#7F2121]"
+          case ReservationStatus.CANCELLED:
+            return "text-[#424242]"
+          case ReservationStatus.COMPLETED:
+            return "text-[#0D47A1]"
+          default:
+            return "text-gray-800"
+        }
+      }
+    
+      getStatusDotColor(status: ReservationStatus): string {
+        switch (status) {
+          case ReservationStatus.PENDING:
+            return "bg-[#FFB74D]"
+          case ReservationStatus.CONFIRMED:
+            return "bg-[#81C784]"
+          case ReservationStatus.REJECTED:
+            return "bg-[#E57373]"
+          case ReservationStatus.CANCELLED:
+            return "bg-[#9E9E9E]"
+          case ReservationStatus.COMPLETED:
+            return "bg-[#64B5F6]"
+          default:
+            return "bg-gray-500"
+        }
+      }
 }
 

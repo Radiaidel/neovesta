@@ -181,22 +181,45 @@ export class SubscriptionDetailComponent implements OnInit, OnDestroy {
       .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
-  getPaymentStatusColor(status: PaymentStatus): string {
+  formatPrice(price: number): string {
+    if (!price) return ""
+    return new Intl.NumberFormat("fr-MA", { style: "currency", currency: "MAD" }).format(price)
+  }
+
+  getPaymentStatusTextColor(status: PaymentStatus): string {
     switch (status) {
       case PaymentStatus.PENDING:
-        return "bg-yellow-100 text-yellow-800"
+        return "text-pending"
       case PaymentStatus.PAID:
-        return "bg-green-100 text-green-800"
+        return "text-paid"
       case PaymentStatus.FAILED:
-        return "bg-red-100 text-red-800"
+        return "text-failed"
       case PaymentStatus.REFUNDED:
-        return "bg-blue-100 text-blue-800"
+        return "text-refunded"
       case PaymentStatus.CANCELLED:
-        return "bg-gray-100 text-gray-800"
+        return "text-cancelled"
       default:
-        return "bg-gray-100 text-gray-800"
+        return ""
     }
   }
+
+  getPaymentStatusDotColor(status: PaymentStatus): string {
+    switch (status) {
+      case PaymentStatus.PENDING:
+        return "bg-amber-500"
+      case PaymentStatus.PAID:
+        return "bg-green-500"
+      case PaymentStatus.FAILED:
+        return "bg-red-500"
+      case PaymentStatus.REFUNDED:
+        return "bg-blue-500"
+      case PaymentStatus.CANCELLED:
+        return "bg-gray-500"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
 
   canModifySubscription(subscription: Subscription): boolean {
     if (this.isResident) {

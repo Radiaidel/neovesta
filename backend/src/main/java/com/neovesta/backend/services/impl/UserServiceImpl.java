@@ -2,14 +2,12 @@ package com.neovesta.backend.services.impl;
 
 import com.neovesta.backend.dtos.request.CreateUserRequest;
 import com.neovesta.backend.dtos.request.UpdateUserRequest;
-import com.neovesta.backend.dtos.request.UserSearchRequest;
 import com.neovesta.backend.dtos.response.UserResponse;
 import com.neovesta.backend.exceptions.ResourceNotFoundException;
 import com.neovesta.backend.exceptions.UnauthorizedException;
 import com.neovesta.backend.mappers.UserMapper;
 import com.neovesta.backend.models.Admin;
 import com.neovesta.backend.models.Contract;
-import com.neovesta.backend.models.Residence;
 import com.neovesta.backend.models.ResidenceManager;
 import com.neovesta.backend.models.Resident;
 import com.neovesta.backend.models.SubResidenceManager;
@@ -23,8 +21,6 @@ import com.neovesta.backend.services.UserService;
 import com.neovesta.backend.utils.AuthenticationFacade;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -247,7 +243,6 @@ public class UserServiceImpl implements UserService {
         User currentUser = getCurrentUser();
         Specification<User> spec = buildSearchSpecification(searchTerm, role, currentUser);
         Pageable pageable = PageRequest.of(page, size);
-        System.out.println(userRepository.findAll(spec, pageable).map(userMapper::toResponse));
         return userRepository.findAll(spec, pageable).map(userMapper::toResponse);
     }
 

@@ -1,206 +1,324 @@
 <app-header></app-header>
-<div class="container mx-auto px-4 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Subscriptions</h1>
-        <p class="text-gray-600 dark:text-gray-300 mt-1">
-          <ng-container *ngIf="isManager && residenceName">Manage subscriptions for {{ residenceName }}</ng-container>
-          <ng-container *ngIf="isResident">Manage your service subscriptions</ng-container>
-          <ng-container *ngIf="!isManager && !isResident">Manage all subscriptions in the system</ng-container>
-        </p>
-      </div>
-      <a 
-        routerLink="/subscriptions/new" 
-        class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-        </svg>
-        New Subscription
-      </a>
+
+<div class="min-h-screen bg-gradient-to-b from-[#f0f4f8] to-white">
+  <!-- Hero Section -->
+  <div class="relative bg-[#1a2942] text-white overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 left-0 w-full h-full bg-pattern-grid"></div>
     </div>
-  
-    <!-- Filters -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
-      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Filters</h2>
-      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Search -->
-        <div class="col-span-1 md:col-span-2">
-          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <input 
-              type="text" 
-              id="search" 
-              formControlName="search"
-              placeholder="Search by user or service name..." 
-              class="pl-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            />
-          </div>
-        </div>
-  
-        <!-- Subscription Type -->
+    
+    <div class="container mx-auto px-4 py-12 relative z-10">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
-          <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
-          <select 
-            id="type" 
-            formControlName="type"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-          >
-            <option [ngValue]="null">All Types</option>
-            <option [value]="SubscriptionType.MONTHLY">Monthly</option>
-            <option [value]="SubscriptionType.YEARLY">YEARLY</option>
-          </select>
-        </div>
-  
-        <!-- Payment Status -->
-        <div>
-          <label for="paymentStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Status</label>
-          <select 
-            id="paymentStatus" 
-            formControlName="paymentStatus"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-          >
-            <option [ngValue]="null">All Statuses</option>
-            <option [value]="PaymentStatus.PENDING">Pending</option>
-            <option [value]="PaymentStatus.PAID">Paid</option>
-            <option [value]="PaymentStatus.FAILED">Failed</option>
-            <option [value]="PaymentStatus.REFUNDED">Refunded</option>
-            <option [value]="PaymentStatus.CANCELLED">Cancelled</option>
-          </select>
-        </div>
-  
-        <!-- Active Status -->
-        <div>
-          <label for="isActive" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-          <select 
-            id="isActive" 
-            formControlName="isActive"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-          >
-            <option [ngValue]="null">All</option>
-            <option [ngValue]="true">Active</option>
-            <option [ngValue]="false">Inactive</option>
-          </select>
-        </div>
-  
-        <!-- Admin Confirmation -->
-        <div *ngIf="isManager">
-          <label for="isConfirmedByAdmin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admin Confirmation</label>
-          <select 
-            id="isConfirmedByAdmin" 
-            formControlName="isConfirmedByAdmin"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-          >
-            <option [ngValue]="null">All</option>
-            <option [ngValue]="true">Confirmed</option>
-            <option [ngValue]="false">Not Confirmed</option>
-          </select>
-        </div>
-  
-        <!-- Start Date Range -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date Range</label>
-          <div class="grid grid-cols-2 gap-2">
-            <input 
-              type="date" 
-              formControlName="startDateFrom"
-              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            />
-            <input 
-              type="date" 
-              formControlName="startDateTo"
-              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            />
-          </div>
-        </div>
-  
-        <!-- End Date Range -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date Range</label>
-          <div class="grid grid-cols-2 gap-2">
-            <input 
-              type="date" 
-              formControlName="endDateFrom"
-              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            />
-            <input 
-              type="date" 
-              formControlName="endDateTo"
-              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            />
-          </div>
-        </div>
-  
-        <!-- Sort -->
-        <div>
-          <label for="sortBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
-          <div class="flex gap-2">
-            <select 
-              id="sortBy" 
-              formControlName="sortBy"
-              class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            >
-              <option value="startDate">Start Date</option>
-              <option value="endDate">End Date</option>
-              <option value="price">Price</option>
-              <option value="type">Type</option>
-              <option value="paymentStatus">Payment Status</option>
-            </select>
-            <select 
-              id="sortDir" 
-              formControlName="sortDir"
-              class="w-24 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-3 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
-            >
-              <option value="desc">DESC</option>
-              <option value="asc">ASC</option>
-            </select>
-          </div>
-        </div>
-  
-        <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end gap-3">
-          <button 
-            type="button" 
-            (click)="resetFilters()"
-            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            Reset
-          </button>
-          <button 
-            type="submit" 
-            class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            Apply Filters
-          </button>
-        </div>
-      </form>
-    </div>
-  
-    <!-- Loading State -->
-    <div class="flex justify-center my-12" *ngIf="loading$ | async">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-  
-    <!-- Results -->
-    <ng-container *ngIf="!(loading$ | async)">
-      <div *ngIf="(subscriptions$ | async)?.content?.length; else noSubscriptions" class="space-y-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <app-subscription-card
-            *ngFor="let subscription of (subscriptions$ | async)?.content"
-            [subscription]="subscription"
-            [isManager]="isManager"
-            (delete)="confirmDelete(subscription)"
-            (confirm)="confirmSubscription($event)"
-            (refuse)="refuseSubscription($event)"
-            (updatePayment)="updatePaymentStatus($event)"
-          ></app-subscription-card>
+          <h1 class="text-4xl font-bold">
+            Service <span class="text-[#C5A47E]">Subscriptions</span>
+          </h1>
+          <p class="mt-3 text-gray-300 max-w-xl">
+            Manage and monitor all service subscriptions in the Neovesta system
+          </p>
         </div>
         
-        <!-- Pagination -->
+        <!-- Add Subscription Button -->
+        <div>
+          <a 
+            routerLink="/subscriptions/new" 
+            class="group relative overflow-hidden rounded-full bg-[#C5A47E] text-[#1a2942] px-6 py-3 font-medium shadow-lg shadow-[#C5A47E]/20 hover:shadow-[#C5A47E]/40 transition-all duration-300 flex items-center gap-2"
+          >
+            <div class="absolute inset-0 bg-white/30 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out rounded-full"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 relative" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            <span class="relative">New Subscription</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Filters -->
+  <div class="container mx-auto px-4 my-8">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-[#1a2942]">Advanced Filters</h2>
+        <button 
+          type="button" 
+          (click)="toggleFilters()"
+          class="text-sm text-gray-500 hover:text-[#1a2942] flex items-center gap-1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-300" [ngClass]="{'rotate-180': !showFilters}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+          {{ showFilters ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+      
+      <div class="overflow-hidden transition-all duration-500 ease-in-out" [ngClass]="{'max-h-0 opacity-0': !showFilters, 'max-h-[2000px] opacity-100': showFilters}">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div class="col-span-1 md:col-span-2">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input 
+                type="text" 
+                id="search" 
+                formControlName="search"
+                placeholder="Search by user or service..." 
+                class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none"
+              />
+            </div>
+          </div>
+
+          <!-- Subscription Type -->
+          <div>
+            <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <select 
+                id="type" 
+                formControlName="type"
+                class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option [ngValue]="null">All Types</option>
+                <option [value]="SubscriptionType.MONTHLY">Monthly</option>
+                <option [value]="SubscriptionType.YEARLY">Yearly</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Status -->
+          <div>
+            <label for="paymentStatus" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <select 
+                id="paymentStatus" 
+                formControlName="paymentStatus"
+                class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option [ngValue]="null">All Statuses</option>
+                <option [value]="PaymentStatus.PENDING">Pending</option>
+                <option [value]="PaymentStatus.PAID">Paid</option>
+                <option [value]="PaymentStatus.FAILED">Failed</option>
+                <option [value]="PaymentStatus.REFUNDED">Refunded</option>
+                <option [value]="PaymentStatus.CANCELLED">Cancelled</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Status -->
+          <div>
+            <label for="isActive" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <select 
+                id="isActive" 
+                formControlName="isActive"
+                class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+              >
+                <option [ngValue]="null">All</option>
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Inactive</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date Range -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date Range</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input 
+                  type="date" 
+                  formControlName="startDateFrom"
+                  class="pl-8 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none text-sm"
+                />
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input 
+                  type="date" 
+                  formControlName="startDateTo"
+                  class="pl-8 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">End Date Range</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input 
+                  type="date" 
+                  formControlName="endDateFrom"
+                  class="pl-8 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none text-sm"
+                />
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input 
+                  type="date" 
+                  formControlName="endDateTo"
+                  class="pl-8 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Sort -->
+          <div class="col-span-1 md:col-span-2 lg:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sort Options</label>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                  </svg>
+                </div>
+                <select 
+                  formControlName="sortBy"
+                  class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+                >
+                  <option value="startDate">Start Date</option>
+                  <option value="endDate">End Date</option>
+                  <option value="price">Price</option>
+                  <option value="type">Type</option>
+                  <option value="paymentStatus">Payment Status</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                  </svg>
+                </div>
+                <select 
+                  formControlName="sortDir"
+                  class="pl-10 w-full rounded-lg border border-gray-200 bg-white text-gray-800 py-2 focus:ring-2 focus:ring-[#C5A47E] focus:border-[#C5A47E] outline-none appearance-none"
+                >
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-1 md:col-span-2 lg:col-span-2 flex items-end">
+            <div class="flex gap-3 w-full">
+              <button 
+                type="button" 
+                (click)="resetFilters()"
+                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset
+              </button>
+              <button 
+                type="submit" 
+                class="flex-1 px-4 py-2 bg-[#1a2942] text-white rounded-lg hover:bg-[#243a5e] transition-colors flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="container mx-auto px-4 py-12" *ngIf="loading$ | async">
+    <app-loading-spinner></app-loading-spinner>
+
+  </div>
+
+  <!-- Results -->
+  <div class="container mx-auto px-4 pb-16" *ngIf="!(loading$ | async)">
+    <ng-container *ngIf="(subscriptions$ | async)?.content?.length; else noSubscriptions">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <app-subscription-card
+          *ngFor="let subscription of (subscriptions$ | async)?.content; let i = index"
+          [subscription]="subscription"
+          [isManager]="isManager"
+          (delete)="confirmDelete(subscription)"
+          (confirm)="confirmSubscription($event)"
+          (refuse)="refuseSubscription($event)"
+          (updatePayment)="updatePaymentStatus($event)"
+          [ngClass]="{'animate-fadeIn': true}"
+          [style.animation-delay]="i * 100 + 'ms'"
+        ></app-subscription-card>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="flex justify-center">
         <app-pagination
           [currentPage]="(currentPage$ | async) || 0"
           [totalPages]="(totalPages$ | async) || 0"
@@ -209,47 +327,74 @@
           (pageChange)="onPageChange($event)"
         ></app-pagination>
       </div>
-      
-      <ng-template #noSubscriptions>
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-12 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    </ng-container>
+    
+    <ng-template #noSubscriptions>
+      <div class="bg-white rounded-2xl shadow-lg p-16 text-center">
+        <div class="w-24 h-24 mx-auto bg-[#f0f4f8] rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[#9BA8A5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No subscriptions found</h3>
-          <p class="mt-1 text-gray-500 dark:text-gray-400">
-            <ng-container *ngIf="isResident">You don't have any subscriptions yet.</ng-container>
-            <ng-container *ngIf="!isResident">There are no subscriptions matching your filters.</ng-container>
-          </p>
-          <ng-container *ngIf="isResident">
-            <a 
-              routerLink="/subscriptions/new"
-              class="mt-4 inline-block px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-            >
-              Subscribe to a Service
-            </a>
-          </ng-container>
-          <ng-container *ngIf="!isResident">
-            <button 
-              (click)="resetFilters()"
-              class="mt-4 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-            >
-              Reset Filters
-            </button>
-          </ng-container>
         </div>
-      </ng-template>
-    </ng-container>
-  
-    <!-- Confirmation Dialog -->
-    <app-confirm-dialog
-      [isOpen]="showDeleteConfirm"
-      [title]="'Delete Subscription'"
-      [message]="'Are you sure you want to delete this subscription? This action cannot be undone.'"
-      [confirmText]="'Delete'"
-      [cancelText]="'Cancel'"
-      (confirm)="deleteSubscription()"
-      (cancel)="cancelDelete()"
-    ></app-confirm-dialog>
+        <h3 class="mt-6 text-xl font-bold text-[#1a2942]">No Subscriptions Found</h3>
+        <p class="mt-2 text-gray-600 max-w-md mx-auto">We couldn't find any subscriptions matching your criteria. Try adjusting your filters or adding new subscriptions.</p>
+        
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <button 
+            (click)="resetFilters()"
+            class="px-6 py-3 bg-[#f0f4f8] text-[#1a2942] rounded-lg hover:bg-[#e1e8f0] transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Reset Filters
+          </button>
+          
+          <a 
+            *ngIf="isResident"
+            routerLink="/subscriptions/new" 
+            class="px-6 py-3 bg-[#1a2942] text-white rounded-lg hover:bg-[#243a5e] transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Subscription
+          </a>
+        </div>
+      </div>
+    </ng-template>
   </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirm-dialog
+    [isOpen]="showDeleteConfirm"
+    [title]="'Delete Subscription'"
+    [message]="'Are you sure you want to delete this subscription? This action cannot be undone.'"
+    [confirmText]="'Delete'"
+    [cancelText]="'Cancel'"
+    (confirm)="deleteSubscription()"
+    (cancel)="cancelDelete()"
+  ></app-confirm-dialog>
+</div>
+
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
   
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
   
+  .bg-pattern-grid {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+</style>
+

@@ -11,6 +11,28 @@ import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinne
 import { AuthService } from "../../../services/auth.service";
 import { Role } from "../../../models/user.model";
 import { HeaderComponent } from "../../shared/header/header.component";
+import { 
+  faUmbrellaBeach, 
+  faSpa,
+  faTools,
+  faCar,
+  faBroom,
+  faUtensils,
+  faBookOpen,
+  faShieldAlt,
+  faFilm,
+  faDumbbell,
+  faHeartbeat,
+  faChild,
+  faBriefcase,
+  faInfoCircle,
+  faCheck,
+  faTimes,
+  faCalendarAlt,
+  faCalendarCheck,
+  IconDefinition
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: "app-feature-detail",
@@ -20,7 +42,8 @@ import { HeaderComponent } from "../../shared/header/header.component";
     RouterModule,
     ConfirmDialogComponent,
     LoadingSpinnerComponent,
-    HeaderComponent
+    HeaderComponent,
+    FontAwesomeModule
 ],
   templateUrl: "./feature-detail.component.html",
 })
@@ -55,22 +78,49 @@ export class FeatureDetailComponent implements OnInit, OnDestroy {
     [FeatureCategory.OTHER]: "bg-gray-100 text-gray-800",
   };
 
-  categoryIcons: Record<FeatureCategory, string> = {
-    [FeatureCategory.LEISURE]: "umbrella-beach",
-    [FeatureCategory.WELLNESS]: "spa",
-    [FeatureCategory.MAINTENANCE]: "tools",
-    [FeatureCategory.TRANSPORT]: "car",
-    [FeatureCategory.CLEANING]: "broom",
-    [FeatureCategory.CATERING]: "utensils",
-    [FeatureCategory.EDUCATION]: "book",
-    [FeatureCategory.SECURITY]: "shield-alt",
-    [FeatureCategory.ENTERTAINMENT]: "film",
-    [FeatureCategory.SPORT]: "running",
-    [FeatureCategory.HEALTH]: "heartbeat",
-    [FeatureCategory.KIDS]: "child",
-    [FeatureCategory.BUSINESS]: "briefcase",
-    [FeatureCategory.OTHER]: "ellipsis-h",
-  };
+  getCategoryIcon(category: FeatureCategory): IconDefinition {
+    const iconMap: Record<FeatureCategory, IconDefinition> = {
+      [FeatureCategory.LEISURE]: faUmbrellaBeach,
+      [FeatureCategory.WELLNESS]: faSpa,
+      [FeatureCategory.MAINTENANCE]: faTools,
+      [FeatureCategory.TRANSPORT]: faCar,
+      [FeatureCategory.CLEANING]: faBroom,
+      [FeatureCategory.CATERING]: faUtensils,
+      [FeatureCategory.EDUCATION]: faBookOpen,
+      [FeatureCategory.SECURITY]: faShieldAlt,
+      [FeatureCategory.ENTERTAINMENT]: faFilm,
+      [FeatureCategory.SPORT]: faDumbbell,
+      [FeatureCategory.HEALTH]: faHeartbeat,
+      [FeatureCategory.KIDS]: faChild,
+      [FeatureCategory.BUSINESS]: faBriefcase,
+      [FeatureCategory.OTHER]: faInfoCircle
+    };
+  
+    return iconMap[category] || faInfoCircle;
+  }
+  private library = inject(FaIconLibrary);
+  constructor(){
+    this.library.addIcons(
+      faUmbrellaBeach, 
+      faSpa,
+      faTools,
+      faCar,
+      faBroom,
+      faUtensils,
+      faBookOpen,
+      faShieldAlt,
+      faFilm,
+      faDumbbell,
+      faHeartbeat,
+      faChild,
+      faBriefcase,
+      faInfoCircle,
+      faCheck,
+      faTimes,
+      faCalendarAlt,
+      faCalendarCheck
+    );
+  }
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
@@ -118,13 +168,34 @@ export class FeatureDetailComponent implements OnInit, OnDestroy {
     return this.categoryColors[category] || "bg-gray-100 text-gray-800";
   }
 
-  getCategoryIcon(category: FeatureCategory): string {
-    return this.categoryIcons[category] || "question";
-  }
 
   formatDateTime(dateString: string): string {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleString();
+  }
+
+  categoryDefaultImages: Record<FeatureCategory, string> = {
+    [FeatureCategory.LEISURE]: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.WELLNESS]: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.MAINTENANCE]: 'https://plus.unsplash.com/premium_photo-1721830791498-ec809d9d94ec?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Outils de réparation
+    [FeatureCategory.TRANSPORT]: 'https://images.unsplash.com/photo-1502872364588-894d7d6ddfab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Bus
+    [FeatureCategory.CLEANING]: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.CATERING]: 'https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.EDUCATION]: 'https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Salle de classe
+    [FeatureCategory.SECURITY]: 'https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.ENTERTAINMENT]: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.SPORT]: 'https://images.unsplash.com/photo-1547347298-4074fc3086f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Football
+    [FeatureCategory.HEALTH]: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.KIDS]: 'https://images.unsplash.com/photo-1577896852336-9e9c1452f5e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Enfant qui joue
+    [FeatureCategory.BUSINESS]: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    [FeatureCategory.OTHER]: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', // Bureau générique
+  };
+  
+
+  
+  getCategoryImage(category: FeatureCategory): string {
+    // Utiliser la même logique que dans la carte
+    return this.categoryDefaultImages[category];
   }
 }

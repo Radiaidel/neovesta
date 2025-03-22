@@ -1,89 +1,98 @@
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-all hover:shadow-lg h-full flex flex-col">
-    <!-- Image -->
-    <div class="relative h-48 overflow-hidden">
-      <div *ngIf="feature.imageUrl" class="w-full h-full">
-        <img 
-          [src]="feature.imageUrl" 
-          [alt]="feature.name"
-          class="w-full h-full object-cover"
-        />
-      </div>
-      <div *ngIf="!feature.imageUrl" class="w-full h-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-        <i class="fas fa-{{ getCategoryIcon(feature.featureCategory) }} text-white text-4xl"></i>
-      </div>
-      
-      <!-- Status Badge -->
-      <div 
-        class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium"
-        [ngClass]="feature.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-      >
-        {{ feature.active ? 'Active' : 'Inactive' }}
-      </div>
-  
-      <!-- Category Badge -->
-      <div 
-        class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1"
-        [ngClass]="getCategoryColor(feature.featureCategory)"
-      >
-        <i class="fas fa-{{ getCategoryIcon(feature.featureCategory) }} text-xs"></i>
-        {{ formatFeatureCategory(feature.featureCategory) }}
-      </div>
+<div class="group relative bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 h-full flex flex-col">
+  <!-- Image with Overlay -->
+  <div class="relative h-48 overflow-hidden">
+    <div *ngIf="feature.imageUrl" class="w-full h-full">
+      <img 
+        [src]="feature.imageUrl" 
+        [alt]="feature.name"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
     </div>
     
-    <!-- Content -->
-    <div class="p-5 flex-grow flex flex-col">
-      <div class="flex justify-between items-start mb-2">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">{{ feature.name }}</h3>
-      </div>
-      
-      <div class="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 flex-grow">
-        {{ feature.description || 'No description available.' }}
-      </div>
-      
-      <div class="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-3" *ngIf="feature.location">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        {{ feature.location }}
-      </div>
-      
-      <div class="flex gap-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
-        <div class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
-          {{ formatFeatureType(feature.featureType) }}
-        </div>
-        <div class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md" *ngIf="feature.requiresManagerApproval">
-          Approval Required
-        </div>
-      </div>
-      
-      <!-- Actions -->
-      <div class="flex justify-between mt-auto pt-3 border-t border-gray-200 dark:border-gray-700">
+    <!-- Nouveau bloc pour l'image par défaut -->
+    <div *ngIf="!feature.imageUrl" class="w-full h-full">
+      <img 
+        [src]="getCategoryImage(feature.featureCategory)" 
+        alt="Default category image"
+        class="w-full h-full object-cover opacity-90"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#1a2942]/60 to-[#243a5e]/60"></div>
+    </div>
+
+    
+    <!-- Overlay with Quick Actions -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+      <div class="flex justify-between items-center">
         <a 
           [routerLink]="['/features', feature.id]"
-          class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 font-medium text-sm"
+          class="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors text-sm"
         >
           View Details
         </a>
+        
         <div class="flex gap-2" *ngIf="isManager">
           <a 
             [routerLink]="['/features', feature.id, 'edit']"
-            class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
+            class="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </a>
           <button 
             (click)="onDelete()"
-            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+            class="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-red-500/70 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
         </div>
       </div>
     </div>
+    
+    <!-- Status Badge -->
+    <div 
+      class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium"
+      [ngClass]="feature.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+    >
+      {{ feature.active ? 'Active' : 'Inactive' }}
+    </div>
+    
+    <!-- Category Badge -->
+    <div 
+      class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1"
+      [ngClass]="getCategoryColor(feature.featureCategory)"
+    >
+      <i class="fas fa-{{ getCategoryIcon(feature.featureCategory) }} text-xs"></i>
+      {{ formatFeatureCategory(feature.featureCategory) }}
+    </div>
   </div>
   
+  <!-- Content -->
+  <div class="p-5 flex-grow flex flex-col">
+    <h3 class="text-lg font-bold text-[#1a2942] mb-2 line-clamp-1">{{ feature.name }}</h3>
+    
+    <p class="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">
+      {{ feature.description || 'No description available.' }}
+    </p>
+    
+    <div class="flex items-center text-sm text-gray-600 mb-3" *ngIf="feature.location">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      {{ feature.location }}
+    </div>
+    
+    <div class="flex flex-wrap gap-2 text-xs">
+      <div class="px-2 py-1 bg-gray-100 rounded-md text-gray-700">
+        {{ formatFeatureType(feature.featureType) }}
+      </div>
+      <div class="px-2 py-1 bg-gray-100 rounded-md text-gray-700" *ngIf="feature.requiresManagerApproval">
+        Approval Required
+      </div>
+    </div>
+  </div>
+</div>
+
