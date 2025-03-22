@@ -1,15 +1,12 @@
+version: '3.8'
+
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: ../backend.Dockerfile
+    image: aidar673/neovesta-backend:latest
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - DATABASE_URL=jdbc:postgresql://db:5432/neovesta_db
-      - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=aidar
+      - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/neovesta_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=aidar
@@ -17,16 +14,16 @@ services:
       - db
     networks:
       - neovesta-network
+
   frontend:
-    build:
-      context: .
-      dockerfile: ./frontend.Dockerfile    
+    image: aidar673/neovesta-frontend:latest
     ports:
       - "4200:80"
     depends_on:
       - backend
     networks:
       - neovesta-network
+
   db:
     image: postgres:14
     ports:
@@ -39,8 +36,10 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - neovesta-network
+
 networks:
   neovesta-network:
     driver: bridge
+
 volumes:
   postgres-data:
