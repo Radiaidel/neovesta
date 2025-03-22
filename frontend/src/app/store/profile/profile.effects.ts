@@ -40,12 +40,9 @@ export class ProfileEffects {
         this.profileService.updatePassword(id, request).pipe(
           map((user) => {
             this.toastr.show('Mot de passe mis à jour avec succès', 'success');
-            
-            // Déconnecter l'utilisateur
             this.authService.logout();
             this.router.navigate(['/login']);
-            
-            return ProfileActions.updatePasswordSuccess({ user });
+            return ProfileActions.updatePasswordSuccess({ user: user }); // Add explicit user property
           }),
           catchError((error) => {
             if (error instanceof HttpErrorResponse) {
