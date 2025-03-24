@@ -21,12 +21,14 @@ import { subscriptionReducer } from './store/subscription/subscription.reducer';
 import { SubscriptionEffects } from './store/subscription/subscription.effects';
 import { profileReducer } from './store/profile/profile.reducer';
 import { ProfileEffects } from './store/profile/profile.effects';
+import { APP_BASE_HREF } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
 
   
 providers: [
   provideRouter(routes),
+  { provide: APP_BASE_HREF, useValue: '/' },
   provideHttpClient(withInterceptors([authInterceptor])),
   provideStore({
     users: userReducer,

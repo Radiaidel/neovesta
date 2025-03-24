@@ -40,7 +40,6 @@ import { trigger, transition, style, animate, query, stagger } from "@angular/an
     HeaderComponent
 ],
   templateUrl: "./my-reservations.component.html",
-  styleUrl:"./my-reservations.component.scss",
   animations: [
     trigger("cardAnimation", [
       transition("* => *", [

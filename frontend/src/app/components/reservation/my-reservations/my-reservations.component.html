@@ -1,53 +1,50 @@
 <app-header></app-header>
-<div class="my-reservations-container">
-  <!-- Animated background elements -->
-  <div class="animated-bg">
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
-  </div>
+<div class="relative min-h-screen bg-gray-50 overflow-hidden">
+
 
   <div class="container mx-auto px-4 py-8 relative z-10">
-    <!-- Header with animations -->
-    <div class="header-section">
-      <div class="header-content">
-        <h1 class="page-title">My Reservations</h1>
-        <p class="page-subtitle">View and manage your service reservations</p>
+    <div class="flex justify-between items-center mb-8 md:flex-row flex-col md:items-center items-start gap-4">
+      <div class="flex-1">
+        <h1 class="text-4xl font-bold text-[#2D4356] mb-2 relative inline-block group">
+          My Reservations
+          <span class="absolute -bottom-2 left-0 w-12 h-1 bg-gradient-to-r from-[#2D4356] to-[#C8A27D] rounded-full transition-all duration-300 group-hover:w-full"></span>
+        </h1>
+        <p class="text-gray-500">View and manage your service reservations</p>
       </div>
       <a 
         routerLink="/reservations/new" 
-        class="new-reservation-button"
+        class="flex items-center gap-2 bg-[#C8A27D] text-white py-3 px-6 rounded-xl font-medium transition-all duration-300 relative overflow-hidden hover:-translate-y-0.5 hover:shadow-md group"
       >
-        <span class="button-icon">+</span>
+        <span class="text-xl font-bold">+</span>
         <span>New Reservation</span>
+        <span class="absolute inset-0 bg-black/10 w-0 group-hover:w-full transition-all duration-300 -z-10"></span>
       </a>
     </div>
 
-    <!-- Filters with animations -->
-    <div class="filters-card">
-      <div class="filters-header">
-        <h2>Filters</h2>
+    <div class="bg-white rounded-xl shadow-sm mb-8 overflow-hidden">
+      <div class="flex justify-between items-center px-6 py-5 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800">Filters</h2>
         <button 
           type="button" 
-          class="toggle-filters-button"
+          class="bg-transparent border-none text-gray-500 cursor-pointer transition-all duration-300 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 hover:text-gray-800"
           (click)="toggleFilters()"
           [class.expanded]="showFilters"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300" [ngClass]="{'rotate-180': showFilters}" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
           </svg>
         </button>
       </div>
       
-      <div class="filters-body" [class.expanded]="showFilters">
-        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filters-form">
-          <!-- Status -->
-          <div class="filter-group">
-            <label for="status">Status</label>
-            <div class="custom-select">
+      <div class="max-h-0 overflow-hidden transition-all duration-300" [ngClass]="{'max-h-[500px]': showFilters}">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+          <div class="flex flex-col gap-2">
+            <label for="status" class="text-sm font-medium text-gray-800">Status</label>
+            <div class="relative w-full">
               <select 
                 id="status" 
                 formControlName="status"
+                class="appearance-none w-full py-3 px-4 border border-gray-200 rounded-xl bg-white text-gray-800 text-sm cursor-pointer transition-all duration-300 focus:outline-none focus:border-[#2D4356] focus:ring-3 focus:ring-[#2D4356]/10"
               >
                 <option [ngValue]="null">All Statuses</option>
                 <option [value]="ReservationStatus.PENDING">Pending</option>
@@ -56,7 +53,7 @@
                 <option [value]="ReservationStatus.CANCELLED">Cancelled</option>
                 <option [value]="ReservationStatus.COMPLETED">Completed</option>
               </select>
-              <div class="select-arrow">
+              <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
@@ -64,13 +61,13 @@
             </div>
           </div>
 
-          <!-- Date Filter -->
-          <div class="filter-group">
-            <label for="dateFilter">Date</label>
-            <div class="custom-select">
+          <div class="flex flex-col gap-2">
+            <label for="dateFilter" class="text-sm font-medium text-gray-800">Date</label>
+            <div class="relative w-full">
               <select 
                 id="dateFilter" 
                 formControlName="dateFilter"
+                class="appearance-none w-full py-3 px-4 border border-gray-200 rounded-xl bg-white text-gray-800 text-sm cursor-pointer transition-all duration-300 focus:outline-none focus:border-[#2D4356] focus:ring-3 focus:ring-[#2D4356]/10"
               >
                 <option value="upcoming">Upcoming</option>
                 <option value="past">Past</option>
@@ -78,7 +75,7 @@
                 <option value="week">This Week</option>
                 <option value="month">This Month</option>
               </select>
-              <div class="select-arrow">
+              <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
@@ -87,33 +84,35 @@
           </div>
 
           <!-- Sort -->
-          <div class="filter-group sort-group">
-            <label for="sortBy">Sort By</label>
-            <div class="sort-controls">
-              <div class="custom-select">
+          <div class="flex flex-col gap-2">
+            <label for="sortBy" class="text-sm font-medium text-gray-800">Sort By</label>
+            <div class="flex gap-2 md:flex-row flex-col">
+              <div class="relative w-full">
                 <select 
                   id="sortBy" 
                   formControlName="sortBy"
+                  class="appearance-none w-full py-3 px-4 border border-gray-200 rounded-xl bg-white text-gray-800 text-sm cursor-pointer transition-all duration-300 focus:outline-none focus:border-[#2D4356] focus:ring-3 focus:ring-[#2D4356]/10"
                 >
                   <option value="requestedDate">Requested Date</option>
                   <option value="scheduledDate">Scheduled Date</option>
                   <option value="status">Status</option>
                 </select>
-                <div class="select-arrow">
+                <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-gray-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                   </svg>
                 </div>
               </div>
-              <div class="custom-select direction-select">
+              <div class="relative md:w-[100px] w-full flex-shrink-0">
                 <select 
                   id="sortDir" 
                   formControlName="sortDir"
+                  class="appearance-none w-full py-3 px-4 border border-gray-200 rounded-xl bg-white text-gray-800 text-sm cursor-pointer transition-all duration-300 focus:outline-none focus:border-[#2D4356] focus:ring-3 focus:ring-[#2D4356]/10"
                 >
                   <option value="desc">DESC</option>
                   <option value="asc">ASC</option>
                 </select>
-                <div class="select-arrow">
+                <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-gray-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                   </svg>
@@ -122,11 +121,11 @@
             </div>
           </div>
 
-          <div class="filter-actions">
+          <div class="col-span-1 md:col-span-3 flex justify-end gap-4 mt-4 md:flex-row flex-col">
             <button 
               type="button" 
               (click)="resetFilters()"
-              class="reset-button"
+              class="flex items-center gap-2 py-3 px-5 bg-transparent border border-gray-200 rounded-xl text-gray-500 font-medium transition-all duration-300 hover:bg-gray-100 hover:text-gray-800"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
@@ -135,7 +134,7 @@
             </button>
             <button 
               type="submit" 
-              class="apply-button"
+              class="flex items-center gap-2 py-3 px-5 bg-[#2D4356] text-white rounded-xl font-medium transition-all duration-300 hover:bg-[#1e2e3e]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
@@ -148,95 +147,107 @@
     </div>
 
     <!-- Loading State -->
-    <div class="loading-container" *ngIf="loading$ | async">
+    <div class="flex justify-center py-16" *ngIf="loading$ | async">
       <app-loading-spinner></app-loading-spinner>
-
     </div>
 
     <!-- Results -->
     <ng-container *ngIf="!(loading$ | async)">
-      <div *ngIf="(reservations$ | async)?.content?.length; else noReservations" class="reservations-results">
-        <div class="reservations-grid">
+      <div *ngIf="(reservations$ | async)?.content?.length; else noReservations" class="mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div 
             *ngFor="let reservation of (reservations$ | async)?.content"
-            class="reservation-card-wrapper"
+            class="h-full"
             [@cardAnimation]
           >
-            <div class="reservation-card">
-              <div class="card-header" [ngClass]="getStatusClass(reservation.status)">
-                <div class="service-image">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div class=" bg-[#2D4356] relative h-40 overflow-hidden" [ngClass]="{
+                'bg-gradient-to-r from-amber-500 to-amber-400': getStatusClass(reservation.status) === 'status-pending',
+                'bg-gradient-to-r from-emerald-500 to-emerald-400': getStatusClass(reservation.status) === 'status-confirmed',
+                'bg-gradient-to-r from-red-500 to-red-400': getStatusClass(reservation.status) === 'status-rejected',
+                'bg-gradient-to-r from-gray-600 to-gray-500': getStatusClass(reservation.status) === 'status-cancelled',
+                'bg-gradient-to-r from-blue-700 to-blue-600': getStatusClass(reservation.status) === 'status-completed'
+              }">
+                <div class="w-full h-full">
                   <img 
                     *ngIf="reservation.feature?.imageUrl" 
                     [src]="reservation.feature?.imageUrl" 
                     [alt]="reservation.feature?.name"
+                    class="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div *ngIf="!reservation.feature?.imageUrl" class="service-placeholder">
+                  <div *ngIf="!reservation.feature?.imageUrl" class="w-full h-full flex items-center justify-center text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
                 </div>
-                <div class="status-badge" [ngClass]="getStatusClass(reservation.status)">
+                <div class="absolute top-4 right-4 py-2 px-4 rounded-full text-xs font-semibold uppercase tracking-wider bg-white shadow-sm" [ngClass]="{
+                  'text-amber-500': getStatusClass(reservation.status) === 'status-pending',
+                  'text-emerald-500': getStatusClass(reservation.status) === 'status-confirmed',
+                  'text-red-500': getStatusClass(reservation.status) === 'status-rejected',
+                  'text-gray-600': getStatusClass(reservation.status) === 'status-cancelled',
+                  'text-blue-700': getStatusClass(reservation.status) === 'status-completed'
+                }">
                   {{ formatStatus(reservation.status) }}
                 </div>
               </div>
               
-              <div class="card-body">
-                <h3 class="service-name">{{ reservation.feature?.name || 'Unknown Service' }}</h3>
+              <div class="p-6 flex-1">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ reservation.feature?.name || 'Unknown Service' }}</h3>
                 
-                <div class="reservation-details">
-                  <div class="detail-item">
-                    <div class="detail-icon">
+                <div class="flex flex-col gap-3 mb-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[#2D4356] flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <div class="detail-content">
-                      <span class="detail-label">Requested</span>
-                      <span class="detail-value">{{ formatDate(reservation.requestedDate) }}</span>
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500 mb-1">Requested</span>
+                      <span class="text-sm text-gray-800">{{ formatDate(reservation.requestedDate) }}</span>
                     </div>
                   </div>
                   
-                  <div class="detail-item" *ngIf="reservation.scheduledDate">
-                    <div class="detail-icon">
+                  <div class="flex items-start gap-3" *ngIf="reservation.scheduledDate">
+                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[#2D4356] flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <div class="detail-content">
-                      <span class="detail-label">Scheduled</span>
-                      <span class="detail-value">{{ formatDate(reservation.scheduledDate) }}</span>
+                    <div class="flex flex-col">
+                      <span class="text-xs text-gray-500 mb-1">Scheduled</span>
+                      <span class="text-sm text-gray-800">{{ formatDate(reservation.scheduledDate) }}</span>
                     </div>
                   </div>
                 </div>
                 
-                <div class="admin-note" *ngIf="reservation.adminNote">
-                  <div class="note-icon">
+                <div class="flex gap-3 p-4 bg-gray-100 rounded-xl mt-4" *ngIf="reservation.adminNote">
+                  <div class="text-gray-500 flex-shrink-0 mt-0.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                     </svg>
                   </div>
-                  <p>{{ reservation.adminNote }}</p>
+                  <p class="text-sm text-gray-500 leading-relaxed">{{ reservation.adminNote }}</p>
                 </div>
               </div>
               
-              <div class="card-actions">
-                <div class="action-buttons">
+              <div class="px-6 py-5 border-t border-gray-200 flex flex-col gap-4">
+                <div class="flex justify-between items-center">
                   <a 
                     [routerLink]="['/reservations', reservation.id]"
-                    class="view-button"
+                    class="flex items-center gap-2 text-[#2D4356] font-medium text-sm transition-all duration-300 hover:text-[#1e2e3e] group"
                   >
                     <span>View Details</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                   </a>
                   
-                  <div class="secondary-actions">
+                  <div class="flex gap-3">
                     <a 
                       *ngIf="isPending(reservation)"
                       [routerLink]="['/reservations', reservation.id, 'edit']"
-                      class="edit-button"
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 transition-all duration-300 hover:bg-gray-100 hover:text-[#2D4356]"
                       title="Edit Reservation"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,7 +256,7 @@
                     </a>
                     <button 
                       (click)="confirmDelete(reservation)"
-                      class="delete-button"
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 transition-all duration-300 hover:bg-red-50 hover:text-red-500"
                       title="Delete Reservation"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -258,7 +269,7 @@
                 <button 
                   *ngIf="isPending(reservation)"
                   (click)="cancelReservation(reservation.id)"
-                  class="cancel-button"
+                  class="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 text-red-500 rounded-xl font-medium text-sm transition-all duration-300 hover:bg-red-50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -271,7 +282,7 @@
         </div>
         
         <!-- Pagination -->
-        <div class="pagination-container">
+        <div class="flex justify-center mt-8">
           <app-pagination
             [currentPage]="(currentPage$ | async) || 0"
             [totalPages]="(totalPages$ | async) || 0"
@@ -283,20 +294,20 @@
       </div>
       
       <ng-template #noReservations>
-        <div class="empty-state">
-          <div class="empty-icon">
+        <div class="bg-white rounded-xl shadow-sm py-16 px-8 text-center flex flex-col items-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 class="empty-title">No reservations found</h3>
-          <p class="empty-message">You don't have any reservations yet.</p>
+          <h3 class="text-2xl font-semibold text-gray-800 mb-2">No reservations found</h3>
+          <p class="text-gray-500 mb-8">You don't have any reservations yet.</p>
           <a 
             routerLink="/reservations/new"
-            class="empty-action"
+            class="inline-flex items-center gap-2 bg-[#C8A27D] text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:bg-[#b38e6d] hover:-translate-y-0.5 hover:shadow-md group"
           >
             <span>Make a Reservation</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </a>
@@ -316,4 +327,3 @@
     ></app-confirm-dialog>
   </div>
 </div>
-
