@@ -18,6 +18,7 @@ export const routes: Routes = [
     path: "forgot-password",
     loadComponent: () =>
       import("./components/forgot-password/forgot-password.component").then((m) => m.ForgotPasswordComponent),
+    canActivate: [authGuard]
   },
 
   {
@@ -47,6 +48,7 @@ export const routes: Routes = [
     path: "residences",
     loadComponent: () =>
       import("./components/residence/residence-list/residence-list.component").then((m) => m.ResidenceListComponent),
+    canActivate: [authGuard]
   },
   {
     path: "residences/new",
@@ -97,21 +99,25 @@ export const routes: Routes = [
     path: "features",
     loadComponent: () =>
       import("./components/feature/feature-list/feature-list.component").then((m) => m.FeatureListComponent),
+    canActivate: [authGuard]
   },
   {
     path: "features/new",
     loadComponent: () =>
       import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+    canActivate: [authGuard]
   },
   {
     path: "features/:id",
     loadComponent: () =>
       import("./components/feature/feature-detail/feature-detail.component").then((m) => m.FeatureDetailComponent),
+    canActivate: [authGuard]
   },
   {
     path: "features/:id/edit",
     loadComponent: () =>
       import("./components/feature/feature-form/feature-form.component").then((m) => m.FeatureFormComponent),
+    canActivate: [authGuard]
   },
   {
     path: "reservations",
@@ -119,63 +125,72 @@ export const routes: Routes = [
       import("./components/reservation/reservation-list/reservation-list.component").then(
         (m) => m.ReservationListComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "reservations/new",
     loadComponent: () =>
       import("./components/reservation/reservation-form/reservation-form.component").then(
         (m) => m.ReservationFormComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "reservations/:id",
     loadComponent: () =>
       import("./components/reservation/reservation-detail/reservation-detail.component").then(
         (m) => m.ReservationDetailComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "reservations/:id/edit",
     loadComponent: () =>
       import("./components/reservation/reservation-form/reservation-form.component").then(
         (m) => m.ReservationFormComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "my-reservations",
     loadComponent: () =>
       import("./components/reservation/my-reservations/my-reservations.component").then(
         (m) => m.MyReservationsComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "subscriptions",
     loadComponent: () =>
       import("./components/subscription/subscription-list/subscription-list.component").then(
         (m) => m.SubscriptionListComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "subscriptions/new",
     loadComponent: () =>
       import("./components/subscription/subscription-form/subscription-form.component").then(
         (m) => m.SubscriptionFormComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "subscriptions/:id",
     loadComponent: () =>
       import("./components/subscription/subscription-detail/subscription-detail.component").then(
         (m) => m.SubscriptionDetailComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "subscriptions/:id/edit",
     loadComponent: () =>
       import("./components/subscription/subscription-form/subscription-form.component").then(
         (m) => m.SubscriptionFormComponent,
       ),
-  },
+      canActivate: [authGuard]
+    },
   {
     path: "profile",
     loadComponent: () => import("./components/profile/profile.component").then((m) => m.ProfileComponent),

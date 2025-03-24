@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common"
 import { FormBuilder, type FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
 import { ActivatedRoute, CanDeactivate, Router, RouterModule } from "@angular/router"
 import { Store } from "@ngrx/store"
-import { type Observable, Subject, takeUntil } from "rxjs"
+import { Observable, Subject, takeUntil } from "rxjs"
 import { ContractType, PaymentFrequency, PaymentMethod } from "../../../models/contract.model"
 import { Role } from "../../../models/user.model"
 import { AuthService } from "../../../services/auth.service"
@@ -14,11 +14,12 @@ import { selectContractLoading, selectSelectedContract } from "../../../store/co
 import { LoadingSpinnerComponent } from "../../ui/loading-spinner/loading-spinner.component"
 import { HeaderComponent } from "../../shared/header/header.component";
 import { CanComponentDeactivate } from "../../../guards/contract-required.guard"
+import { ConfirmDialogComponent } from "../../ui/confirm-dialog/confirm-dialog.component";
 
 @Component({
     selector: "app-contract-form",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingSpinnerComponent, HeaderComponent],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingSpinnerComponent, HeaderComponent, ConfirmDialogComponent],
     templateUrl: `./contract-form.component.html`
 })
 export class ContractFormComponent implements OnInit, OnDestroy, CanComponentDeactivate {
@@ -117,11 +118,27 @@ export class ContractFormComponent implements OnInit, OnDestroy, CanComponentDea
         }
     }
 
-    canDeactivate(): boolean | Observable<boolean> {
-        if (this.contractForm.dirty && !this.isSubmitting) {
-            return confirm('Voulez-vous vraiment quitter sans sauvegarder les modifications ?');
-        }
-        return true;
+    showDeactivateConfirm = false;
+    private confirmSubject = new Subject<boolean>();
+  
+    canDeactivate(): Observable<boolean> {
+      if (this.contractForm.dirty && !this.isSubmitting) {
+        this.showDeactivateConfirm = true; 
+        return this.confirmSubject.asObservable();
+      }
+      return new Observable<boolean>((observer) => observer.next(true));
+    }
+  
+    confirmDeactivate() {
+      this.showDeactivateConfirm = false;
+      this.confirmSubject.next(true); 
+      this.confirmSubject.complete();
+    }
+  
+    cancelDeactivate() {
+      this.showDeactivateConfirm = false;
+      this.confirmSubject.next(false);
+      this.confirmSubject.complete();
     }
     createForm(): FormGroup {
         return this.fb.group({

@@ -307,3 +307,14 @@
 </div>
 
 </div>
+
+<!-- Add this at the end of your template -->
+<app-confirm-dialog
+  [isOpen]="showDeactivateConfirm"
+  title="Unsaved Changes"
+  message="Voulez-vous vraiment quitter sans sauvegarder les modifications ?"
+  confirmText="Quitter"
+  cancelText="Annuler"
+  (confirm)="confirmDeactivate()"
+  (cancel)="cancelDeactivate()"
+></app-confirm-dialog>
