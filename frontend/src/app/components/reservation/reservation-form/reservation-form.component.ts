@@ -180,7 +180,6 @@ export class ReservationFormComponent implements OnInit, OnDestroy {
         residenceName: residence.name
       }).subscribe((response) => {
         this.availableFeatures = response.content;
-        console.log(response.content)
       });
     });
   }

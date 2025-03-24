@@ -10,7 +10,7 @@ export enum Role {
 
 export interface User {
   id: string
-  profilePictureUrl: string
+  profilePictureUrl?: string
   email: string
   firstName: string
   lastName: string

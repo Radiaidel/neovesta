@@ -88,7 +88,6 @@ export class ContractFormComponent implements OnInit, OnDestroy, CanComponentDea
         this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
             const residentId = params["residentId"]
             if (residentId) {
-                console.log("Received residentId from query params:", residentId)
                 this.contractForm.patchValue({ residentId: residentId })
                 this.contractForm.get("residentId")?.disable()
                 this.residentIdFromRoute = residentId
@@ -240,7 +239,6 @@ export class ContractFormComponent implements OnInit, OnDestroy, CanComponentDea
 
         const formValue = this.contractForm.getRawValue() 
 
-        console.log("Submitting contract form:", formValue)
         if (this.isEditMode && this.contractId) {
             this.store.dispatch(
                 ContractActions.updateContract({

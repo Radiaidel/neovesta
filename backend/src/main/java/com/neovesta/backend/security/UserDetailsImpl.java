@@ -64,6 +64,7 @@ public class UserDetailsImpl implements UserDetails {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
+                .profilePictureUrl(user.getProfilePictureUrl())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
